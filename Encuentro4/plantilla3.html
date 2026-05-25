@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Generador de Imágenes Artísticas (POST BYOP)</title>
+  <style>
+    :root {
+      --primary-color: #6f42c1;
+      --primary-hover: #5a32a3;
+      --success-color: #28a745;
+      --success-hover: #218838;
+      --bg-sidebar: #f8f9fa;
+      --bg-viewport: #111215;
+      --border-color: #dee2e6;
+      --text-color: #1e293b;
+      --text-muted: #64748b;
+      --sidebar-width: 420px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text-color);
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      min-height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      background-color: var(--bg-viewport);
+    }
+
+    /* Diseño de Dos Columnas (Especificación 6 y 8) */
+    .sidebar {
+      width: var(--sidebar-width);
+      min-width: var(--sidebar-width);
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      overflow-y: auto;
+      height: 100%;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .viewport {
+      flex: 1;
+      background-color: var(--bg-viewport);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      height: 100%;
+      position: relative;
+    }
+
+    /* Cabecera del Panel */
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Tarjeta BYOP (Gestión de API Key - Requerimiento 5) */
+    .byop-card {
+      background-color: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+
+    .byop-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-badge {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .status-badge.missing {
+      background-color: #f1f5f9;
+      color: #64748b;
+    }
+
+    .status-badge.active {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+
+    .api-input-wrapper {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Controles generales */
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    select, input[type="text"], input[type="password"] {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      font-size: 0.9rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background-color: #fff;
+      color: #1e293b;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+      appearance: none;
+    }
+
+    select:focus, input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.12);
+    }
+
+    /* Prompt Estructurado (Especificación 9) */
+    textarea {
+      width: 100%;
+      height: 180px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 0.72rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      resize: none;
+      line-height: 1.4;
+      background-color: #fff;
+    }
+
+    /* Botonera */
+    .btn-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    button {
+      height: 44px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.05s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      user-select: none;
+    }
+
+    button:active {
+      transform: scale(0.99);
+    }
+
+    .btn-secondary {
+      background-color: #e2e8f0;
+      color: #334155;
+    }
+    .btn-secondary:hover {
+      background-color: #cbd5e1;
+    }
+
+    .btn-accent {
+      background-color: #0284c7;
+      color: #fff;
+    }
+    .btn-accent:hover {
+      background-color: #0369a1;
+    }
+
+    #generateBtn {
+      background-color: var(--primary-color);
+      color: #fff;
+    }
+    #generateBtn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    #downloadBtn {
+      background-color: var(--success-color);
+      color: #fff;
+    }
+    #downloadBtn:hover {
+      background-color: var(--success-hover);
+    }
+    #downloadBtn:disabled {
+      background-color: #6c757d;
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    /* Lienzo Relación de Aspecto 1:1 (Especificación 6) */
+    .canvas-container {
+      width: 100%;
+      max-width: min(75vh, 75vw);
+      aspect-ratio: 1 / 1;
+      background-color: #18191d;
+      border: 1px solid #2d2d34;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    #resultImage {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .placeholder-text {
+      color: #64748b;
+      text-align: center;
+      padding: 24px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* Notificaciones */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 600;
+      z-index: 99999;
+      transform: translateY(-50px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .notification.success { background-color: #10b981; }
+    .notification.error { background-color: #ef4444; }
+    .notification.show { transform: translateY(0); opacity: 1; }
+
+    /* Overlay de carga */
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(18, 18, 20, 0.9);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      color: #fff;
+      font-size: 1rem;
+      z-index: 10;
+    }
+
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top: 4px solid var(--primary-color);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Adaptación Responsiva (Especificación 8) */
+    @media (max-width: 900px) {
+      body {
+        flex-direction: column;
+        overflow-y: auto;
+        height: auto;
+      }
+
+      .sidebar {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 1.5rem 1rem;
+      }
+
+      .viewport {
+        width: 100%;
+        height: auto;
+        padding: 2.5rem 1rem;
+      }
+
+      .canvas-container {
+        max-width: 100%;
+        max-height: calc(100vw - 2rem);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="toast" class="notification"></div>
+
+  <!-- Panel Izquierdo (Especificación 6) -->
+  <aside class="sidebar">
+    <div>
+      <h1>Generador BYOP</h1>
+      <p class="subtitle">Ecosistema autónomo de procesamiento de imágenes artísticas por POST.</p>
+    </div>
+
+    <!-- Gestión de API Key (BYOP Flow - Requerimiento 5) -->
+    <div class="byop-card">
+      <div class="byop-title">
+        <span>Tu API Key</span>
+        <span id="keyBadge" class="status-badge missing">Sin Clave</span>
+      </div>
+      <div class="api-input-wrapper">
+        <input type="password" id="apiKeyInput" placeholder="Introduce o solicita tu clave..." style="flex: 1;">
+        <button id="saveKeyBtn" class="btn-secondary" style="height: 40px; width: 80px; padding: 0;">Validar</button>
+      </div>
+      <button id="authBtn" class="btn-accent" style="height: 40px;">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 4px;">
+          <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+        </svg>
+        Obtener API Key
+      </button>
+    </div>
+
+    <!-- Estilo Artístico (Especificación 1) -->
+    <div class="control-group">
+      <label for="styleSelect">Estilo Artístico</label>
+      <select id="styleSelect">
+        <option value="fantasía cinematográfica" selected>Fantasía cinematográfica</option>
+        <option value="acuarela artística">Acuarela artística</option>
+        <option value="surrealismo">Surrealismo</option>
+        <option value="arte cyberpunk">Arte cyberpunk</option>
+        <option value="realismo mágico">Realismo mágico</option>
+        <option value="pintura al óleo">Pintura al óleo</option>
+        <option value="anime detallado">Anime detallado</option>
+        <option value="arte de papel recortado">Arte de papel recortado</option>
+      </select>
+    </div>
+
+    <!-- Pintores Famosos (Especificación 2) -->
+    <div class="control-group">
+      <label for="painterInput">Artista / Pintor de Referencia</label>
+      <input type="text" id="painterInput" placeholder="Ej: Van Gogh, Rembrandt..." value="John Philip Falter">
+    </div>
+
+    <!-- Selector de Modelos de Imagen (Especificación 3) -->
+    <div class="control-group">
+      <label for="modelSelect">Modelo de Imagen</label>
+      <select id="modelSelect">
+        <option value="flux" selected>flux</option>
+        <option value="zimage">zimage</option>
+        <option value="klein">klein</option>
+        <option value="grok-imagine">grok-imagine</option>
+        <option value="nanobanana">nanobanana</option>
+        <option value="gptimage">gptimage</option>
+        <option value="gptimage-large">gptimage-large</option>
+        <option value="wan-image">wan-image</option>
+        <option value="qwen-image">qwen-image</option>
+        <option value="gpt-image-2">gpt-image-2</option>
+      </select>
+    </div>
+
+    <!-- Estructura del Prompt Editable (Especificación 9) -->
+    <div class="control-group">
+      <label for="promptTextarea">Estructura del Prompt (Editable)</label>
+      <textarea id="promptTextarea" spellcheck="false"></textarea>
+    </div>
+
+    <!-- Acciones (Especificación 7) -->
+    <div class="btn-container">
+      <button id="generateBtn">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+          <path d="M11.5 7.5a.5.5 0 0 0-.5-.5H9V5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h2a.5.5 0 0 0 .5-.5z"/>
+        </svg>
+        Generar Imagen
+      </button>
+      <button id="downloadBtn" disabled>
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+          <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+        </svg>
+        Descargar Imagen
+      </button>
+    </div>
+  </aside>
+
+  <!-- Lienzo de Presentación (Lado Derecho - Especificación 6) -->
+  <main class="viewport">
+    <div class="canvas-container">
+      <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <span style="font-weight: 500;">Generando obra de arte...</span>
+      </div>
+      <img id="resultImage" alt="Resultado de la generación">
+      <div id="placeholderText" class="placeholder-text">
+        Introduce o solicita tu API Key de Pollinations para habilitar el servicio y visualizar el lienzo.
+      </div>
+    </div>
+  </main>
+
+  <script>
+    "use strict";
+
+    let currentDataUrl = null;
+
+    // Alertas de sistema
+    function showNotification(message, type = "success") {
+      const toast = document.getElementById('toast');
+      toast.className = `notification ${type}`;
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
+    }
+
+    // Actualiza el indicador de clave
+    function updateKeyStatus(hasKey) {
+      const badge = document.getElementById('keyBadge');
+      if (hasKey) {
+        badge.textContent = "Configurada";
+        badge.className = "status-badge active";
+      } else {
+        badge.textContent = "Sin Clave";
+        badge.className = "status-badge missing";
+      }
+    }
+
+    // Retorna la estructura JSON solicitada (Especificación 4)
+    function buildPromptJson(estilo, pintor) {
+      const structure = {
+        "prompt": "A fierce warrior woman in ornate silver armor standing beside a massive silver wolf, ancient forest at dusk, glowing runes on the armor, epic fantasy art style, dramatic lighting, detailed fur, volumetric fog",
+        "negative_prompt": "blurry, cartoon, nsfw, low quality",
+        "style": estilo,
+        "mood": "Epic, powerful",
+        "lighting": "Dramatic rim lighting at dusk",
+        "color_palette": ["deep silver", "midnight blue", "forest green", "amber glow"],
+        "artist_references": [pintor]
+      };
+      return JSON.stringify(structure, null, 2);
+    }
+
+    // Sincroniza los selectores con la caja de texto (Especificación 9)
+    function syncPromptText() {
+      if (document.activeElement === document.getElementById('promptTextarea')) {
+        return;
+      }
+      const estilo = document.getElementById('styleSelect').value;
+      const pintor = document.getElementById('painterInput').value.trim() || 'John Philip Falter';
+      document.getElementById('promptTextarea').value = buildPromptJson(estilo, pintor);
+    }
+
+    // Inicializa el flujo BYOP en el inicio de la app (Requerimiento 5)
+    function initializeAuthFlow() {
+      const hash = window.location.hash;
+      if (hash) {
+        const params = new URLSearchParams(hash.substring(1));
+        const keyFromUrl = params.get('api_key');
+        if (keyFromUrl && (keyFromUrl.startsWith('plln_sk_') || keyFromUrl.startsWith('sk_') || keyFromUrl.startsWith('pk_'))) {
+          localStorage.setItem('pollinations_api_key', keyFromUrl);
+          document.getElementById('apiKeyInput').value = keyFromUrl;
+          updateKeyStatus(true);
+          showNotification("¡API Key enlazada y configurada exitosamente!");
+          history.replaceState(null, null, window.location.pathname);
+        }
+      }
+
+      const storedKey = localStorage.getItem('pollinations_api_key');
+      if (storedKey) {
+        document.getElementById('apiKeyInput').value = storedKey;
+        updateKeyStatus(true);
+      }
+    }
+
+    // Valida y guarda manualmente la clave introducida en el input
+    function validateAndSaveManualKey() {
+      const val = document.getElementById('apiKeyInput').value.trim();
+      if (!val) {
+        localStorage.removeItem('pollinations_api_key');
+        updateKeyStatus(false);
+        showNotification("Se ha removido la clave almacenada.", "error");
+        return;
+      }
+
+      if (val.startsWith('plln_sk_') || val.startsWith('sk_') || val.startsWith('pk_')) {
+        localStorage.setItem('pollinations_api_key', val);
+        updateKeyStatus(true);
+        showNotification("Clave guardada y validada.");
+      } else {
+        showNotification("El formato de la clave parece incorrecto (debería empezar por plln_sk_, sk_ o pk_).", "error");
+      }
+    }
+
+    // Inicia redirección automática hacia el portal de Pollinations (Flujo OAuth BYOP)
+    function redirectForApiKey() {
+      const redirectUri = window.location.origin + window.location.pathname;
+      const authorizeUrl = `https://enter.pollinations.ai/authorize?redirect_uri=${encodeURIComponent(redirectUri)}`;
+      window.location.href = authorizeUrl;
+    }
+
+    // Generador de imágenes usando POST a gen.pollinations.ai (Especificación 3)
+    async function generarImagen() {
+      const apiKey = localStorage.getItem('pollinations_api_key');
+      if (!apiKey) {
+        showNotification("Se requiere una API Key para utilizar el generador.", "error");
+        return;
+      }
+
+      const modelo = document.getElementById('modelSelect').value;
+      const promptValue = document.getElementById('promptTextarea').value.trim();
+
+      const loader = document.getElementById('loadingOverlay');
+      const resultImage = document.getElementById('resultImage');
+      const placeholderText = document.getElementById('placeholderText');
+      const downloadBtn = document.getElementById('downloadBtn');
+
+      loader.style.display = 'flex';
+      downloadBtn.disabled = true;
+
+      try {
+        const url = "https://gen.pollinations.ai/v1/images/generations";
+        const payload = {
+          "prompt": promptValue,
+          "model": modelo,
+          "n": 1,
+          "size": "1024x1024",
+          "quality": "medium",
+          "response_format": "b64_json",
+          "user": "",
+          "image": "",
+          "safe": ""
+        };
+
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`La API devolvió un código de error: ${response.status} - ${errorText}`);
+        }
+
+        const result = await response.json();
+        if (!result.data || result.data.length === 0 || !result.data[0].b64_json) {
+          throw new Error("No se recibieron datos de imagen en el formato Base64 esperado.");
+        }
+
+        const base64Data = result.data[0].b64_json;
+        currentDataUrl = `data:image/png;base64,${base64Data}`;
+
+        const tempImage = new Image();
+        tempImage.onload = () => {
+          loader.style.display = 'none';
+          placeholderText.style.display = 'none';
+          resultImage.src = currentDataUrl;
+          resultImage.style.display = 'block';
+          downloadBtn.disabled = false;
+          showNotification("¡Imagen generada exitosamente!");
+        };
+        tempImage.onerror = () => {
+          loader.style.display = 'none';
+          alert('Hubo un error al interpretar los datos Base64 de la imagen.');
+        };
+        tempImage.src = currentDataUrl;
+
+      } catch (error) {
+        loader.style.display = 'none';
+        console.error(error);
+        showNotification(`No se pudo generar la imagen: ${error.message}`, "error");
+      }
+    }
+
+    // Descarga de la imagen local libre de CORS (Especificación 7)
+    function descargar() {
+      if (!currentDataUrl) return;
+
+      const a = document.createElement('a');
+      a.href = currentDataUrl;
+      a.download = `obra_byop_${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Inicialización y enlace de eventos
+    window.addEventListener("DOMContentLoaded", () => {
+      document.getElementById('styleSelect').addEventListener('change', syncPromptText);
+      document.getElementById('painterInput').addEventListener('input', syncPromptText);
+      document.getElementById('saveKeyBtn').addEventListener('click', validateAndSaveManualKey);
+      document.getElementById('authBtn').addEventListener('click', redirectForApiKey);
+      document.getElementById('generateBtn').addEventListener('click', generarImagen);
+      document.getElementById('downloadBtn').addEventListener('click', descargar);
+
+      initializeAuthFlow();
+      syncPromptText();
+    });
+  </script>
+</body>
+</html>
