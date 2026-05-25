@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Imágenes - Pollinations BYOP</title>
+    <style>
+        :root {
+            --primary-color: #5d5cde;
+            --primary-hover: #4b4abc;
+            --bg-color: #0f111a;
+            --card-bg: #1a1d2e;
+            --text-color: #f1f3f9;
+            --text-muted: #a0aec0;
+            --border-color: #2d3142;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        header {
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            width: 100%;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #a78bfa, #5d5cde);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Contenedor Principal en 2 columnas */
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        /* Columna Izquierda: Controles */
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"], 
+        input[type="password"], 
+        select, 
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: #0f111a;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        textarea {
+            resize: vertical;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .api-key-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: #2d3142;
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #3f445e;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #0d9488;
+        }
+
+        .btn-disabled {
+            background-color: #2d3142;
+            color: var(--text-muted);
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Columna Derecha: Lienzo 1:1 */
+        .canvas-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .canvas-container {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background-color: #151824;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .canvas-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .canvas-placeholder {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .canvas-placeholder svg {
+            width: 64px;
+            height: 64px;
+            fill: currentColor;
+            opacity: 0.4;
+        }
+
+        /* Animación de Carga */
+        .spinner {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .actions-bar {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Notificaciones */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .notification.success {
+            background-color: var(--success-color);
+            color: white;
+            display: block;
+        }
+
+        .notification.error {
+            background-color: var(--error-color);
+            color: white;
+            display: block;
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Reglas Responsivas */
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Generador de Imágenes Artísticas</h1>
+        <p>Utiliza Pollinations AI de forma segura con tu API Key personal mediante el flujo BYOP</p>
+    </header>
+
+    <main class="app-container">
+        
+        <!-- COLUMNA IZQUIERDA: CONTROLES -->
+        <section class="controls-panel">
+            
+            <!-- Configuración API Key (BYOP) -->
+            <div class="card">
+                <div class="card-title">
+                    <span>Configuración de Acceso (BYOP)</span>
+                    <span id="key-status" style="font-size: 0.75rem; color: var(--error-color);">● Clave ausente</span>
+                </div>
+                <div class="form-group">
+                    <label for="api-key">API Key (plln_sk_... o sk_...)</label>
+                    <div class="api-key-container">
+                        <input type="password" id="api-key" placeholder="Pega tu clave o haz clic en Obtener" />
+                        <button type="button" class="btn btn-secondary" id="btn-show-key" title="Mostrar/Ocultar">👁️</button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" style="width: 100%;" id="btn-get-key">
+                    🔑 Obtener API Key de Pollinations
+                </button>
+            </div>
+
+            <!-- Parámetros de Generación -->
+            <div class="card">
+                <div class="card-title">Configuración del Arte</div>
+                
+                <div class="form-group">
+                    <label for="style-select">Estilo Visual</label>
+                    <select id="style-select">
+                        <option value="fantasía cinematográfica">Fantasía cinematográfica</option>
+                        <option value="acuarela artística">Acuarela artística</option>
+                        <option value="surrealismo">Surrealismo</option>
+                        <option value="arte cyberpunk">Arte cyberpunk</option>
+                        <option value="realismo mágico" selected>Realismo mágico</option>
+                        <option value="pintura al óleo">Pintura al óleo</option>
+                        <option value="anime detallado">Anime detallado</option>
+                        <option value="arte de papel recortado">Arte de papel recortado</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="animal-input">Animal protagonista</label>
+                    <input type="text" id="animal-input" value="zorro" placeholder="Ej: zorro, gato, búho..." />
+                </div>
+
+                <div class="form-group">
+                    <label for="model-select">Modelo de Imagen</label>
+                    <select id="model-select">
+                        <option value="flux" selected>Flux</option>
+                        <option value="zimage">Zimage</option>
+                        <option value="klein">Klein</option>
+                        <option value="grok-imagine">Grok-Imagine</option>
+                        <option value="nanobanana">Nanobanana</option>
+                        <option value="gptimage">GPT Image</option>
+                        <option value="gptimage-large">GPT Image (Large)</option>
+                        <option value="wan-image">Wan-Image</option>
+                        <option value="qwen-image">Qwen-Image</option>
+                        <option value="gpt-image-2">GPT Image 2</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Estructura del Prompt Editable -->
+            <div class="card" style="flex-grow: 1; display: flex; flex-direction: column;">
+                <div class="card-title">Estructura del Prompt (Editable)</div>
+                <div class="form-group" style="flex-grow: 1; display: flex; flex-direction: column;">
+                    <textarea id="prompt-textarea" style="flex-grow: 1; min-height: 180px;"></textarea>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- COLUMNA DERECHA: LIENZO Y BOTONES -->
+        <section class="canvas-panel">
+            
+            <div class="canvas-container" id="canvas-container">
+                <!-- Estado por defecto -->
+                <div class="canvas-placeholder" id="placeholder-view">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"/>
+                    </svg>
+                    <span>Lienzo 1:1</span>
+                    <small style="color: var(--text-muted);">La imagen se presentará aquí en formato cuadrado</small>
+                </div>
+
+                <!-- Spinner de carga -->
+                <div class="spinner" id="loading-spinner"></div>
+
+                <!-- Imagen generada -->
+                <img id="generated-image" alt="Resultado de la generación" />
+            </div>
+
+            <div class="actions-bar">
+                <button type="button" class="btn btn-primary" id="btn-generate">
+                    ✨ Generar Imagen
+                </button>
+                <button type="button" class="btn btn-secondary btn-disabled" id="btn-download">
+                    💾 Descargar Imagen
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <div class="notification" id="notification"></div>
+
+    <footer>
+        <p>Desarrollado de forma segura aplicando el flujo de autorización externa (BYOP).</p>
+    </footer>
+
+    <script>
+        // Elementos del DOM
+        const apiKeyInput = document.getElementById('api-key');
+        const btnShowKey = document.getElementById('btn-show-key');
+        const btnGetKey = document.getElementById('btn-get-key');
+        const keyStatus = document.getElementById('key-status');
+        
+        const styleSelect = document.getElementById('style-select');
+        const animalInput = document.getElementById('animal-input');
+        const modelSelect = document.getElementById('model-select');
+        const promptTextarea = document.getElementById('prompt-textarea');
+        
+        const canvasContainer = document.getElementById('canvas-container');
+        const placeholderView = document.getElementById('placeholder-view');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const generatedImage = document.getElementById('generated-image');
+        
+        const btnGenerate = document.getElementById('btn-generate');
+        const btnDownload = document.getElementById('btn-download');
+        const notification = document.getElementById('notification');
+
+        // Inicialización y enlace de eventos
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeApiKey();
+            updatePromptStructure();
+        });
+
+        styleSelect.addEventListener('change', updatePromptStructure);
+        animalInput.addEventListener('input', updatePromptStructure);
+        
+        apiKeyInput.addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            saveApiKey(val);
+        });
+
+        btnShowKey.addEventListener('click', () => {
+            if (apiKeyInput.type === 'password') {
+                apiKeyInput.type = 'text';
+                btnShowKey.textContent = '🔒';
+            } else {
+                apiKeyInput.type = 'password';
+                btnShowKey.textContent = '👁️';
+            }
+        });
+
+        btnGetKey.addEventListener('click', startAuthFlow);
+        btnGenerate.addEventListener('click', generateImage);
+        btnDownload.addEventListener('click', downloadImage);
+
+        // --- Gestión de la API Key (BYOP) ---
+        
+        function initializeApiKey() {
+            // 1. Intentar leer clave previa en localStorage
+            let apiKey = localStorage.getItem('pollinations_api_key');
+
+            // 2. Comprobar si regresamos del flujo de autorización con el token en la URL
+            const hash = window.location.hash;
+            if (hash) {
+                // Buscamos patrones de claves sk_ o plln_sk_
+                const tokenMatch = hash.match(/(plln_sk_[a-zA-Z0-9_-]+)|(sk_[a-zA-Z0-9_-]+)/);
+                if (tokenMatch) {
+                    apiKey = tokenMatch[0];
+                    localStorage.setItem('pollinations_api_key', apiKey);
+                    showNotification("¡API Key capturada con éxito de la URL!", "success");
+                    
+                    // Limpieza de URL para seguridad
+                    history.replaceState("", document.title, window.location.pathname + window.location.search);
+                }
+            }
+
+            if (apiKey) {
+                apiKeyInput.value = apiKey;
+                validateAndSetStatus(apiKey);
+            }
+        }
+
+        function saveApiKey(key) {
+            if (key) {
+                localStorage.setItem('pollinations_api_key', key);
+                validateAndSetStatus(key);
+            } else {
+                localStorage.removeItem('pollinations_api_key');
+                setKeyStatus(false, "Clave ausente");
+            }
+        }
+
+        function validateAndSetStatus(key) {
+            // Se acepta formato estándar que empiece por plln_sk_ o sk_
+            const isValid = key.startsWith('plln_sk_') || key.startsWith('sk_');
+            if (isValid) {
+                setKeyStatus(true, "Clave válida localmente");
+            } else {
+                setKeyStatus(false, "Formato incorrecto");
+            }
+        }
+
+        function setKeyStatus(isValid, message) {
+            if (isValid) {
+                keyStatus.textContent = `● ${message}`;
+                keyStatus.style.color = "var(--success-color)";
+            } else {
+                keyStatus.textContent = `● ${message}`;
+                keyStatus.style.color = "var(--error-color)";
+            }
+        }
+
+        function startAuthFlow() {
+            // Redirección al flujo externo de Pollinations para obtener la clave de forma transparente
+            const redirectUri = window.location.origin + window.location.pathname;
+            const authUrl = `https://enter.pollinations.ai/authorize?redirect_uri=${encodeURIComponent(redirectUri)}`;
+            window.location.href = authUrl;
+        }
+
+        // --- Estructura del Prompt ---
+
+        function updatePromptStructure() {
+            const estilo = styleSelect.value;
+            const animal = animalInput.value.trim() || "[animal]";
+            
+            const promptData = {
+                style: estilo,
+                setting: "un jardín japonés con cerezos",
+                subject: "una mujer joven con kimono azul",
+                animal: animal,
+                interaction: `el ${animal} descansa junto a la mujer bajo los pétalos cayendo`,
+                lighting: "luz suave de primavera",
+                mood: "pacífico y emotivo"
+            };
+
+            // Se presenta en formato JSON legible pero totalmente editable por el usuario
+            promptTextarea.value = JSON.stringify(promptData, null, 2);
+        }
+
+        // --- Generación de Imagen ---
+
+        async function generateImage() {
+            const apiKey = apiKeyInput.value.trim();
+            if (!apiKey) {
+                showNotification("Por favor, introduce o autoriza una API Key primero.", "error");
+                return;
+            }
+
+            const promptText = promptTextarea.value.trim();
+            if (!promptText) {
+                showNotification("El prompt no puede estar vacío.", "error");
+                return;
+            }
+
+            const model = modelSelect.value;
+
+            // Transición a estado de carga
+            btnGenerate.classList.add('btn-disabled');
+            btnGenerate.textContent = "Generando...";
+            btnDownload.classList.add('btn-disabled');
+            placeholderView.style.display = "none";
+            generatedImage.style.display = "none";
+            loadingSpinner.style.display = "block";
+
+            const payload = {
+                prompt: promptText,
+                model: model,
+                n: 1,
+                size: "1024x1024",
+                quality: "medium",
+                response_format: "b64_json",
+                user: "",
+                image: "",
+                safe: ""
+            };
+
+            try {
+                const response = await fetch('https://gen.pollinations.ai/v1/images/generations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorDetail = await response.text();
+                    throw new Error(`Error en el servidor (${response.status}): ${errorDetail || response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                // Extraer base64 de la respuesta
+                if (result.data && result.data[0] && result.data[0].b64_json) {
+                    const base64Data = result.data[0].b64_json;
+                    generatedImage.src = `data:image/png;base64,${base64Data}`;
+                    
+                    // Mostrar imagen una vez cargada
+                    generatedImage.onload = () => {
+                        loadingSpinner.style.display = "none";
+                        generatedImage.style.display = "block";
+                        btnDownload.classList.remove('btn-disabled');
+                        btnGenerate.classList.remove('btn-disabled');
+                        btnGenerate.textContent = "✨ Generar Imagen";
+                        showNotification("¡Imagen generada con éxito!", "success");
+                    };
+                } else {
+                    throw new Error("No se recibió el formato de datos base64 esperado.");
+                }
+
+            } catch (error) {
+                console.error(error);
+                loadingSpinner.style.display = "none";
+                placeholderView.style.display = "flex";
+                btnGenerate.classList.remove('btn-disabled');
+                btnGenerate.textContent = "✨ Generar Imagen";
+                showNotification(error.message || "Fallo al generar la imagen.", "error");
+            }
+        }
+
+        // --- Descarga de Imagen ---
+
+        function downloadImage() {
+            const src = generatedImage.src;
+            if (!src || src.startsWith('data:image/svg+xml') || !src.startsWith('data:image/')) {
+                showNotification("No hay ninguna imagen generada lista para descargar.", "error");
+                return;
+            }
+
+            const downloadLink = document.createElement('a');
+            downloadLink.href = src;
+            downloadLink.download = `pollinations-${modelSelect.value}-${Date.now()}.png`;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+
+        // --- Utilidades del Sistema ---
+
+        function showNotification(text, type) {
+            notification.textContent = text;
+            notification.className = `notification ${type}`;
+            
+            setTimeout(() => {
+                notification.className = "notification";
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
