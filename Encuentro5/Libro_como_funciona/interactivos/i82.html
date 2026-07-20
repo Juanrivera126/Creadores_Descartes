@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador Virológico: Cuestionario Interactivo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Roboto:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #e2e8f0;
+            /* Fondo inspirado en un ambiente de laboratorio estéril y biotecnología */
+            background: linear-gradient(135deg, #020617 0%, #0f172a 60%, #064e3b 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #38bdf8;
+            text-align: center;
+            font-family: 'JetBrains+Mono', monospace;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+            margin-bottom: 5px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            text-align: center;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            font-family: 'JetBrains+Mono', monospace;
+        }
+
+        .quiz-container {
+            background-color: rgba(15, 23, 42, 0.85);
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 650px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        /* Indicador dinámico en forma de Tubo de Ensayo Clínico */
+        .lab-indicator {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: rgba(30, 41, 59, 0.5);
+            padding: 12px 20px;
+            border-radius: 10px;
+            justify-content: center;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .tube-body {
+            width: 140px;
+            height: 20px;
+            border: 2.5px solid #64748b;
+            border-radius: 0px 0px 10px 10px; /* Base redondeada de tubo de ensayo */
+            position: relative;
+            padding: 1px;
+            background: rgba(15, 23, 42, 0.8);
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .tube-body::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 2px;
+            width: 100%;
+            background: #94a3b8; /* Borde superior del tubo de ensayo */
+        }
+
+        .tube-fluid {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border-radius: 0px 0px 6px 6px;
+            transition: width 0.5s ease, background-color 0.5s ease;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+        }
+
+        .indicator-text {
+            font-family: 'JetBrains+Mono', monospace;
+            font-weight: bold;
+            color: #38bdf8;
+            font-size: 13px;
+        }
+
+        h2 {
+            color: #f8fafc;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-weight: bold;
+            border-left: 4px solid #38bdf8;
+            padding-left: 12px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            margin: 10px 0;
+            background-color: #1e293b;
+            color: #cbd5e1;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: rgba(56, 189, 248, 0.1);
+            border-color: #38bdf8;
+            color: #f8fafc;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            background-color: #0f172a;
+            color: #475569;
+            border-color: #1e293b;
+            cursor: not-allowed;
+        }
+
+        .correct {
+            background-color: rgba(16, 185, 129, 0.15) !important;
+            color: #10b981 !important;
+            border-color: #10b981 !important;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2) !important;
+        }
+
+        .incorrect {
+            background-color: rgba(239, 68, 68, 0.15) !important;
+            color: #ef4444 !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important;
+        }
+
+        .dynamic-status {
+            font-family: 'JetBrains+Mono', monospace;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            text-align: center;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .status-success {
+            color: #10b981;
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status-fail {
+            color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .explanation {
+            background-color: rgba(30, 41, 59, 0.4);
+            border-left: 4px solid #38bdf8;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .score {
+            font-family: 'JetBrains+Mono', monospace;
+            font-size: 13px;
+            font-weight: bold;
+            color: #94a3b8;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #next-btn {
+            background-color: #0284c7;
+            color: #ffffff;
+            border: none;
+            text-align: center;
+            font-family: 'JetBrains+Mono', monospace;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        #next-btn:hover {
+            background-color: #0369a1;
+            box-shadow: 0 0 12px rgba(3, 105, 161, 0.5);
+        }
+    </style>
+</head>
+<body style=" overflow-x: hidden;">
+
+    <h1>Análisis Virológico</h1>
+    <div class="subtitle">Módulo de Evaluación de Conocimientos</div>
+   
+    <div id="quiz-container" class="quiz-container">
+        <!-- Indicador dinámico de avance del análisis -->
+        <div class="lab-indicator">
+            <span class="indicator-text">Muestra analizada:</span>
+            <div class="tube-body">
+                <div id="tube-fluid" class="tube-fluid"></div>
+            </div>
+            <span id="progress-text" class="indicator-text">0%</span>
+        </div>
+        
+        <h2 id="question">Cargando reactivos de diagnóstico...</h2>
+        <div id="answers"></div>
+        <div id="explanation-container">
+            <div id="dynamic-status" class="dynamic-status" style="display: none;"></div>
+            <div id="explanation" class="explanation" style="display: none;"></div>
+        </div>
+        <button id="next-btn" class="btn" style="display: none;">Siguiente Análisis</button>
+        <div id="score" class="score"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                "question": "¿Cuál es el principal componente de protección estructural que rodea directamente el material genético de un virus?",
+                "options": [
+                    "La cápside proteica",
+                    "La envoltura lipídica derivada del huésped",
+                    "El citoplasma celular",
+                    "El ribosoma bacteriano"
+                ],
+                "correctAnswer": 0,
+                "explanation": "La cápside es una cubierta compuesta por subunidades proteicas llamadas capsómeros que envuelve y protege el genoma vírico (ADN o ARN).",
+                "reference": "Libro de Virología, Sección: Estructura de un virus"
+            },
+            {
+                "question": "¿Qué estructura externa utilizan los virus para reconocer y adherirse de forma específica a los receptores de la célula huésped?",
+                "options": [
+                    "Espículas o proteínas de superficie",
+                    "El tegumento amorfo",
+                    "La doble hélice interna",
+                    "Los lípidos de la cápside"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Las espículas son glucoproteínas de superficie que actúan como llaves moleculares para unirse a receptores específicos en la membrana de la célula hospedadora.",
+                "reference": "Libro de Virología, Sección: Estructura de un virus"
+            },
+            {
+                "question": "¿De dónde proviene la envoltura lipídica externa presente en algunos virus complejos como el del herpes o el virus de la gripe?",
+                "options": [
+                    "La sintetiza el propio virus de forma independiente",
+                    "La extrae de la pared de las células vegetales secas",
+                    "La deriva de la membrana celular de la célula huésped durante su salida",
+                    "Proviene de los orgánulos mitocondriales del virus"
+                ],
+                "correctAnswer": 2,
+                "explanation": "Los virus con envoltura adquieren su capa lipídica externa a partir de las membranas de la célula hospedadora mediante el proceso de gemación.",
+                "reference": "Libro de Virología, Sección: Estructura de un virus"
+            },
+            {
+                "question": "¿Cuál es una de las razones principales de la elevada tasa de mutación y adaptabilidad de los virus de ARN en comparación con los de ADN?",
+                "options": [
+                    "La falta de un mecanismo de corrección de errores en sus ARN polimerasas",
+                    "Su mayor tamaño genómico tridimensional",
+                    "La asimilación de cloroplastos celulares",
+                    "Que se replican exclusivamente fuera de la célula huésped"
+                ],
+                "correctAnswer": 0,
+                "explanation": "La ausencia de mecanismos de lectura y corrección de pruebas en las enzimas replicativas de ARN permite que acumulen mutaciones con extrema rapidez.",
+                "reference": "Libro de Virología, Sección: Virus de ARN"
+            },
+            {
+                "question": "¿Cuál es la secuencia correcta de fases en el ciclo general de replicación de un virus?",
+                "options": [
+                    "Adhesión, Penetración, Desnudamiento, Replicación/Síntesis, Ensamblaje y Liberación",
+                    "Ensamblaje, Lisis, Transcripción, Mutación y Adhesión",
+                    "Liberación, Fusión, Adhesión, Penetración y Desnudamiento",
+                    "Adhesión, Ensamblaje, Lisis, Replicación y Envoltura"
+                ],
+                "correctAnswer": 0,
+                "explanation": "El ciclo vital se inicia con la adhesión y penetración, seguido de la liberación del genoma, síntesis de componentes, ensamblaje de nuevos viriones y su posterior liberación.",
+                "reference": "Libro de Virología, Sección: Replicación viral"
+            },
+            {
+                "question": "¿En qué consiste el método de liberación viral conocido como 'gemación' (budding)?",
+                "options": [
+                    "En la lisis y destrucción inmediata y total de la célula huésped",
+                    "En la exportación de partículas mediante microtúbulos rígidos",
+                    "En que el virus 'brota' a través de la membrana celular, adquiriendo su envoltura sin destruir la célula de inmediato",
+                    "En la cristalización inactiva del virus dentro del núcleo celular"
+                ],
+                "correctAnswer": 2,
+                "explanation": "A diferencia de la lisis que rompe la célula hospedadora, la gemación permite al virus emerger paulatinamente envolviéndose en un fragmento de la membrana celular del huésped.",
+                "reference": "Libro de Virología, Sección: Replicación viral"
+            },
+            {
+                "question": "Para un virus de ARN de sentido positivo (+ssRNA), ¿cómo se procesa su genoma dentro de la célula huésped?",
+                "options": [
+                    "El ARN genómico actúa directamente como ARN mensajero (ARNm) para ser traducido por los ribosomas celulares",
+                    "Debe convertirse obligatoriamente en ADN por transcripción inversa antes de traducirse",
+                    "Requiere ser encapsulado de inmediato en mitocondrias celulares",
+                    "Solo sirve como soporte estructural y no codifica proteínas"
+                ],
+                "correctAnswer": 0,
+                "explanation": "El genoma de ARN monocatenario de sentido positivo es equivalente al ARNm celular y puede ser leído directamente por la maquinaria de traducción de la célula hospedadora.",
+                "reference": "Libro de Virología, Sección: Virus de ARN"
+            },
+            {
+                "question": "¿Qué enzima especializada define el comportamiento de los retrovirus como el VIH, permitiéndoles integrar su genoma en el ADN del huésped?",
+                "options": [
+                    "Transcriptasa inversa (o reversa)",
+                    "ARN polimerasa dependiente de ARN (RdRp)",
+                    "ADN helicasa del estator",
+                    "Amilasa retroviral tipo I"
+                ],
+                "correctAnswer": 0,
+                "explanation": "La transcriptasa inversa convierte el ARN monocatenario viral en ADN de doble cadena, el cual posteriormente se integra en el genoma celular de la célula diana.",
+                "reference": "Libro de Virología, Sección: Virus de ARN"
+            },
+            {
+                "question": "El virus del Ébola pertenece a la familia Filoviridae. ¿Qué tipo de material genético conforma su genoma?",
+                "options": [
+                    "ARN lineal monocatenario de sentido negativo",
+                    "ADN bicatenario lineal",
+                    "ARN de doble cadena segmentado",
+                    "ADN circular de cadena simple"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Los filovirus, como el Ébola, poseen un genoma de ARN monocatenario de polaridad negativa, lo que significa que requiere transcribirse a sentido positivo para poder replicarse.",
+                "reference": "Libro de Virología, Sección: Virus de ARN"
+            },
+            {
+                "question": "¿Qué moléculas de señalización química liberan las células infectadas para alertar al sistema inmunitario de la invasión viral?",
+                "options": [
+                    "Citoquinas (o citoquinas de alarma)",
+                    "Capsómeros modificados",
+                    "Inmunoglobulinas de tipo B",
+                    "Adyuvantes celulares"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Al detectar la invasión, las células liberan citoquinas, agentes químicos de alarma que atraen a los macrófagos y células dendríticas al foco de la infección.",
+                "reference": "Libro de Virología, Sección: Respuesta inmunitaria"
+            },
+            {
+                "question": "¿Qué proteínas del sistema inmunitario innato impiden directamente que un virus se propague a las células sanas vecinas al interferir con la replicación viral?",
+                "options": [
+                    "Interferones",
+                    "Anticuerpos neutralizantes",
+                    "Proteínas del tegumento",
+                    "Adyuvantes químicos"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Los interferones son glucoproteínas cruciales de la inmunidad innata que inducen un estado de resistencia antiviral en las células vecinas no infectadas.",
+                "reference": "Libro de Virología, Sección: Respuesta inmunitaria"
+            },
+            {
+                "question": "¿Qué células especializadas de la inmunidad adaptativa se encargan de producir los anticuerpos específicos?",
+                "options": [
+                    "Los linfocitos B (diferenciados en células plasmáticas)",
+                    "Los linfocitos T citotóxicos",
+                    "Las células Natural Killer (NK)",
+                    "Los macrófagos alveolares"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Los linfocitos B reconocen antígenos específicos y se transforman en células plasmáticas productoras de anticuerpos (inmunoglobulinas) para neutralizar los patógenos.",
+                "reference": "Libro de Virología, Sección: Respuesta inmunitaria"
+            },
+            {
+                "question": "¿Cuál es la función principal de las células de memoria inmunológica que persisten tras superar una infección o recibir una vacuna?",
+                "options": [
+                    "Brindar una respuesta inmunológica mucho más rápida y potente ante futuras exposiciones al mismo patógeno",
+                    "Facilitar la integración del virus en el ADN mitocondrial",
+                    "Eliminar de forma permanente los glóbulos rojos antiguos",
+                    "Modificar la estructura ósea del huésped"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Las células de memoria T y B permanecen en el organismo y permiten neutralizar el patógeno velozmente en un segundo contacto, previniendo el desarrollo de la enfermedad.",
+                "reference": "Libro de Virología, Sección: Respuesta inmunitaria"
+            },
+            {
+                "question": "En el diseño de vacunas virales, ¿cuál es el papel que desempeña el componente denominado 'adyuvante'?",
+                "options": [
+                    "Potenciar y amplificar la respuesta inmunitaria del organismo frente al antígeno",
+                    "Es la proteína específica del virus que actúa como molde genético",
+                    "Actúa como conservante criogénico para evitar la congelación de la dosis",
+                    "Es el vector viral encargado de inyectar el ADN terapéutico"
+                ],
+                "correctAnswer": 0,
+                "explanation": "El adyuvante es una sustancia que se añade a la vacuna para estimular y optimizar la respuesta inmunitaria del cuerpo frente al antígeno administrado.",
+                "reference": "Libro de Virología, Sección: Vacunas"
+            },
+            {
+                "question": "¿Qué genotipos del Virus del Papiloma Humano (VPH) son responsables de aproximadamente el 70% de los casos mundiales de cáncer de cuello uterino?",
+                "options": [
+                    "HPV 16 y HPV 18",
+                    "HPV 1 y HPV 2",
+                    "HPV 6 y HPV 11",
+                    "HPV 45 y HPV 52"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Los tipos 16 y 18 son virus oncogénicos de alto riesgo responsables de la gran mayoría de las neoplasias asociadas al VPH.",
+                "reference": "Libro de Virología, Sección: Vacunas"
+            },
+            {
+                "question": "En los laboratorios de diagnóstico clínico, ¿qué detecta sustancialmente una prueba de antígenos frente a una serológica de anticuerpos?",
+                "options": [
+                    "La de antígenos detecta proteínas directas del propio virus; la de anticuerpos detecta la respuesta defensiva que generó el paciente",
+                    "La de antígenos analiza el ARN celular; la de anticuerpos analiza el ADN mitocondrial",
+                    "La de antígenos evalúa exclusivamente muestras de orina; la de anticuerpos evalúa tejido pulmonar",
+                    "No existe diferencia operativa; ambas buscan material genético libre"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Las pruebas de antígenos identifican la presencia física del virus (proteínas de cápside o espícula), mientras que las serológicas identifican si el cuerpo ha producido anticuerpos para combatirlo.",
+                "reference": "Libro de Virología, Sección: Diagnóstico viral"
+            },
+            {
+                "question": "¿Qué técnica de diagnóstico de alta sensibilidad realiza la amplificación exponencial de fragmentos de material genético para identificar la presencia de virus?",
+                "options": [
+                    "Reacción en Cadena de la Polimerasa (PCR)",
+                    "Espectrometría de masas automatizada",
+                    "Microscopía óptica de campo oscuro",
+                    "Centrifugación de gradiente de densidad"
+                ],
+                "correctAnswer": 0,
+                "explanation": "La PCR (Polymerase Chain Reaction) es capaz de replicar millones de veces fragmentos específicos de ADN o ARN vírico para hacerlos detectables, incluso en cantidades mínimas.",
+                "reference": "Libro de Virología, Sección: Diagnóstico viral"
+            },
+            {
+                "question": "¿Cuál es la fórmula teórica ideal que modela el crecimiento exponencial de copias de ADN durante el proceso de termociclado en una PCR?",
+                "options": [
+                    "N(t) = N₀ · 2ⁿ",
+                    "N(t) = N₀ + 2n",
+                    "N(t) = N₀ / 2ⁿ",
+                    "N(t) = N₀ · log(n)"
+                ],
+                "correctAnswer": 0,
+                "explanation": "La amplificación de copias de ADN se duplica teóricamente en cada ciclo de la PCR, donde N₀ es la cantidad inicial de copias y 'n' es el número de ciclos completados.",
+                "reference": "Libro de Virología, Sección: Diagnóstico viral"
+            },
+            {
+                "question": "¿Cuál es la única enfermedad infecciosa causada por un virus que ha sido erradicada de forma global gracias a campañas masivas de vacunación?",
+                "options": [
+                    "La viruela",
+                    "La gripe estacional",
+                    "El virus de la inmunodeficiencia humana (VIH)",
+                    "El sarampión"
+                ],
+                "correctAnswer": 0,
+                "explanation": "La Organización Mundial de la Salud certificó la erradicación de la viruela en el año 1980, lo que constituye uno de los mayores hitos históricos de la medicina preventiva.",
+                "reference": "Libro de Virología, Sección: Prevención de las enfermedades virales"
+            },
+            {
+                "question": "¿Por qué virus como el de la gripe común (influenza) requieren el desarrollo y aplicación de una vacuna actualizada anualmente?",
+                "options": [
+                    "Debido a la deriva antigénica y constantes mutaciones genéticas que alteran la estructura de sus proteínas de superficie",
+                    "Porque los anticuerpos humanos se disuelven metabólicamente cada 30 días",
+                    "Porque el virus de la gripe muta transformándose en bacteria de forma periódica",
+                    "Debido a que el frío del invierno desactiva el principio activo de las vacunas anteriores"
+                ],
+                "correctAnswer": 0,
+                "explanation": "La alta tasa de mutación del virus de la influenza provoca variaciones constantes en sus glucoproteínas de superficie (hemaglutinina y neuraminidasa), evadiendo la memoria inmunitaria generada por vacunas previas.",
+                "reference": "Libro de Virología, Sección: Prevención de las enfermedades virales"
+            }
+        ];
+
+        // Mezclar las preguntas al iniciar la carga para dinamismo
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        shuffle(questions);
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answeredCorrectly = false;
+
+        const quizContainer = document.getElementById('quiz-container');
+        let questionElement = document.getElementById('question');
+        let answersElement = document.getElementById('answers');
+        let dynamicStatusElement = document.getElementById('dynamic-status');
+        let explanationElement = document.getElementById('explanation');
+        let nextButton = document.getElementById('next-btn');
+        let scoreElement = document.getElementById('score');
+        let tubeFluidElement = document.getElementById('tube-fluid');
+        let progressTextElement = document.getElementById('progress-text');
+
+        function loadQuestion() {
+            if (currentQuestion >= questions.length) {
+                showFinalScore();
+                return;
+            }
+
+            const question = questions[currentQuestion];
+            questionElement.textContent = `${currentQuestion + 1}. ${question.question}`;
+            answersElement.innerHTML = '';
+            
+            dynamicStatusElement.style.display = 'none';
+            explanationElement.style.display = 'none';
+            nextButton.style.display = 'none';
+            answeredCorrectly = false;
+
+            updateProgress();
+
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('btn');
+                button.addEventListener('click', () => selectAnswer(index));
+                answersElement.appendChild(button);
+            });
+
+            updateScore();
+        }
+
+        function updateProgress() {
+            const percentage = Math.round((currentQuestion / questions.length) * 100);
+            if (tubeFluidElement && progressTextElement) {
+                tubeFluidElement.style.width = `${percentage}%`;
+                progressTextElement.textContent = `${percentage}%`;
+                
+                // Variar color de reactivo (Verde/Cian según progreso clínico)
+                if (percentage < 35) {
+                    tubeFluidElement.style.backgroundColor = '#14b8a6'; // Cian (Reactivo inicial)
+                    tubeFluidElement.style.boxShadow = '0 0 10px #14b8a6';
+                } else if (percentage < 75) {
+                    tubeFluidElement.style.backgroundColor = '#06b6d4'; // Azul celeste (Fase de PCR)
+                    tubeFluidElement.style.boxShadow = '0 0 10px #06b6d4';
+                } else {
+                    tubeFluidElement.style.backgroundColor = '#10b981'; // Verde brillante (Análisis completado)
+                    tubeFluidElement.style.boxShadow = '0 0 10px #10b981';
+                }
+            }
+        }
+
+        function selectAnswer(index) {
+            if (answeredCorrectly) return;
+
+            const question = questions[currentQuestion];
+            const buttons = answersElement.getElementsByTagName('button');
+
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                if (i === question.correctAnswer) {
+                    buttons[i].classList.add('correct');
+                } else if (i === index) {
+                    buttons[i].classList.add('incorrect');
+                }
+            }
+
+            const isCorrect = (index === question.correctAnswer);
+            
+            if (isCorrect) {
+                score++;
+                answeredCorrectly = true;
+                dynamicStatusElement.textContent = "✓ ANTÍGENO DETECTADO: El anticuerpo ha neutralizado eficazmente la diana viral.";
+                dynamicStatusElement.className = "dynamic-status status-success";
+            } else {
+                dynamicStatusElement.textContent = "✗ EVASIÓN INMUNITARIA: El virus ha secuestrado con éxito la maquinaria de traducción celular.";
+                dynamicStatusElement.className = "dynamic-status status-fail";
+            }
+
+            explanationElement.innerHTML = `
+                <p><strong>Fundamento Clínico:</strong> ${question.explanation}</p>
+                <p style="margin-top: 8px; font-size: 0.8rem; color: #94a3b8; font-family: 'JetBrains+Mono', monospace;"><strong>Referencia bibliográfica:</strong> ${question.reference}</p>
+            `;
+            
+            dynamicStatusElement.style.display = 'block';
+            explanationElement.style.display = 'block';
+            nextButton.style.display = 'block';
+            updateScore();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        function showFinalScore() {
+            if (tubeFluidElement && progressTextElement) {
+                tubeFluidElement.style.width = '100%';
+                tubeFluidElement.style.backgroundColor = '#10b981';
+                progressTextElement.textContent = '100%';
+            }
+
+            let rating = "";
+            if (score === 20) {
+                rating = "Inmunidad Total: Dominio absoluto de la virología molecular.";
+            } else if (score >= 15) {
+                rating = "Nivel de Anticuerpos Elevado: Sólido criterio de bioseguridad y virología.";
+            } else if (score >= 10) {
+                rating = "Carga Viral Moderada: Posee conocimientos generales, pero se recomienda repasar los ciclos.";
+            } else {
+                rating = "Infección Activa: Se aconseja una revisión exhaustiva del material de estudio.";
+            }
+
+            quizContainer.innerHTML = `
+                <div class="lab-indicator">
+                    <span class="indicator-text">Análisis:</span>
+                    <div class="tube-body">
+                        <div class="tube-fluid" style="width: 100%; background-color: #10b981;"></div>
+                    </div>
+                    <span class="indicator-text">COMPLETADO</span>
+                </div>
+                <h2 style="text-align: center; font-size: 1.4rem; border-left: none; padding-left: 0;">Informe Clínico Final</h2>
+                <p style="text-align: center; font-size: 0.95rem; margin-bottom: 20px; color: #94a3b8;">
+                    Precisión diagnóstica en base a 20 reactivos virológicos evaluados:
+                </p>
+                <div style="font-size: 3rem; font-family: 'JetBrains+Mono', monospace; font-weight: 700; text-align: center; color: #38bdf8; margin-bottom: 10px; text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);">
+                    ${score} / 20
+                </div>
+                <p style="text-align: center; font-style: italic; color: #cbd5e1; font-size: 0.95rem; margin-bottom: 30px; padding: 10px; background: rgba(30,41,59,0.3); border-radius: 8px;">
+                    "${rating}"
+                </p>
+                <button class="btn" style="text-align: center; font-family: 'JetBrains+Mono', monospace; text-transform: uppercase;" onclick="restartQuiz()">Cargar Nueva Muestra</button>
+            `;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answeredCorrectly = false;
+            shuffle(questions);
+            
+            quizContainer.innerHTML = `
+                <div class="lab-indicator">
+                    <span class="indicator-text">Muestra analizada:</span>
+                    <div class="tube-body">
+                        <div id="tube-fluid" class="tube-fluid"></div>
+                    </div>
+                    <span id="progress-text" class="indicator-text">0%</span>
+                </div>
+                <h2 id="question"></h2>
+                <div id="answers"></div>
+                <div id="explanation-container">
+                    <div id="dynamic-status" class="dynamic-status" style="display: none;"></div>
+                    <div id="explanation" class="explanation" style="display: none;"></div>
+                </div>
+                <button id="next-btn" class="btn" style="display: none;">Siguiente Análisis</button>
+                <div id="score" class="score"></div>
+            `;
+            
+            questionElement = document.getElementById('question');
+            answersElement = document.getElementById('answers');
+            dynamicStatusElement = document.getElementById('dynamic-status');
+            explanationElement = document.getElementById('explanation');
+            nextButton = document.getElementById('next-btn');
+            scoreElement = document.getElementById('score');
+            tubeFluidElement = document.getElementById('tube-fluid');
+            progressTextElement = document.getElementById('progress-text');
+            
+            setupEventListeners();
+            loadQuestion();
+        }
+
+        function updateScore() {
+            if (scoreElement) {
+                scoreElement.textContent = `Aciertos Registrados: ${score} / ${questions.length}`;
+            }
+        }
+
+        function setupEventListeners() {
+            if (nextButton) {
+                nextButton.addEventListener('click', nextQuestion);
+            }
+        }
+
+        setupEventListeners();
+        loadQuestion();
+    </script>
+</body>
+</html>
