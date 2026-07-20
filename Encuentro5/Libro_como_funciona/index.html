@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=yes,minimal-ui">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+	<title>Libro digital interactivo</title>
+
+	<!-- se precarga la imagen utilizada para el cargador del libro, en caso de que se utilice -->
+	<link rel="preload" as="image" href="images/general/icartesilibri_logo.svg">
+
+	<!-- configuración del libro -->
+	<script>
+	window.book_config = {
+		// parámetro que indica si los capítulos, secciones y figura se auto numeran
+		// para que los capítulos se auto numeren deben utilizar la etiqueta <h1>
+		// para que las secciones se auto numeren deben utilizar la etiqueta <h2>
+		auto_numerate_sections_and_figures: true,
+		// parámetro para que los interactivos se muestren a pantalla completa al presionar el botón de la esquina superior derecha
+		open_interactives_fullscreen: true,
+		// parámetro para usar el id de las referencias bibliográficas en lugar de la autonumeración
+		bibitem_ref_id: false,
+	}
+	</script>
+
+  <!-- núcleo del libro interactivo -->
+  <link rel="stylesheet" href="css/style.css" type="text/css">
+  <script type="text/javascript" src="js/book.js" charset="utf-8"></script>
+  
+  <!-- personalización del usuario -->
+  <link rel="stylesheet" href="extra/fonts.css" type="text/css">
+  <link rel="stylesheet" href="extra/style.css" type="text/css">
+  <link rel="stylesheet" href="extra/mis-estilos.css" type="text/css">
+
+  <!-- inclusión de la biblioteca KaTex -->
+  <link rel="stylesheet" type="text/css" href="extra/katex/katex.min.css"/>
+  <script src="extra/katex/katex.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="extra/katex/copy-tex.min.css"/>
+  <script src="extra/katex/copy-tex.min.js"></script>
+  <script src="extra/katex/auto-render.min.js" ></script>
+
+  <!-- Opcional en caso de requerir formulas químicas -->
+  <script src="extra/katex/mhchem.min.js"></script>
+  
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [ {left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}, {left: "\\[", right: "\\]", display: true}, {left: "\\(", right: "\\)", display: false} ]
+    });
+  });
+  </script>
+  
+  <style>
+        .flotad {
+            float: right;
+			margin-top:10px;
+            margin-left: 20px; /* Espacio entre imagen y texto */
+            margin-bottom: 8px;
+            max-width: 50%; /* Tamaño máximo de la imagen */
+        }
+		
+		.flotai {
+            float: left;
+			margin-top:10px;
+			margin-right: 20px; /* Espacio entre imagen y texto */
+            margin-bottom: 8px;
+            max-width: 50%; /* Tamaño máximo de la imagen */
+        }
+        
+    </style>
+</head>
+
+<body>
+	<div id="book_loader_container">
+		<!-- se utiliza un elemento para que funcione como cargador del libro -->
+		<div id="book_loader"></div>
+		<!-- y se indica la imagen a utilizar para personalizar el libro -->
+		<img src="images/general/icartesilibri_logo.svg" width="20%" style="padding-left:1em;">
+	</div>
+	
+	<div id="book_container">
+		<div id="btn_back_page"></div>
+		<div id="btn_next_page"></div>
+		<button id="go_to_table_of_content"></button>
+		
+		<button id="btn_config"></button>
+		<div id="config_options">
+			<div id="dark_light_mode"></div>
+		</div>
+
+		<!-- si este elemento no esta presente, el botón de la tabla de contenido lleva a la primera página con un elemento class="toc_link" -->
+	<div id="table_of_content"></div>
+
+	<div id="pages_container">
+	<!--  -->
+	<div class="page" style="background-color:transparent;"></div>
+
+	<!-- Portada -->
+	<div class="page invertcolor" style="margin:0; padding:0; background-size:contain; background-image:url(images/general/portada.svg);">
+				
+		<div class="invertcolor" style="position: absolute; width: 640px; height: 1025px; left: 0px; top: 0px; background-size:contain; background-image: url('images/portada1.png');"></div>
+					
+		<!-- Nombre del autor del libro -->
+		<div class="box-glass2" style="position: absolute; bottom: 10px; left:240px; font-size:22px; color:#002a69;"><b>Juan Esteban Rivera García</b></div>
+		
+		<!-- Logo de la editorial o institución -->
+		<div class="box-glass" style="position: absolute; bottom: 
+		5px; right:385px; width:640px; text-align:center;"> <a  target="_blank" href="https://proyectodescartes.org"> <img src="images/general/gifanimadoRedProyecto.gif" width="120px"/></a> </div>
+	</div>
+
+	<!--  -->
+	<div class="page" style="display:flex; align-items:center; justify-content:center;">
+		<a style="width:50%" target="_blank" href="https://proyectodescartes.org/iCartesiLibri/"><img src="images/general/icartesilibri_logo.svg" width="100%"></a>
+	</div>
+
+	<!--  -->
+	<!-- init-page-num="true" es un parámetro que indica que a partir de esta página comienza la numeración -->
+	<!-- inicialmente los números de las páginas se numeran con numerales romanos -->
+	<!-- num="" es un parámetro que indica que esta página no lleva numeración visible -->
+	<!--  -->
+	<div class="page" style="text-align:center; font-size:120%;" init-page-num="true" num="">
+		<h1>¿Cómo funciona la virología?</h1>
+		<br><br><br><br>
+		<div style="margin-top: 110px; color: var(--h1-color); font-size:30px"><b>Juan Esteban Rivera García</b>
+		<br><br>
+		</div>
+		<div align="center" style="position: absolute; bottom: 105px; left:0; right:0;"> Fondo Editorial RED Descartes<br><br>
+		<a  target="_blank" href="https://proyectodescartes.org"> <img src="images/general/logo_descartes3.png" width="300px"/></a></div>
+
+		<div align="center" style="position: absolute; bottom: 50px; left:0; right:0;">Córdoba (España)<br/>
+		2026</div>
+	</div>
+
+	<!--  -->
+    <div class="page" num="">
+		<p>¿Cómo funciona la virología?</p>
+		<br>
+		<p>Autor: <br>
+		Juan Esteban Rivera García
+		</p><br>
+      	  
+		<p>
+        Código JavaScript para el libro: <a href="https://github.com/jlongi/libro_interactivo" target="_blank">Joel Espinosa Longi</a>, <a href="https://www.matem.unam.mx/" target="_blank">IMATE</a>, UNAM. <br>
+        Recursos interactivos: <a href="http://descartes.matem.unam.mx/" target="_blank">DescartesJS</a>, <a href="https://proyectodescartes.org/descartescms/herramientas-ia" target="_blank">Herramientas de IA</a>, ChatGPT y Gemini. <br>
+        Fuentes: <a href="https://fonts.google.com/specimen/Lato" target="_blank">Lato</a> y <a href="https://fonts.google.com/specimen/Ubuntu+Mono" target="_blank">UbuntuMono</a><br>
+		Imagen de portada: ilustración generada por GPT Image 2</p><br><br>
+		<p>Red Educativa Digital Descartes<br>
+        Córdoba (España)<br>
+        <a href="mailto:descartes@proyectodescartes.org?Subject=Fondo editorial"> descartes@proyectodescartes.org</a><br>
+        <a href="https://proyectodescartes.org/descartescms/" target="_blank">https://proyectodescartes.org</a><br>
+        <br>
+        Proyecto iCartesiLibri<br>
+        <a href="https://proyectodescartes.org/iCartesiLibri/index.htm" target="_blank">https://proyectodescartes.org/iCartesiLibri/index.htm</a> <br>
+        <br>
+        ISBN: 978-84-10368-58-3<br>
+		</p>
+		<p style="font-size:10px; position: absolute; bottom: 30px; left: 50px; right:0;"><a href="http://creativecommons.org/licenses/by-nc-sa/4.0" target="_blank"><img src="images/general/88x31.png" style="height:36px; width:99px" /></a><br>
+        Esta obra está bajo una licencia Creative Commons 4.0 internacional: Reconocimiento-No Comercial-Compartir Igual.</p>
+    
+	</div>
+
+	<!--  -->
+	<div class="page">
+		<h2>Tabla de contenido</h2>
+		<div class="toc_link" href="#prefacio"></div>
+		<div class="toc_link" href="#c11"></div>
+		<div class="toc_link" href="#c12"></div>
+		<div class="toc_link" href="#c13"></div>
+		<div class="toc_link" href="#c14"></div>
+		<div class="toc_link" href="#c15"></div>
+		<div class="toc_link" href="#c16"></div>
+		<div class="toc_link" href="#c17"></div>
+		<div class="toc_link" href="#c18"></div>
+		<div class="toc_link" href="#c19"></div>
+										
+	</div>
+
+	
+
+	<!--  -->
+	<!-- num-type-arabic="true" es un parámetro que indica que a partir de esta página la numeración utilizara numerales arábigos -->
+	<!--  -->
+	<div class="page" num-type-arabic="true">
+		<h1 id="prefacio">Prefacio</h1>
+		<p>Este libro forma parte de la colección <b>¿Cómo funciona?</b>, una serie de publicaciones concebida para explicar, de manera clara, rigurosa y accesible, los principios fundamentales que gobiernan los fenómenos científicos, tecnológicos y naturales que influyen en nuestra vida cotidiana. Cada volumen de la colección busca responder preguntas esenciales mediante un enfoque didáctico, apoyado en ilustraciones, recursos multimedia e interactividad, con el propósito de facilitar un aprendizaje significativo tanto para estudiantes como para docentes y lectores interesados en comprender el funcionamiento del mundo que los rodea.</p>
+		<p>En esta obra, dedicada a la virología, el lector descubrirá cómo los virus están estructurados, cómo se replican, cómo interactúan con el sistema inmunitario, cómo funcionan las vacunas y cuáles son las principales estrategias para el diagnóstico y la prevención de las enfermedades virales. Más que presentar una colección de conceptos, el libro pretende mostrar la lógica biológica que explica el comportamiento de estos agentes infecciosos y la forma en que la ciencia ha logrado comprenderlos para proteger la salud pública.</p>
+		<p style="text-align-last: justify">Uno de los elementos diferenciadores de esta publicación es la incorporación de objetos interactivos tridimensionales que permiten explorar estructuras moleculares reales de virus, proteínas, anticuerpos y complejos biológicos de interés. Estos recursos han sido desarrollados mediante <i>iCn3D Structure Viewer</i>, una aplicación de código abierto creada por el <i>National Center for Biotechnology Information</i> (NCBI) y disponible en <a target="_blank" href="https://github.com/ncbi/icn3d">https://github.com/ncbi/icn3d</a>. Esta herramienta no solo funciona como un visor molecular 3D basado en la web, sino que también constituye una potente plataforma para el análisis interactivo de estructuras biomoleculares, permitiendo examinar proteínas, ácidos nucleicos, sitios de unión,  interacciones </p>		
+										
+	</div>
+	
+	<div class="page">
+		<p>moleculares, mutaciones y otras características estructurales directamente desde el navegador, sin necesidad de instalar software especializado. La integración de estos modelos tridimensionales transforma la experiencia de lectura en una experiencia de exploración científica. El lector puede rotar, ampliar, ocultar componentes, cambiar representaciones y analizar detalles estructurales que complementan las explicaciones del texto. De esta manera, conceptos que tradicionalmente solo podían apreciarse mediante imágenes estáticas cobran vida y adquieren una nueva dimensión educativa.</p>
+		<p>Asimismo, el libro incorpora infografías, ilustraciones generadas con GPT Image 2, videos educativos y otros recursos digitales cuidadosamente seleccionados para enriquecer el aprendizaje. La combinación de contenidos escritos con herramientas interactivas responde a un modelo educativo moderno, en el que la visualización, la experimentación y la participación activa favorecen una comprensión más profunda de procesos biológicos complejos.</p>
+		<p>Esperamos que esta obra contribuya no solo al aprendizaje de la virología, sino también al desarrollo de la curiosidad científica y del pensamiento crítico. Comprender <b>cómo funcionan</b> los virus significa comprender mejor algunos de los mayores desafíos sanitarios de la humanidad y valorar el papel de la investigación científica en el desarrollo de vacunas, tratamientos y estrategias de prevención que protegen la vida. Bienvenido a este nuevo libro de la colección <b>¿Cómo funciona?</b> Lo invitamos a leer, explorar e interactuar con cada uno de sus recursos, convencidos de que el conocimiento se fortalece cuando la explicación, la visualización y la experimentación se integran en una sola experiencia de aprendizaje.</p>
+					
+				
+		<p>Juan Esteban Rivera García</p>
+		<p>2026</p>	
+	
+	</div>
+
+	<!--  -->
+	<!-- Una página en blanco y sin numeración visible -->
+	<!--  -->
+	<div class="page" num="">
+		<div class="image_expand" style="position: absolute; width: 640px; height: 1025px; left: 0px; top: 0px; background-image: url('images/intro/intro.jpg'); background-size:contain; background-repeat: no-repeat" onclick="openImage(this)"></div>
+	</div>
+
+	<!-- pag 7 -->
+	<div class="page">
+		<h1 id="c11">Introducción</h1>
+		<figure class="flotai">
+        <img loading="lazy" src="images/intro/intro2.jpg" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Virus: la partícula infecciosa mínima.</figcaption></figure>
+		<p>La virología es la rama de la biología que se dedica al estudio de los <strong>virus</strong>, entidades biológicas fascinantes y omnipresentes que desempeñan roles cruciales en la salud humana, animal y vegetal, así como en los ecosistemas globales. Estos <strong>agentes infecciosos microscópicos</strong> son mucho más pequeños que las bacterias y requieren de un huésped vivo para poder replicarse. Su naturaleza única, que a menudo se encuentra en la frontera entre lo vivo y lo no vivo, los convierte en objetos de estudio de inmensa complejidad y continuo descubrimiento.</p><p>En su nivel más fundamental, un virus es una <strong>partícula infecciosa</strong> compuesta por material genético (ya sea <strong>ADN</strong> o <strong>ARN</strong>) encerrado en una cubierta proteica llamada <strong>cápside</strong>. Algunos virus también poseen una envoltura lipídica externa derivada de la membrana celular del huésped. El <strong>principio de funcionamiento</strong> de un virus se basa en su capacidad para secuestrar la maquinaria celular del huésped. Una vez que un virus infecta una célula, inyecta su material genético y fuerza a la célula a producir nuevas copias del virus.</p>
+		
+	</div>
+
+	<!-- pag 8 -->
+	<div class="page">
+		<p>Los <strong>componentes principales</strong> de un virus, más allá de su genoma y cápside, pueden variar. Algunos virus pueden codificar enzimas esenciales para su replicación, mientras que otros dependen completamente de las enzimas del huésped. El <strong>proceso interno</strong> de infección viral es una batalla molecular constante. El virus se une a la superficie de una célula susceptible, introduce su material genético, y luego utiliza los recursos celulares (ribosomas, enzimas, energía) para ensamblar nuevas partículas virales. Finalmente, estas nuevas partículas son liberadas de la célula, a menudo destruyéndola en el proceso, para infectar a otras células.</p><p>Las <strong>aplicaciones prácticas</strong> de la virología son vastas y abarcan desde la medicina hasta la biotecnología. El desarrollo de <strong>vacunas</strong> ha sido uno de los mayores triunfos de la virología, previniendo innumerables enfermedades mortales como la viruela, la polio y el sarampión. Además, los virus se utilizan como herramientas en <strong>terapia génica</strong> y como <strong>vectores</strong> para administrar medicamentos o modificar células. Sin embargo, también presentan <strong>desafíos</strong> significativos, como la <strong>resistencia a los antivirales</strong> y la capacidad de los virus para <strong>mutar rápidamente</strong>, lo que dificulta el desarrollo de tratamientos y vacunas efectivas a largo plazo.</p><p>Un <strong>caso real</strong> que ilustra la importancia de la virología es la pandemia de <strong>COVID-19</strong>, causada por el coronavirus SARS-CoV-2. El estudio intensivo de este virus, desde su estructura y genoma hasta su mecanismo de infección y transmisión, fue fundamental para desarrollar vacunas y tratamientos en un tiempo récord. La virología nos permite comprender la naturaleza de estas amenazas, desarrollar estrategias de defensa y, en última instancia, proteger la salud pública.</p>
+				
+	</div>
+	
+	<!-- pag 9 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/intro/intro3.jpg" style="border-radius:15px;cursor:pointer;width:92%;" onclick="openImage(this)">
+        <figcaption>COVID 19_ El virus que cambió la epidemiología.</figcaption></figure>
+	
+	</div>
+
+	<!-- pag 10 -->
+	<div class="page">
+		<h1 id="c12">¿Cómo funciona la estructura de un virus?</h1>
+		<p>Un virus, en su esencia más básica, es un agente infeccioso microscópico incapaz de reproducirse por sí mismo. Su <strong>concepto fundamental</strong> reside en su estructura simplificada y su dependencia obligatoria de células huésped para llevar a cabo su ciclo vital. Carecen de la maquinaria celular necesaria para la replicación, como ribosomas o mitocondrias, por lo que secuestran los mecanismos de una célula viva para crear copias de sí mismos.</p>
+		
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c11.jpg" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>La arquitectura invisible que impulsa contagios.</figcaption></figure>
+		
+	</div>
+	
+	<!-- pag 11 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c12.jpg" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>Un virus, en su esencia más básica, como agente infeccioso microscópico incapaz de reproducirse por sí mismo.</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 12 -->
+	<div class="page">
+		<p>La estructura de un virus, aunque aparentemente simple, es ingeniosamente diseñada para cumplir su propósito principal: la replicación. En su núcleo, todo virus es esencialmente material genético, ya sea <strong>ADN (ácido desoxirribonucleico)</strong> o <strong>ARN (ácido ribonucleico)</strong>, encapsulado por una capa protectora. Este material genético contiene las instrucciones para crear nuevas copias del virus.</p>
+		<p>El <strong>principio de funcionamiento</strong> de un virus se basa en su total dependencia de las células huésped para su replicación. Un virus es un parásito intracelular obligado. No posee la maquinaria celular necesaria para llevar a cabo procesos metabólicos o para reproducirse por sí mismo. Una vez que el virus infecta una célula, utiliza la maquinaria molecular de esa célula para transcribir y traducir su propio material genético, produciendo así las proteínas virales necesarias y replicando su genoma.</p>
+		<p>Los <strong>componentes principales</strong> de un virus son el genoma y la cápside. El genoma viral puede ser de cadena simple o doble, lineal o circular, y su tamaño varía considerablemente entre los diferentes tipos de virus. La <strong>cápside</strong> es una cubierta proteica que rodea y protege el genoma. Está compuesta por subunidades proteicas llamadas capsómeros, que se ensamblan de manera específica para formar la estructura de la cápside, como la icosaédrica (con forma de poliedro regular de 20 caras) o la helicoidal (con forma de espiral). Algunos virus, especialmente los de animales, poseen una <strong>envoltura lipídica</strong> externa, derivada de la membrana celular del huésped, que rodea a la cápside.</p>
+		<p style="text-align-last: justify">Una vez dentro de la célula huésped, el <strong>proceso interno</strong> más crucial es la replicación de su genoma y la producción de nuevas proteínas virales. El material genético del virus dirige a la maquinaria celular para que fabrique los componentes necesarios para ensamblar nuevas partículas virales. Este proceso, aunque simple en concepto,</p>		
+	
+	</div>
+
+	<!-- pag 13 -->
+	<div class="page">
+		<p> puede ser altamente eficiente, llevando a la producción de miles de nuevos virus a partir de una sola célula infectada. En algunos casos, esto puede culminar en la lisis (ruptura) de la célula huésped para liberar los virus recién formados, un <strong>caso real</strong> que vemos en enfermedades como la gripe.</p>
+		<p>Los <strong>procesos internos</strong> de replicación viral son complejos y varían según el tipo de virus, pero generalmente implican las siguientes etapas: adhesión a la célula huésped, penetración, desnudamiento (liberación del material genético), replicación del genoma y síntesis de proteínas virales, ensamblaje de nuevas partículas virales y liberación de los nuevos viriones de la célula huésped (mediante lisis o gemación). Por ejemplo, el virus de la gripe, un virus de ARN, utiliza enzimas virales y celulares para replicar su ARN y producir sus proteínas, que luego se ensamblan y emergen de la célula.</p>
+		<p>Los <strong>desafíos o limitaciones</strong> principales para los virus son la necesidad de encontrar y acceder a células huésped adecuadas, y la capacidad del sistema inmunitario del huésped para detectarlos y neutralizarlos. Sin embargo, su <strong>aplicación práctica</strong> en la investigación biomédica es inmensa.</p>
+		<p>Los virus modificados genéticamente se utilizan como herramientas para la terapia génica, entregando material genético terapéutico a células específicas. Además, el estudio de los virus ha sido fundamental para comprender la biología celular y el desarrollo de vacunas, una de las <strong>aplicaciones prácticas</strong> más significativas en la salud pública.</p>
+		
+	
+	</div>
+	
+	<!-- pag 14 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c14.jpg);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 15 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c14.jpg);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 16 -->	
+	<div class="page">
+	<h2>Historia pionera de la virología</h2>
+		<p>A pesar de sus otros éxitos, Louis Pasteur (1822–1895) no pudo encontrar un agente causante de la rabia y especuló sobre un patógeno demasiado pequeño para ser detectado con un microscopio. En 1884, el microbiólogo francés Charles Chamberland (1851–1931) inventó un filtro, conocido hoy como el filtro de Chamberland , que tenía poros más pequeños que las bacterias. Por lo tanto, podía pasar una solución que contenía bacterias a través del filtro y eliminarlas por completo de la solución.</p>
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Vídeo</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p16.png" width="1152" height="654" scale="90%" src="videos/index1.html"></div>
+            <figcaption style="margin-top:-0.5em" prefix="Video">Louis Pasteur (<a target="_blank" href="https://www.youtube.com/watch?v=oUjcEEv8R6M">NotimexTV</a>, Licencia Atribución de Creative Commons).</figcaption>
+          </figure>
+        </div>
+		</div>
+		
+	
+	</div>
+	
+	<!-- pag 17 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Historia pionera de la virología</h5>
+		
+          <figure>
+            <div class="interactive" poster="posters/p17.png" width="540" height="600" scale="100%" src="interactivos/i11.html"></div>
+            <figcaption style="margin-top:-0.5em" prefix="Presentación">Algunos hitos relevantes de la historia antigua y la relacionada con el surgimiento de la virología (<a target="_blank" href="https://liveutmb.sharepoint.com/:p:/s/collaboration/webfiles/Eadxvj3CjUdLnOBcSXeSSGEBI5uz5inqCAOcDV6qJLIUdQ?e=cFpm2O">Fundamentos de Virología de Murphy</a>).</figcaption>
+          </figure>
+     
+		</div>
+	
+	</div>	
+	
+	<!-- pag 18 -->
+	<div class="page">
+		<h1 id="c13">¿Cómo funciona la replicación viral?</h1>
+		<p>Los virus son entidades extraordinariamente simples pero increíblemente eficaces en su capacidad para perpetuarse. El <strong>concepto fundamental</strong> de la replicación viral radica en su dependencia absoluta de la maquinaria celular del huésped. Al carecer de ribosomas, enzimas metabólicas y la capacidad de generar energía por sí mismos, los virus deben secuestrar las células para producir nuevas partículas virales. Este proceso, conocido como <strong>ciclo de replicación viral</strong>, es esencialmente una toma de control de la fábrica celular.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c21.jpg" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Así funciona la replicación viral.</figcaption></figure>
+		
+	</div>
+	
+	<!-- pag 19 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c22.jpg" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>Un virus, en su esencia más básica, como agente infeccioso microscópico incapaz de reproducirse por sí mismo.</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 20 -->
+	<div class="page">
+		<p>El proceso comienza con la <strong>adhesión</strong> del virus a la superficie de una célula huésped susceptible. Los virus poseen proteínas en su superficie (el <strong>componente principal</strong> conocido como envoltura o cápside) que se unen específicamente a receptores presentes en la membrana celular. Una vez unido, el virus introduce su material genético (ADN o ARN) en el citoplasma o núcleo de la célula. Este paso, la <strong>penetración</strong>, puede ocurrir por fusión de membranas virales y celulares, o mediante endocitosis inducida por el virus.</p>
+		<p>Una vez dentro, el virus libera su genoma, y aquí es donde el <strong>principio de funcionamiento</strong> se vuelve crucial: el material genético viral dirige a la maquinaria celular del huésped. Utilizando las enzimas, ribosomas y precursores de la célula, el genoma viral se <strong>replica</strong> y se <strong>transcribe</strong> (si es necesario) para producir ARNm viral. Este ARNm viral luego se traduce para sintetizar las proteínas virales, que incluyen las estructurales que formarán la nueva cápside y las enzimas necesarias para la replicación del genoma.</p>
+		<p>Los <strong>procesos internos</strong> de la célula se desvían para satisfacer las demandas virales. Los componentes virales recién sintetizados se ensamblan para formar nuevas partículas virales, un proceso conocido como <strong>ensamblaje</strong>. Finalmente, las nuevas partículas virales son liberadas de la célula huésped. Dependiendo del tipo de virus, esta <strong>liberación</strong> puede ocurrir por lisis celular (rompiendo la célula), lo que mata al huésped, o por gemación, donde el virus "brota" de la membrana celular, a menudo sin matar inmediatamente a la célula.</p>
+		<p style="text-align-last: justify">Este ciclo de replicación es un ejemplo fascinante de cómo un organismo parasitario puede explotar recursos externos. Comprender este ciclo no solo es fundamental para la virología básica, sino que también tiene <strong>aplicaciones prácticas</strong> directas en el desarrollo de antivirales. Al identificar las etapas clave de la replicación, se pueden </p>
+	
+	</div>
+
+	<!-- pag 21 -->
+	<div class="page">
+		<p>diseñar fármacos que interfieran selectivamente con uno o varios de estos pasos, bloqueando así la propagación viral. Por ejemplo, algunos antivirales inhiben la replicación del genoma, mientras que otros bloquean la entrada del virus a la célula o su liberación. El estudio de la replicación viral en organismos como el bacteriófago $\lambda$ (lambda) ha sido instrumental en el desarrollo de técnicas de ingeniería genética y la biología molecular moderna.</p>
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Vídeo</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p21.png" width="1152" height="654" scale="90%" src="videos/index2.html"></div>
+            <figcaption prefix="Video">Representación del ADN, video del <i>National Human Genome Research Institute</i> (<a target="_blank" href="https://www.genome.gov/es/genetics-glossary/%C3%81cido-desoxirribonucleico">NIH</a>)</figcaption>
+          </figure>
+        </div>
+		</div>
+		
+	</div>
+	
+	<!-- pag 22 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c24.jpg);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 23 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c24.jpg);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 24 -->	
+	<div class="page">
+	
+		<p>La replicación es la fase que implica la síntesis de ARN mensajero (ARNm) vírico en todos los virus con rasgos de ARN positivos, la síntesis de proteínas víricas, el ensamblaje de proteínas víricas y la replicación del genoma viral. El proceso de replicación es esencial para mantener la estabilidad de la información genética contenida en el ADN.</p>
+		<p>Esta replicación utiliza enzimas idénticas a las involucradas en la replicación del ADN celular y una característica común es la presencia de estructuras circulares temporales por lo menos en algunas de dicho proceso.</p>
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Vídeo</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p24.png" width="1152" height="654" scale="90%" src="videos/index3.html"></div>
+            <figcaption prefix="Video">Representación de la síntesis o transcripción de ARN mensajero</i> (<a target="_blank" href="https://www.genome.gov/es/genetics-glossary/Transcripcion">NIH</a>)</figcaption>
+          </figure>
+        </div>
+		</div>
+		
+	
+	</div>
+	
+	<!-- pag 25 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Virólogos que han obtenido el Premio Nobel de Fisiología o Medicina.</h5>
+		
+          <figure>
+            <div class="interactive" poster="posters/p25.png" width="540" height="450" scale="100%" src="interactivos/i21.html"></div>
+            <figcaption style="margin-top:-0.5em" prefix="Presentación">Virólogos que han obtenido el Premio Nobel.</figcaption>
+          </figure>
+     
+		</div>
+		<br><p style="width:480px; margin-left: 30px; text-align: center; color: var(--h1-color); font-size: 20p"><b>A pesar de los logros de los científicos en los últimos cien años, los virus continúan planteando nuevas amenazas y desafíos.</b></p>
+	
+	</div>
+
+	<!-- pag 26 -->
+	<div class="page">
+		<h1 id="c14">¿Cómo funcionan los virus de ADN?</h1>
+		<p>Los virus de ADN, también conocidos como virus desoxirribonucleicos, son entidades biológicas fascinantes que utilizan el ácido desoxirribonucleico (ADN) como su material genético. A diferencia de los virus de ARN, su genoma de ADN les confiere una notable estabilidad y les permite interactuar de manera específica con la maquinaria celular del huésped. El concepto fundamental es que replican su ADN y lo utilizan para dirigir la producción de nuevas partículas virales.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c31.jpg" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Virus de ADN, la maquinaria invisible de la epidemia.</figcaption></figure>
+		
+	</div>
+	
+	<!-- pag 27 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c32.jpg" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>La estrategia invisible que mueve brotes,</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 28 -->
+	<div class="page">
+		<p>Los <strong>componentes principales</strong> de un virus de ADN son su genoma de ADN, encapsulado dentro de una cubierta proteica llamada <strong>cápside</strong>. Algunos virus de ADN más complejos también poseen una <strong>envoltura lipídica</strong> externa, derivada de la membrana celular del huésped, que rodea a la cápside. Esta estructura les permite adherirse a las células y facilitar la entrada.</p>
+		<p>El <strong>principio de funcionamiento</strong> de los virus de ADN se basa en la replicación de su material genético en el núcleo o citoplasma de la célula huésped. Una vez que el virus infecta una célula, inyecta su ADN y utiliza las enzimas y ribosomas de la célula para transcribir y traducir sus genes. Esto lleva a la síntesis de proteínas virales y a la replicación del genoma de ADN, un proceso análogo a la replicación del ADN celular pero dirigido por el código genético viral. La replicación del ADN viral sigue pasos similares a los de la replicación celular, implicando la separación de las hebras y la síntesis de nuevas hebras complementarias.</p>
+		<p>Los <strong>procesos internos</strong> son críticos para la propagación viral. Tras la entrada en la célula, el ADN viral puede seguir diversas rutas. Algunos virus se integran en el genoma del huésped (profagos), mientras que otros permanecen como entidades separadas (episomas). Posteriormente, la transcripción del ADN viral a ARN mensajero ($ARNm$) permite la síntesis de las proteínas necesarias para ensamblar nuevas partículas virales. El ensamblaje y la liberación de estos nuevos virus marcan el fin del ciclo de infección, a menudo provocando la lisis o muerte de la célula huésped.</p>
+		<p style="text-align-last: justify">Existen diversas <strong>aplicaciones prácticas</strong> y <strong>casos reales</strong> asociados a los virus de ADN. Por ejemplo, algunos virus de ADN, como los adenovirus, se investigan como <strong>vectores virales</strong> en terapias génicas y vacunas, aprovechando su capacidad para introducir material genético en células. Un ejemplo clásico es la familia de virus <strong>Herpesviridae</strong>, que </p>
+	
+	</div>
+
+	<!-- pagi 29 -->
+	<div class="page">
+		<p>incluye patógenos humanos como el virus del herpes simple (VHS) y el virus de la varicela-zóster. La comprensión de su ciclo de replicación es crucial para el desarrollo de antivirales que interfieran con enzimas específicas, como las ADN polimerasas virales. A pesar de su utilidad potencial, los virus de ADN también presentan <strong>desafíos o limitaciones</strong>. Su tamaño y complejidad a menudo requieren mecanismos de replicación más elaborados que los virus de ARN, y la integración en el genoma del huésped puede tener consecuencias imprevistas, como la mutagénesis o la transformación celular. Además, la alta fidelidad de la replicación del ADN viral, aunque beneficiosa para la estabilidad, puede hacerlos menos propensos a mutaciones rápidas en comparación con algunos virus de ARN, lo que podría influir en su adaptabilidad evolutiva en ciertos contextos.</p>
+		<figure style="margin-top: -10px">
+        <div class="interactive sin_boton" style="border: 0px" poster="posters/p29.png" width="690" height="600" scale="82%" src="interactivos/dist/virus/orthomyxoviridae/index0.html"></div>
+            <figcaption prefix="Interactivo" style="margin-top:-10px">Estructura cristalina del anticuerpo 27F3 que reconoce la HA del virus de la influenza.</figcaption>
+        </figure>
+		
+	</div>
+	
+	<!-- pag 30 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c34.jpg);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 31 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c34.jpg);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 32 -->	
+	<div class="page">
+	
+		<p>Los virus del herpes humano de la familia <i>Herpesviridae</i> se caracterizan por tener un genoma de <b>ADN lineal de doble cadena</b>, una cápside icosaédrica rodeada por un tegumento, una capa amorfa de proteínas que rodea la cápside, y una envoltura formada por poliaminas, lípidos y glicoproteínas. El virus del herpes simple (VHS) se distribuye en todo el mundo y tiene la capacidad de infectar células epiteliales y neuronales estableciendo una infección persistente latente en el sistema nervioso.</p>
+		<p>Para el herpes simple, presentamos el siguiente video:</p>
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Vídeo</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p32.png" width="1152" height="654" scale="90%" src="videos/index4.html"></div>
+            <figcaption prefix="Video">Genoma del herpes simple (video del canal <a target="_blank" href="https://www.youtube.com/watch?v=rrp3-VG__I8">Aupur Televisión</a>, Licencia Atribución de Creative Commons ).</figcaption>
+          </figure>
+        </div>
+		</div>
+		
+	
+	</div>
+	
+	<!-- pag 33 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Virus Epstein-Barr</h5>
+		
+          <figure>
+            <div class="interactive" poster="posters/p33.png" width="670" height="600" scale="100%" src="interactivos/dist/virus/herpesvirus/epstein_barr0.html"></div>
+            <figcaption style="margin-top:-0.5em" prefix="Interactivo">Estructura atómica del portal del virus Epstein-Barr.</figcaption>
+          </figure>
+     
+		</div>
+		<br><p style="width:480px; margin-left: 30px; text-align: center; color: var(--h1-color); font-size: 20p"><b>Proteína portal del virus de Epstein-Barr, resuelto por microscopía crioelectrónica a una resolución de 3,5 Å.</b></p>
+	
+	</div>
+
+	<!-- pag 34 -->
+	<div class="page">
+		<h1 id="c15">¿Cómo funcionan los virus de ARN?</h1>
+		<p>Los virus de ARN representan una fascinante categoría dentro del mundo viral, caracterizados principalmente por su material genético compuesto por ácido ribonucleico (ARN) en lugar de ADN. Este <strong>concepto fundamental</strong> es crucial, ya que dicta la forma en que estos virus se replican y interactúan con sus huéspedes. A diferencia de los virus de ADN, que pueden integrar su genoma directamente en el ADN de la célula hospedadora, los virus de ARN deben emplear mecanismos más complejos para transcribir y replicar su material genético.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c41.jpg" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Virus de ARN, la maquinaria invisible que impulsa brotes globales.</figcaption></figure>
+		
+	</div>
+	
+	<!-- pag 35 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c42.jpg" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>Virus de ARN: cómo convierten su genoma en infección.</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 36 -->
+	<div class="page" num="">
+		<div style="position: absolute; width: 1280px; height: 200px; left: 0px; top: 625px; background-image: url('images/contenido/arn.png'); " onclick="openImage(this)"></div>
+		<p> Los <strong>componentes principales</strong> de un virus de ARN suelen incluir una cadena de ARN, una cápside proteica que protege el ARN, y en algunos casos, una envoltura lipídica derivada de la membrana de la célula hospedadora.</p>
+		<p>El <strong>principio de funcionamiento</strong> de los virus de ARN gira en torno a la necesidad de convertir su genoma de ARN en una forma que la maquinaria celular pueda leer y replicar, o utilizar directamente para la síntesis de nuevas partículas virales. Para aquellos virus de ARN cuyo genoma es de sentido positivo (ssRNA+), el ARN actúa directamente como ARN mensajero (ARNm), pudiendo ser traducido por los ribosomas de la célula hospedadora para producir proteínas virales, incluyendo las enzimas necesarias para la replicación del ARN. Los virus de ARN de sentido negativo (ssRNA-) son más complejos, ya que su ARN no puede ser traducido directamente. Necesitan codificar una enzima ARN polimerasa dependiente de ARN (RdRp), que transcribirá su genoma de ARN a ARN mensajero complementario (ARNm) antes de que la traducción pueda ocurrir.</p>
+		<p style="text-align-last: justify">Los <strong>procesos internos</strong> de replicación varían significativamente. En los retrovirus, como el VIH, el ARN genómico es transcripto inversamente a ADN mediante una enzima viral llamada transcriptasa inversa. Este ADN viral se integra luego en el genoma del huésped, desde donde se transcribe de vuelta a ARN para formar nuevos virus. En otros virus de ARN, como el virus de la influenza, el genoma está</p>	
+	
+	</div>
+
+	<!-- pag 37 -->
+	<div class="page" num="">
+		<div style="position: absolute; width: 1280px; height: 200px; left: -640px; top: 625px; background-image: url('images/contenido/arn.png'); " onclick="openImage(this)"></div>
+		<p> fragmentado y la replicación se lleva a cabo en el núcleo de la célula hospedadora, a diferencia de muchos virus de ADN que se replican en el citoplasma.</p>
+		<p><strong>Casos reales o ejemplos</strong> notables incluyen la gripe (causada por virus de la familia <em>Orthomyxoviridae</em>), el resfriado común (causado por rinovirus y coronavirus), la hepatitis C (virus de la hepatitis C, VHC), el sarampión (virus del sarampión), la poliomielitis (poliovirus), y el VIH (virus de la inmunodeficiencia humana). La rápida tasa de mutación de muchos virus de ARN, debido a la falta de un mecanismo de corrección de errores en sus ARN polimerasas, presenta un <strong>desafío significativo</strong> en el desarrollo de vacunas y tratamientos antivirales efectivos a largo plazo, ya que pueden evolucionar rápidamente para evadir la respuesta inmune o la acción de los fármacos.</p>
+		<p>A pesar de los desafíos, el estudio de los virus de ARN ha conducido a importantes <strong>aplicaciones prácticas</strong> y beneficios. La transcriptasa inversa, una enzima clave en la replicación de retrovirus, se ha convertido en una herramienta molecular invaluable en la investigación biomédica, permitiendo la síntesis de ADN a partir de ARN en técnicas como la Reacción en Cadena de la Polimerasa (PCR) y la clonación génica. La replicación viral también es fundamental para el desarrollo de terapias antivirales dirigidas, como los inhibidores de proteasa y los inhibidores de transcriptasa inversa, que han mejorado drásticamente el manejo de enfermedades como el VIH.</p>
+		
+	</div>
+	
+	<!-- pag 38 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c44.jpg);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 39 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c44.jpg);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 40 -->	
+	<div class="page">
+		<p>La familia Filoviridae es una familia de virus del orden Mononegavirales, cuyo nombre proviene del latín filum (hilo en español), que se refiere a la morfología de los filovirus. Esta familia de virus se caracteriza por poseer como genoma ARN lineal monocatenario de sentido negativo, infecta principalmente a primates. El virus más conocido de este grupo es el Ebolavirus, que provoca la enfermedad ébola, mientras que del resto de géneros no se conoce todavía mucho.</p>
+		<p>El siguiente video de History Latinoamérica, titulado "20 AÑOS DE HISTORIA – 2014, Ébola, el viejo enemigo",  tiene la siguiente descripción: "Este rebrote del letal virus afecta a parte del continente africano. Contagiarse era sinónimo de muerte, con dolores corporales, fiebres, vómitos y diarrea".</p>
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Vídeo</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p40.png" width="1152" height="654" scale="90%" src="videos/index5.html"></div>
+             <figcaption prefix="Video">Ébola, el viejo enemigo (video del canal <a target="_blank" href="https://www.youtube.com/watch?v=Q7e7ZVjEZ8g">History Latinoamérica</a>, Licencia Atribución de Creative Commons ).</figcaption>
+          </figure>
+        </div>
+		</div>
+		
+	
+	</div>
+	
+	<!-- pag 41 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Virus del ébola</h5>
+		
+          <figure>
+            <div class="interactive" poster="posters/p33.png" width="540" height="450" scale="100%" src="interactivos/dist/virus/ebola/index0.html"></div>
+            <figcaption style="margin-top:-0.5em" prefix="Interactivo">Estructura cristalina de la glicoproteína GP de la envoltura del ébola zaire en complejo con el compuesto ARN0074953.</figcaption>
+          </figure>
+     
+		</div>
+		<br><p style="width:480px; margin-left: 30px; text-align: center; color: var(--h1-color); font-size: 20p"><b>Las proteínas no estructurales incluyen la ARN polimerasa (L), el precursor de la glicoproteína (GP) y dos proteínas virales, NP y VP35, que juegan un papel en la replicación y transcripción del virus.</b></p>
+	
+	</div>
+
+	<!-- pag 42 -->
+	<div class="page">
+		<h1 id="c16">¿Cómo funciona la respuesta inmunitaria frente a los virus?</h1>
+		<p>Cuando un virus invade nuestro organismo, desata una compleja y fascinante <strong>respuesta inmunitaria</strong> diseñada para neutralizar la amenaza y proteger nuestras células. Este proceso se puede dividir en varias etapas clave, que trabajan de forma coordinada para erradicar al invasor. Inicialmente, las células infectadas liberan <strong>señales de alarma</strong>, como las citoquinas, que alertan al sistema inmunitario de la presencia de un agente patógeno. Estas señales atraen a células especializadas, como los <strong>macrófagos</strong> y las <strong>células dendríticas</strong>, que son los primeros en responder.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c51.jpg" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>Virus versus defensas.</figcaption></figure>
+		
+	</div>
+	
+	<!-- pag 43 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c52.jpg" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>Memoria inmunológica: la huella que protege a la población.</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 44 -->
+	<div class="page">
+		<p>Estos <strong>centinelas celulares</strong> actúan como <strong>detectores</strong> del patógeno. Los macrófagos son capaces de <strong>fagocitar</strong> (engullir y destruir) partículas virales y células infectadas. Las células dendríticas, por su parte, son cruciales para la <strong>inmunidad adaptativa</strong>, ya que procesan fragmentos del virus (antígenos) y los presentan a otras células inmunitarias, como los <strong>linfocitos T</strong>, desencadenando una respuesta más específica y potente. Este reconocimiento temprano y la presentación de antígenos son el <strong>concepto fundamental</strong> para iniciar la lucha contra el virus.</p><p>La <strong>inmunidad innata</strong> es la primera línea de defensa. Se activa rápidamente y no es específica; es decir, responde de manera similar a diferentes tipos de virus. Los <strong>interferones</strong> son un componente vital en esta etapa. Estas proteínas, liberadas por las células infectadas, interfieren con la replicación viral e impiden que el virus se propague a células sanas. Además, las <strong>células Natural Killer (NK)</strong>, otro componente de la inmunidad innata, son capaces de reconocer y eliminar células infectadas sin necesidad de una previa sensibilización.</p>
+		<p>Posteriormente, entra en juego la <strong>inmunidad adaptativa</strong>, que es más lenta pero altamente específica y genera memoria. Los <strong>linfocitos B</strong> se diferencian en <strong>células plasmáticas</strong> que producen <strong>anticuerpos</strong>. Estos anticuerpos son proteínas con una forma muy precisa que se unen a los antígenos virales, marcándolos para su destrucción por otras células o neutralizando directamente al virus al impedir que infecte nuevas células. Al mismo tiempo, los <strong>linfocitos T citotóxicos</strong> (una subpoblación de linfocitos T) reconocen y destruyen las células que han sido infectadas por el virus, eliminando así los "fábricas" del patógeno.</p>
+		<p style="text-align-last: justify">Un <strong>principio de funcionamiento</strong> clave de la inmunidad adaptativa es la <strong>memoria inmunológica</strong>. Tras una infección, algunas células T y B se</p>
+	
+	</div>
+
+	<!-- pag 45 -->
+	<div class="page">
+		<figure class="flotad" style="text-align: center">
+        <img loading="lazy" src="images/contenido/c53.jpg" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Cómo los virus evaden al sistema inmunitario.</figcaption></figure>
+		<p> convierten en <strong>células de memoria</strong>. Estas células permanecen en el organismo y, si el mismo virus intenta reingresar, responden de manera mucho más rápida y eficaz, a menudo impidiendo que desarrollemos síntomas o que la enfermedad sea muy leve. Este es el <strong>beneficio principal</strong> de la vacunación, que imita este proceso al exponer al cuerpo a formas inofensivas de patógenos para generar esta memoria protectora.</p>
+		<br><p>A pesar de su eficacia, la respuesta inmunitaria frente a los virus enfrenta <strong>desafíos</strong>. Algunos virus han desarrollado estrategias para evadir la detección o el ataque del sistema inmunitario, como la <strong>mutación constante</strong> de sus antígenos (ej: el virus de la gripe), lo que dificulta el reconocimiento por parte de los anticuerpos y las células T previamente generadas. Otros virus pueden <strong>inhibir la producción de interferones</strong> o <strong>integrar su material genético en el ADN de la célula huésped</strong> (ej: el VIH), volviéndose muy difíciles de erradicar por completo. La complejidad de estas interacciones subraya la necesidad de continuar investigando para comprender mejor y potenciar nuestras defensas naturales.</p>
+		
+	</div>
+	
+	<!-- pag 46 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c54.jpg);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 47 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c54.jpg);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 48 -->	
+	<div class="page">
+		<p>Con respecto al VIH, este solo se puede transmitir a través del contacto entre fluidos corporales que poseen una alta concentración viral. El virus no se transmite de manera casual. De acuerdo con los CDC (Centro para el control y la prevención de enfermedades) de Estados Unidos, no se han encontrado casos en que abrazos, besos secos o saludos con las manos hayan sido causantes de infección.</p>
+		<p>El siguiente video muestra una animación 3D para comprender la función de las proteínas de fusión viral tipo I, involucradas en la infección celular, y tomando el virus de la inmunodeficiencia humana tipo I (VIH-1) como ejemplo de un lentivirus/retrovirus importante:</p>
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Vídeo</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p48.png" width="1152" height="654" scale="90%" src="videos/index6.html"></div>
+             <figcaption prefix="Video">Proceso de entrada viral del virus del VIH (video del canal <a target="_blank" href="https://www.youtube.com/watch?v=i__QSjC-pt0">SciArt3D FabLabULL</a>, Licencia Atribución de Creative Commons ).</figcaption>
+          </figure>
+        </div>
+		</div>
+		
+	
+	</div>
+	
+	<!-- pag 41 -->	
+	<div class="page">
+		<p>La siguiente estructura atómica fue obtenida del Virus de la inmunodeficiencia humana tipo 1 (ZAIRE 6 AISLADO).</p>
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Virus del VIH</h5>
+		
+          <figure>
+            <div class="interactive" poster="posters/p49.png" width="540" height="470" scale="100%" src="interactivos/dist/virus/retrovirus/index.html"></div>
+            <figcaption prefix="Interactivo">Nuevo complejo inhibidor de la entrada del VIH MTSFT/T23.</figcaption>
+          </figure>
+     
+		</div>
+		<p style="width:480px; margin-left: 30px; text-align: center; color: var(--h1-color); font-size: 20p"><b>Uno de los virus más conocidos de la familia <i>Retroviridae</i> es el virus de la inmunodeficiencia humana (VIH), que es un lentivirus, que causa la infección por VIH. </b></p>
+	
+	</div>
+
+	<!-- pag 50 -->
+	<div class="page">
+		<h1 id="c17">¿Cómo funcionan las vacunas contra los virus?</h1>
+		<p>Las vacunas representan una de las herramientas más poderosas y exitosas de la medicina moderna en la lucha contra las enfermedades virales. Su <strong>concepto fundamental</strong> radica en <strong>entrenar al sistema inmunológico</strong> del cuerpo para que reconozca y combata un patógeno específico, en este caso, un virus, antes de que cause una enfermedad grave. En esencia, una vacuna introduce una versión debilitada, inactiva o una parte específica del virus en el organismo, lo que genera una respuesta inmune sin provocar la infección en sí.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c61.jpg" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Vacunas y virus: la defensa invisible que  cambia la epidemiología.</figcaption></figure>
+		
+	</div>
+	
+	<!-- pag 51 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c62.jpg" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>Antígeno y adyuvante, la clave de la respuesta inmune.</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 52 -->
+	<div class="page">
+		<p>Los <strong>componentes principales</strong> de una vacuna viral suelen ser el <strong>antígeno</strong>, que es la molécula (a menudo una proteína) del virus que el sistema inmunitario reconoce como extraña, y a veces un <strong>adyuvante</strong>. El adyuvante es una sustancia que potencia la respuesta inmune al antígeno, haciendo que la vacuna sea más efectiva. Existen diversos tipos de vacunas virales, incluyendo las de virus atenuados (virus vivos pero debilitados), virus inactivados (virus muertos), subunidades proteicas (solo la parte del virus que desencadena la respuesta inmune) y vacunas de vectores virales (donde se utiliza un virus inofensivo para transportar el material genético del virus objetivo). El <strong>principio de funcionamiento</strong> es el mismo para todas: presentar al sistema inmunitario la "firma" del virus.</p>
+		<p>Una vez administrada, la vacuna desencadena una serie de <strong>procesos internos</strong>. Las células inmunitarias, como las células presentadoras de antígenos, capturan el antígeno vacunal y lo presentan a otras células inmunitarias, especialmente a los linfocitos T y B. Los linfocitos B comienzan a producir <strong>anticuerpos</strong>, proteínas que se unen específicamente al antígeno viral, neutralizando el virus o marcándolo para su destrucción. Simultáneamente, los linfocitos T de memoria y los linfocitos B de memoria se generan. Estas células de memoria son cruciales, ya que permanecen en el cuerpo a largo plazo y permiten una respuesta mucho más rápida y robusta en caso de una futura exposición al virus real.</p>
+		<p style="text-align-last: justify">Las <strong>aplicaciones prácticas</strong> de las vacunas contra virus son inmensas y han erradicado o controlado enfermedades devastadoras. La <strong>vacuna contra la viruela</strong>, una enfermedad que causó millones de muertes a lo largo de la historia, es un ejemplo paradigmático de éxito, llevando a su erradicación mundial. De manera similar, las vacunas contra la <strong>poliomielitis</strong> han reducido drásticamente la incidencia de esta enfermedad paralizante. Más recientemente, las vacunas contra el </p>
+	
+	</div>
+
+	<!-- pag 53 -->
+	<div class="page">
+		<figure class="flotad" style="text-align: center">
+        <img loading="lazy" src="images/contenido/c63.jpg" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Las vacunas contra el VPH.</figcaption></figure>
+		<p><strong>virus del papiloma humano (VPH)</strong> han demostrado un gran potencial para prevenir el cáncer de cuello uterino, y las vacunas contra la <strong>gripe</strong> son vitales para mitigar la morbilidad y mortalidad estacional.</p>
+		<p>Los <strong>beneficios y ventajas</strong> de la vacunación son claros: <strong>protección individual</strong> contra enfermedades graves y sus complicaciones, <strong>inmunidad colectiva (o de rebaño)</strong> que protege a quienes no pueden ser vacunados (bebés, personas inmunocomprometidas) al reducir la circulación del virus, y la <strong>prevención de brotes epidémicos y pandemias</strong>. A pesar de su éxito, existen <strong>desafíos o limitaciones</strong>, como la necesidad de desarrollar nuevas vacunas para virus emergentes (como el SARS-CoV-2), la posibilidad de que los virus muten y evadan la respuesta inmune generada por vacunas existentes, y la importancia de la distribución equitativa y la aceptación pública para alcanzar altos niveles de cobertura vacunal. La investigación continua se enfoca en mejorar la duración de la inmunidad y la eficacia contra variantes virales.</p>
+		
+	</div>
+	
+	<!-- pag 54 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c64.jpg);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 55 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c64.jpg);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 56 -->	
+	<div class="page">
+		<p>Hay varias vacunas contra la hepatitis. La vacuna contra la hepatitis A y la vacuna contra la hepatitis B son las dos vacunas más comunes. La vacuna contra la hepatitis A está hecha de una forma inactivada del virus de la hepatitis A, mientras que la vacuna contra la hepatitis B está hecha de una parte del virus de la hepatitis B llamada antígeno del superficie. También existe una vacuna combinada contra la hepatitis A y la hepatitis B.</p>
+		<p>El siguiente video está relacionado con estas vacunas:</p>
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Vídeo</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p56.png" width="1152" height="654" scale="90%" src="videos/index7.html"></div>
+             <figcaption prefix="Video">¿Qué son las Hepatitis Virales? (video del canal <a target="_blank" href="https://www.youtube.com/watch?v=NjMiKkyIZfg&t=20s">Sociedad Mexicana de Virología</a>, Licencia Atribución de Creative Commons ).</figcaption>
+          </figure>
+        </div>
+		</div>
+		
+	
+	</div>
+	
+	<!-- pag 57 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Coronavirus</h5>
+		
+          <figure>
+            <div class="interactive" poster="posters/p57.png" width="540" height="470" scale="100%" src="interactivos/dist/virus/coronavirus/index0.html"></div>
+            <figcaption prefix="Interactivo"> Estructura Cryo-EM de la glycoproteína Spyke Omicron del SARS-CoV-2 con ACE2 humano.</figcaption>
+          </figure>
+     
+		</div>
+		<p style="width:480px; margin-left: 30px; text-align: center; color: var(--h1-color); font-size: 20p">Los miembros de la familia <i>Coronaviridae</i>, un grupo monofilético en el orden Nidovirales, son virus de ARN de cadena positiva envueltos de tres clases de vertebrados: mamíferos (coronavirus y torovirus), aves (coronavirus) y peces (bafinivirus).</p>
+	
+	</div>
+
+	<!-- pag 58 -->
+	<div class="page">
+		<h1 id="c18">¿Cómo funciona el diagnóstico de las infecciones virales?</h1>
+		<p>El diagnóstico de las infecciones virales es un proceso crucial para identificar la presencia de un virus específico en un paciente, lo que permite un tratamiento adecuado, el seguimiento de brotes y la prevención de la propagación. El <strong>concepto fundamental</strong> radica en detectar la respuesta del huésped al virus o el material genético o componentes estructurales del propio virus. Esto se logra a través de una variedad de técnicas de laboratorio que aprovechan las diferencias entre el huésped y el agente infeccioso.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c71.jpg" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Detectar, confirmar y controlar brotes.</figcaption></figure>
+		
+	</div>
+	<!-- pag 59 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c72.jpg" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>Muestras biológicas: la huella clave del diagnóstico viral.</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 60 -->
+	<div class="page">
+		<p>Uno de los <strong>componentes principales</strong> en el diagnóstico viral son las muestras biológicas obtenidas del paciente, que pueden incluir sangre, saliva, hisopados nasofaríngeos, orina o tejido. A partir de estas muestras, se aplican diferentes métodos. Las técnicas de <strong>detección de antígenos</strong> buscan identificar proteínas virales específicas. Estas pruebas suelen ser rápidas y asequibles, pero pueden tener una sensibilidad menor en comparación con otros métodos, lo que significa que podrían no detectar virus en etapas muy tempranas o en bajas concentraciones.</p><p>Por otro lado, la <strong>detección de anticuerpos</strong> se enfoca en la respuesta inmunitaria del huésped. Cuando un virus infecta, el cuerpo produce anticuerpos para combatirlo. Identificar estos anticuerpos en la sangre de un paciente puede indicar una infección pasada o presente. El <strong>principio de funcionamiento</strong> de estas pruebas se basa en la reacción antígeno-anticuerpo, donde un antígeno viral conocido se une a los anticuerpos presentes en la muestra del paciente, o viceversa. Un ejemplo clásico son las pruebas serológicas para VIH o hepatitis.</p>
+		<p>Las técnicas de <strong>detección de material genético viral</strong>, como la Reacción en Cadena de la Polimerasa (PCR), son particularmente poderosas. El <strong>proceso interno</strong> de la PCR implica la amplificación exponencial de secuencias de ADN o ARN viral específicas. Si el genoma viral está presente en la muestra, la PCR lo multiplicará millones de veces, haciéndolo detectable. Esto permite una identificación muy sensible y específica del virus, incluso en cantidades ínfimas, lo que la convierte en una herramienta invaluable para diagnosticar infecciones agudas y emergentes, como la COVID-19. La fórmula que describe el crecimiento exponencial de las copias de ADN en la PCR ideal se asemeja a:</p>
+		$$N(t) = N_0 \cdot 2^n$$			
+	
+	</div>
+
+	<!-- pag 61 -->
+	<div class="page">
+		<p>Donde $N(t)$ es el número de copias de ADN en el ciclo $t$, $N_0$ es el número inicial de copias, y $n$ es el número de ciclos de amplificación.</p><p>Los <strong>beneficios y ventajas</strong> del diagnóstico viral son innumerables: permiten un tratamiento temprano y específico, previniendo complicaciones severas; ayudan a controlar y rastrear brotes epidémicos y pandémicos mediante la identificación de fuentes y rutas de transmisión; y son esenciales para la investigación y el desarrollo de vacunas y antivirales. Sin embargo, existen <strong>desafíos o limitaciones</strong>, como la necesidad de personal capacitado, equipos especializados y costos asociados a ciertas pruebas. Además, la variabilidad genética de los virus puede, en ocasiones, dificultar la detección si las pruebas no se actualizan para reconocer nuevas cepas o mutaciones.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c73.jpg" style="border-radius:15px;cursor:pointer;width:90%;" onclick="openImage(this)">
+        <figcaption>Las técnicas de detección de material genético viral.</figcaption></figure>		
+		
+	</div>
+	
+	<!-- pag 62 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c74.jpg);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 63 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c74.jpg);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 64 -->	
+	<div class="page">
+		<p>La mayoría de las infecciones no manifiestan ningún síntoma y se resuelven espontáneamente. En algunas personas, la infección por VPH es persistente y provoca verrugas o lesiones premalignas. Estas lesiones premalignas aumentan el riesgo de cáncer de cuello uterino, vulva, vagina, pene, ano y boca o cuello. Prácticamente todos los casos de cáncer de cuello uterino son causados ​​por el VPH. Alrededor del 70% de estos casos son causados ​​por dos tipos: HPV16 y HPV18. El VPH también se relaciona con el 60–90 % de los casos de otros tipos de cáncer. </p>
+		
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Vídeo</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p64.png" width="1152" height="654" scale="90%" src="videos/index8.html"></div>
+             <figcaption prefix="Video">¿Qué es el Virus del Papiloma Humano? (video del canal <a target="_blank" href="https://www.youtube.com/watch?v=d0PtqhK6nOE">Sinapsis EMP</a>, Licencia Atribución de Creative Commons).</figcaption>
+          </figure>
+        </div>
+		</div>		
+	
+	</div>
+	
+	<!-- pag 65 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Coronavirus</h5>
+		
+          <figure>
+            <div class="interactive" poster="posters/p65.png" width="540" height="470" scale="100%" src="interactivos/dist/virus/papiloma/index0.html"></div>
+            <figcaption prefix="Interactivo">Estructura cristalina de rayos X de Sap97 Pdz3 unida al péptido C-terminal de Hpv18 E6.</figcaption>
+          </figure>
+     
+		</div>
+		<p style="width:480px; margin-left: 30px; text-align: center; color: var(--h1-color); font-size: 20p">La oncoproteína E6 del virus del papiloma humano (VPH) se dirige a ciertos supresores de tumores como MAGI-1 para su degradación. </p>
+	
+	</div>
+
+	<!-- pag 66 -->
+	<div class="page">
+		<h1 id="c19">¿Cómo funciona la prevención de las enfermedades virales?</h1>
+		<p>La prevención de las enfermedades virales es un campo multifacético que se apoya en nuestra comprensión de cómo los virus interactúan con los organismos y cómo se transmiten. El <strong>concepto fundamental</strong> radica en interrumpir el ciclo de vida viral o impedir su entrada en el huésped. Esto se logra principalmente a través de dos enfoques: el fortalecimiento de las defensas naturales del organismo y la limitación de la exposición al virus.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c81.jpg" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Así funciona la prevención de las enfermedades virales.</figcaption></figure>
+		
+	</div>
+
+	<!-- pag 67 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c82.jpg" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>Antígenos virales: la respuesta inmune que protege poblaciones.</figcaption></figure>
+	
+	</div>
+	
+	<!-- pagina 68 -->
+	<div class="page">
+		<p>Los <strong>componentes principales</strong> de la prevención viral incluyen las vacunas, las medidas de higiene y saneamiento, y el desarrollo de tratamientos antivirales que, si bien son curativos, también juegan un rol preventivo al reducir la replicación viral y, por ende, la transmisión. Las vacunas, por ejemplo, funcionan presentando al sistema inmunológico fragmentos del virus o virus atenuados, lo que permite generar una respuesta inmune sin causar la enfermedad. Esto crea una <strong>memoria inmunológica</strong> que, ante una exposición futura al patógeno real, permite una respuesta rápida y eficaz.</p><p>El <strong>principio de funcionamiento</strong> detrás de la prevención vacunal se basa en la inmunidad adquirida. Al exponer al cuerpo a un antígeno viral específico, las células del sistema inmune, como los linfocitos B, producen anticuerpos dirigidos contra ese antígeno. Estas <strong>moléculas de defensa</strong> se unen al virus, neutralizando su capacidad de infectar células o marcándolo para su destrucción por otras células inmunes. La eficacia de una vacuna se mide en términos de su capacidad para prevenir la infección, reducir la gravedad de la enfermedad o disminuir la transmisión comunitaria.</p>
+		<p>Las <strong>aplicaciones prácticas</strong> de la prevención de enfermedades virales son extensas y han tenido un impacto transformador en la salud pública global. La erradicación de la viruela, la drástica reducción de la polio y el control de enfermedades como el sarampión y la gripe son <strong>casos reales</strong> que demuestran el poder de las estrategias preventivas. Estas estrategias no solo salvan vidas, sino que también reducen la carga económica y social asociada a las pandemias y epidemias.</p>
+		<p style="text-align-last: justify">Sin embargo, la prevención de enfermedades virales también presenta <strong>desafíos y limitaciones</strong>. La <strong>evolución constante</strong> de los virus, con la aparición de nuevas cepas y mutaciones, puede comprometer la eficacia de vacunas y tratamientos existentes. Además, la logística</p>	
+	
+	</div>
+
+	<!-- pag 69 -->
+	<div class="page">
+		
+		<p> de distribución de vacunas en regiones remotas y la <strong>resistencia o desinformación</strong> sobre la vacunación son obstáculos significativos. La investigación continua es crucial para desarrollar vacunas de amplio espectro y estrategias de intervención innovadoras que puedan anticiparse a la variabilidad viral.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c83.jpg" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Las aplicaciones prácticas de la prevención de enfermedades virales.</figcaption></figure>
+
+	</div>
+	
+	<!-- pag 70 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c84.jpg);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 71 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c84.jpg);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 72 -->	
+	<div class="page">
+		<p>Año tras año, el mundo se enferma con un nuevo virus de la gripe. Muchas personas se infectan y otras tantas mueren. Al igual que otros virus, el de la gripe cambia constantemente. Esta mutación o variación antigénica suele ocasionar sólo cambios menores; por lo tanto, las compañías farmacéuticas logran contrarrestar la cepa de cada año con la vacuna adecuada. Sin embargo, según indican los registros históricos, cada 10 a 40 años el mundo sufre una pandemia de gripe que resulta de una variación antigénica mayor. El virus atraviesa una mutación tan drástica que el cuerpo humano ya no lo reconoce y se torna indefenso</p>
+		
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Vídeo</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p72.png" width="1152" height="654" scale="90%" src="videos/index9.html"></div>
+             <figcaption prefix="Video">Grandes epidemias y pandemias de la Historia (video del canal <a target="_blank" href="https://www.youtube.com/watch?v=i9OwVImmlTY">Curiosidades de la Historia</a>, Licencia Atribución de Creative Commons ).</figcaption>
+          </figure>
+        </div>
+		</div>		
+	
+	</div>
+	
+	<!-- pag 73 -->	
+	<div class="page">
+				
+          <figure>
+            <div class="interactive" poster="posters/p73.png" width="540" height="720" scale="100%" src="interactivos/i82.html"></div>
+            
+          </figure>
+     
+					
+	</div>
+
+
+	
+	<!--  -->
+	<div class="page invertcolor" num="" style="background-image: radial-gradient(white, #ecf0f1, #e3e5e7); display:flex; align-items:center; justify-content:center;">
+			<a style="width:50%" target="_blank" href="https://descartes.matem.unam.mx/"><img loading="lazy" src="images/general/logo_descartes.svg" width="100%"></a>
+	</div>
+	
+	<!-- [cierra] pages_container -->
+	</div>
+
+	<!-- [cierra] book_container -->
+	</div>
+
+</body>
+</html>
