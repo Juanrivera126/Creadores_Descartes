@@ -1,0 +1,46 @@
+Procedimiento para estructura en línea
+1. Buscar estructura en https://www.ncbi.nlm.nih.gov/structure (por ejemplo, parvovirus)
+
+2. Copia nombre del ID de PDB, para el ejemplo es 2CAS
+
+3. File/Retrieve by ID/PDB/MMDB... poner el ID, que para el ejemplo es 2CAS
+
+4. Abrir el archivo ejemplo, poniendo ? y el resto de caracteres que muestra el enlace, que para el ejemplo es mmdbid=2CAS&bu=1
+
+Procedimiento para estructura en local
+1. Buscar estructura en https://www.ncbi.nlm.nih.gov/structure (por ejemplo, rotavirus)
+
+2. Seleccionar uno, por ejemplo el 7PKO
+
+3. Descargar datos de estructura en pdb
+
+4. Abrir el pdb con Notepad++
+
+5. En Editar/seleccionar todo copiamos el archivo
+
+6. Copiar texto simple en DescartesJS
+
+7. Copiar texto desde el cuadro de dialogo
+
+8. Pegar en archivo local.html en la línea 165, después de HEADER, eliminando \nEND
+
+Modificar el archivo local con:
+
+	  command = "defined sets; style proteins Ribbon; set background black; close popup";
+
+      setupViewer(undefined, undefined, 'div6', command, alignPdb);
+
+Se puede usar, también (https://www.ncbi.nlm.nih.gov/Structure/icn3d/icn3d.html#commands):
+
+set surface Van der Waals surface;
+style proteins b factor tube; (y las demás, todo en minúscula)
+rotate x;
+rotate y;
+rotate z;
+
+rotate left (right, top, down)
+
+Para dimensionar:
+set thickness | linerad 0.6 | coilrad 1 | stickrad 1.2 | crosslinkrad 1.6 | ribbonthick 1.1 | proteinwidth 3 | ballscale 0.6;
+
+set background transparent (black, white, grey)
