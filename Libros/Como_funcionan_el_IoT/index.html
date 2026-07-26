@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=yes,minimal-ui">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+	<title>Libro digital interactivo</title>
+
+	<!-- se precarga la imagen utilizada para el cargador del libro, en caso de que se utilice -->
+	<link rel="preload" as="image" href="images/general/icartesilibri_logo.svg">
+
+	<!-- configuración del libro -->
+	<script>
+	window.book_config = {
+		// parámetro que indica si los capítulos, secciones y figura se auto numeran
+		// para que los capítulos se auto numeren deben utilizar la etiqueta <h1>
+		// para que las secciones se auto numeren deben utilizar la etiqueta <h2>
+		auto_numerate_sections_and_figures: true,
+		// parámetro para que los interactivos se muestren a pantalla completa al presionar el botón de la esquina superior derecha
+		open_interactives_fullscreen: true,
+		// parámetro para usar el id de las referencias bibliográficas en lugar de la autonumeración
+		bibitem_ref_id: false,
+	}
+	</script>
+
+  <!-- núcleo del libro interactivo -->
+  <link rel="stylesheet" href="css/style.css" type="text/css">
+  <script type="text/javascript" src="js/book.js" charset="utf-8"></script>
+  
+  <!-- personalización del usuario -->
+  <link rel="stylesheet" href="extra/fonts.css" type="text/css">
+  <link rel="stylesheet" href="extra/style.css" type="text/css">
+  <link rel="stylesheet" href="extra/mis-estilos.css" type="text/css">
+
+  <!-- inclusión de la biblioteca KaTex -->
+  <link rel="stylesheet" type="text/css" href="extra/katex/katex.min.css"/>
+  <script src="extra/katex/katex.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="extra/katex/copy-tex.min.css"/>
+  <script src="extra/katex/copy-tex.min.js"></script>
+  <script src="extra/katex/auto-render.min.js" ></script>
+
+  <!-- Opcional en caso de requerir formulas químicas -->
+  <script src="extra/katex/mhchem.min.js"></script>
+  
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [ {left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}, {left: "\\[", right: "\\]", display: true}, {left: "\\(", right: "\\)", display: false} ]
+    });
+  });
+  </script>
+  
+  <style>
+        .flotad {
+            float: right;
+			margin-top:10px;
+            margin-left: 20px; /* Espacio entre imagen y texto */
+            margin-bottom: 8px;
+            max-width: 50%; /* Tamaño máximo de la imagen */
+        }
+		
+		.flotai {
+            float: left;
+			margin-top:10px;
+			margin-right: 20px; /* Espacio entre imagen y texto */
+            margin-bottom: 8px;
+            max-width: 50%; /* Tamaño máximo de la imagen */
+        }
+        
+    </style>
+</head>
+
+<body>
+	<div id="book_loader_container">
+		<!-- se utiliza un elemento para que funcione como cargador del libro -->
+		<div id="book_loader"></div>
+		<!-- y se indica la imagen a utilizar para personalizar el libro -->
+		<img src="images/general/icartesilibri_logo.svg" width="20%" style="padding-left:1em;">
+	</div>
+	
+	<div id="book_container">
+		<div id="btn_back_page"></div>
+		<div id="btn_next_page"></div>
+		<button id="go_to_table_of_content"></button>
+		
+		<button id="btn_config"></button>
+		<div id="config_options">
+			<div id="dark_light_mode"></div>
+		</div>
+
+		<!-- si este elemento no esta presente, el botón de la tabla de contenido lleva a la primera página con un elemento class="toc_link" -->
+	<div id="table_of_content"></div>
+
+	<div id="pages_container">
+	<!--  -->
+	<div class="page" style="background-color:transparent;"></div>
+
+	<!-- Portada -->
+	<div class="page invertcolor" style="margin:0; padding:0; background-size:contain; background-image:url(images/general/portada.svg);">
+				
+		<div class="invertcolor" style="position: absolute; width: 640px; height: 1025px; left: 0px; top: 0px; background-size:contain; background-image: url('images/portada1.png');"></div>
+					
+		<!-- Nombre del autor del libro -->
+		<div class="box-glass2" style="position: absolute; bottom: 10px; left:172px; font-size:22px; color:#002a69;"><b>Juan Juan Guillermo Rivera Berrío</b></div>
+		
+		<!-- Logo de la editorial o institución -->
+		<div class="box-glass" style="position: absolute; bottom: 
+		5px; right:480px; width:640px; text-align:center;"> <a  target="_blank" href="https://proyectodescartes.org"> <img src="images/general/gifanimadoRedProyecto.gif" width="120px"/></a> </div>
+	</div>
+
+	<!--  -->
+	<div class="page" style="display:flex; align-items:center; justify-content:center;">
+		<a style="width:50%" target="_blank" href="https://proyectodescartes.org/iCartesiLibri/"><img src="images/general/icartesilibri_logo.svg" width="100%"></a>
+	</div>
+
+	<!--  -->
+	<!-- init-page-num="true" es un parámetro que indica que a partir de esta página comienza la numeración -->
+	<!-- inicialmente los números de las páginas se numeran con numerales romanos -->
+	<!-- num="" es un parámetro que indica que esta página no lleva numeración visible -->
+	<!--  -->
+	<div class="page" style="text-align:center; font-size:120%;" init-page-num="true" num="">
+		<h1>¿Cómo funciona el internet de las cosas (IoT)?</h1>
+		<br><br><br><br>
+		<div style="margin-top: 110px; color: var(--h1-color); font-size:30px"><b>Juan Guillermo Rivera Berrío</b>
+		<br><br>
+		</div>
+		<div align="center" style="position: absolute; bottom: 105px; left:0; right:0;"> Fondo Editorial RED Descartes<br><br>
+		<a  target="_blank" href="https://proyectodescartes.org"> <img src="images/general/logo_descartes3.png" width="300px"/></a></div>
+
+		<div align="center" style="position: absolute; bottom: 50px; left:0; right:0;">Córdoba (España)<br/>
+		2026</div>
+	</div>
+
+	<!--  -->
+    <div class="page" num="">
+		<p>¿Cómo funciona el internet de las cosas (IoT)?</p>
+		<br>
+		<p>Autor: <br>
+		Juan Guillermo Rivera Berrío
+		</p><br>
+      	  
+		<p>
+        Código JavaScript para el libro: <a href="https://github.com/jlongi/libro_interactivo" target="_blank">Joel Espinosa Longi</a>, <a href="https://www.matem.unam.mx/" target="_blank">IMATE</a>, UNAM. <br>
+        Recursos interactivos: <a href="http://descartes.matem.unam.mx/" target="_blank">DescartesJS</a>, <a href="https://proyectodescartes.org/descartescms/herramientas-ia" target="_blank">Herramientas de IA</a>, ChatGPT y Gemini. <br>
+        Fuentes: <a href="https://fonts.google.com/specimen/Lato" target="_blank">Lato</a> y <a href="https://fonts.google.com/specimen/Ubuntu+Mono" target="_blank">UbuntuMono</a><br>
+		Imagen de portada: ilustración generada por GPT Image 2</p><br><br>
+		<p>Red Educativa Digital Descartes<br>
+        Córdoba (España)<br>
+        <a href="mailto:descartes@proyectodescartes.org?Subject=Fondo editorial"> descartes@proyectodescartes.org</a><br>
+        <a href="https://proyectodescartes.org/descartescms/" target="_blank">https://proyectodescartes.org</a><br>
+        <br>
+        Proyecto iCartesiLibri<br>
+        <a href="https://proyectodescartes.org/iCartesiLibri/index.htm" target="_blank">https://proyectodescartes.org/iCartesiLibri/index.htm</a> <br>
+        <br>
+        ISBN: 978-84-10368-58-3<br>
+		</p>
+		<p style="font-size:10px; position: absolute; bottom: 30px; left: 50px; right:0;"><a href="http://creativecommons.org/licenses/by-nc-sa/4.0" target="_blank"><img src="images/general/88x31.png" style="height:36px; width:99px" /></a><br>
+        Esta obra está bajo una licencia Creative Commons 4.0 internacional: Reconocimiento-No Comercial-Compartir Igual.</p>
+    
+	</div>
+
+	<!--  -->
+	<div class="page">
+		<h2>Tabla de contenido</h2>
+		<div class="toc_link" href="#prefacio"></div>
+		<div class="toc_link" href="#c11"></div>
+		<div class="toc_link" href="#c12"></div>
+		<div class="toc_link" href="#c13"></div>
+		<div class="toc_link" href="#c14"></div>
+		<div class="toc_link" href="#c15"></div>
+		<div class="toc_link" href="#c16"></div>
+		<div class="toc_link" href="#c17"></div>
+		<div class="toc_link" href="#c18"></div>
+		<div class="toc_link" href="#c19"></div>
+		<div class="toc_link" href="#c110"></div>
+										
+	</div>
+
+	
+
+	<!--  -->
+	<!-- num-type-arabic="true" es un parámetro que indica que a partir de esta página la numeración utilizara numerales arábigos -->
+	<!--  -->
+	<div class="page" num-type-arabic="true">
+		<h1 id="prefacio">Prefacio</h1>
+		<p>Comprender el mundo comienza por hacerse una pregunta sencilla, pero poderosa: <b>¿cómo funciona?</b> Detrás de cada objeto, fenómeno, tecnología o proceso existe un conjunto de principios que explican su funcionamiento y que permiten transformar la curiosidad en conocimiento. Esa idea constituye la esencia de la colección <b>¿Cómo funciona?</b>, una serie de libros concebida para acercar temas complejos a estudiantes, docentes y lectores interesados mediante explicaciones claras, rigurosas y apoyadas en recursos visuales e interactivos.</p>
+		<p><b>¿Cómo funciona el Internet de las Cosas (IoT)?</b> forma parte de esta colección con el propósito de mostrar cómo millones de dispositivos conectados están cambiando la manera en que vivimos, trabajamos y nos relacionamos con nuestro entorno. Desde sensores inteligentes y hogares automatizados hasta ciudades inteligentes, industria 4.0, computación en el borde y ciberseguridad, este libro explica los fundamentos tecnológicos que hacen posible una de las revoluciones más importantes de la era digital.</p>
+		<p>La colección <b>¿Cómo funciona?</b> se caracteriza por combinar el rigor científico con un lenguaje accesible, integrando ejemplos cotidianos, ilustraciones, modelos matemáticos, aplicaciones reales y actividades que favorecen el aprendizaje activo. Cada capítulo responde a una pregunta concreta, permitiendo que el lector construya el conocimiento de manera progresiva y comprenda no solo qué es una tecnología, sino también por qué funciona y cuál es su impacto en la sociedad.</p>
+		<p style="text-align-last: justify">Uno de los aspectos más innovadores de esta obra es la incorporación de objetos interactivos, simulaciones, cuestionarios y experiencias de aprendizaje desarrolladas con tecnologías web modernas.</p>			
+										
+	</div>
+	
+	<div class="page">
+		<p> Estos recursos invitan al lector a experimentar, explorar y comprobar los conceptos presentados, convirtiendo la lectura en una experiencia dinámica que trasciende las páginas del libro. La integración de herramientas como DescartesJS y diversas aplicaciones basadas en inteligencia artificial demuestra cómo la tecnología también puede enriquecer la forma en que aprendemos.</p>
+		<p>El Internet de las Cosas representa mucho más que una red de dispositivos conectados. Es la convergencia entre la electrónica, las telecomunicaciones, la informática, la inteligencia artificial y la ciencia de los datos para crear sistemas capaces de percibir su entorno, comunicarse y tomar decisiones en tiempo real. Comprender estos principios resulta cada vez más importante para quienes desean desenvolverse en una sociedad profundamente digitalizada.</p>
+		<p>Esperamos que este libro despierte la curiosidad del lector, fortalezca su pensamiento crítico y le permita descubrir que detrás de cada avance tecnológico existen principios científicos y de ingeniería que pueden comprenderse cuando se explican de forma clara y cercana. Ese es, precisamente, el propósito de la colección <b>¿Cómo funciona?</b>: hacer del conocimiento una experiencia accesible, visual, interactiva y estimulante para todos.</p>
+		<p>Bienvenido a este recorrido por el fascinante universo del Internet de las Cosas, donde cada capítulo responde una nueva pregunta y cada respuesta abre la puerta a nuevos descubrimientos.</p>
+							
+				
+		<p>Juan Guillermo Rivera Berrío</p>
+		<p>2026</p>	
+	
+	</div>
+
+	<!--  -->
+	<!-- Una página en blanco y sin numeración visible -->
+	<!--  -->
+	<div class="page" num="">
+		<div class="image_expand" style="position: absolute; width: 640px; height: 1025px; left: 0px; top: 0px; background-image: url('images/intro/intro.jpg'); background-size:contain; background-repeat: no-repeat" onclick="openImage(this)"></div>
+	</div>
+
+	<!-- pag 7 -->
+	<div class="page">
+		<h1 id="c11">Introducción</h1>
+		<p>El Internet de las Cosas, o <strong>IoT</strong> por sus siglas en inglés (<em>Internet of Things</em>), es una revolución tecnológica que se basa en un <strong>concepto fundamental</strong>: conectar objetos físicos cotidianos a Internet para que puedan recopilar, compartir y actuar sobre un flujo de datos sin necesidad de intervención humana directa. Su <strong>principio de funcionamiento</strong> radica en transformar elementos inanimados —desde un simple reloj de pulsera hasta maquinaria industrial compleja— en nodos inteligentes dentro de una inmensa red global. Esta interconexión constante permite que los aparatos "hablen" entre sí, creando un ecosistema dinámico donde la información fluye en tiempo real para tomar decisiones de forma automatizada.</p>
+		<figure>
+        <img loading="lazy" src="images/contenido/11.png" style="border-radius:15px;cursor:pointer;width:93%;" onclick="openImage(this)">
+        <figcaption>El mundo conectado que cambia la vida diaria.</figcaption></figure>
+		
+	</div>
+
+	<!-- pag 8 -->
+	<div class="page">
+		<p>Para lograr este intercambio de manera estructurada, la arquitectura del IoT depende de un ciclo de <strong>procesos internos</strong> que operan de forma ininterrumpida a través de cuatro <strong>componentes principales</strong>:</p>
+		<p><strong>Sensores y actuadores:</strong> Son los "sentidos" y "músculos" del sistema; capturan magnitudes físicas del entorno (como luz, temperatura o movimiento) y, cuando es necesario, ejecutan acciones físicas.</p>
+		<p><strong>Conectividad:</strong> Emplea redes y protocolos de comunicación (como Wi-Fi, 5G, Bluetooth o LoRa) para canalizar la información recabada.</p>
+		<p><strong>Procesamiento de datos:</strong> Ocurre típicamente en servidores en la nube o en el borde de la red (<i>Edge Computing</i>), donde sofisticados algoritmos filtran e interpretan la información bruta.</p>
+		<p><strong>Interfaz de usuario:</strong> Es el entorno visual (como una aplicación móvil o un panel de control) que permite al usuario humano supervisar los datos o configurar reglas de comportamiento.</p>
+		<p>La escala intrínseca de esta tecnología implica el manejo de volúmenes colosales de información, lo que representa un reto directo para la ingeniería de redes. Para comprender esta magnitud matemáticamente, podemos modelar el volumen total de datos generados en una red de IoT. Si consideramos un sistema compuesto por $N$ dispositivos conectados, donde cada uno emite datos a una tasa promedio de transmisión $R$ (en bytes por segundo) durante un intervalo de tiempo $T$, el volumen total de información $V$ se define como:</p>
+		$$V = N \cdot R \cdot T$$
+		<p style="text-align-last: justify">A medida que la variable del número de dispositivos conectados, representada por la incógnita $N$, crece exponencialmente hacia los miles de millones a nivel mundial, la infraestructura de  telecomunica-</p>
+				
+	</div>
+	
+	<!-- pag 9 -->
+	<div class="page">
+		<p>ciones debe aplicar complejos teoremas matemáticos de compresión de datos y un rediseño de las infraestructuras físicas para sostener este tráfico masivo sin latencia.</p>
+		
+		<figure>
+        <img loading="lazy" src="images/contenido/12.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>¿Que hace posible el IoT?</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 10 -->
+	<div class="page">
+		<p>Al llevar este entramado tecnológico a la vida diaria, las <strong>aplicaciones prácticas</strong> inciden en casi todos los sectores de la sociedad. Un destacado ejemplo entre los <strong>casos reales</strong> se sitúa en la domótica, con termostatos inteligentes que analizan de forma autónoma los patrones térmicos de una vivienda para climatizar las habitaciones, ahorrando energía.</p>
+		<p> A una escala mayor, encontramos el IoT Industrial (IIoT), donde sensores adheridos a turbinas de aviones miden variaciones microscópicas de la presión y advierten a los ingenieros de probables fallos estructurales antes de que ocurran, materializando lo que hoy conocemos como mantenimiento predictivo.</p>
+		<p>Naturalmente, este despliegue masivo aporta formidables <strong>beneficios y ventajas</strong>, como la optimización de los sistemas de producción mecánica, la reducción de los costos operativos y un aumento sustancial en la calidad de nuestro nivel de vida rutinario. Sin embargo, la red enfrenta críticos <strong>desafíos o limitaciones</strong> que no pueden ignorarse. La ciberseguridad es el reto más prominente, dado que cualquier bombilla inteligente mal protegida podría convertirse en un puente de acceso a información privada. Además, la ausencia de una estandarización tecnológica entre fabricantes y la vulnerabilidad de la privacidad del usuario continúan siendo frentes abiertos que la comunidad científica deberá resolver para un futuro plenamente interconectado.</p>
+		<p>El siguiente objeto interactivo simula el funcionamiento de un panel de sensores ambientales, ideal para introducir conceptos de Internet de las Cosas (IoT) y sistemas de monitoreo en un cuarto. Cada control representa un sensor real y su efecto se visualiza al instante en una escena interactiva tipo "ventana de ambiente"; por ejemplo, la humedad agrega niebla/vaho sobre la escena y gotas de condensación en la ventana.</p>
+	
+	</div>
+	
+	<!-- pag 11 -->
+	<div class="page">
+		<figure>
+            <div class="interactive" poster="posters/p11.png" width="540" height="720" scale="97%" src="interactivos/i11.html"></div>
+            <figcaption style="margin-top:-0.5em" prefix="Objeto interactivo">Simulación IoT diseñada con Claude Sonnet 5.</figcaption>
+          </figure>
+	
+	</div>
+
+	<!-- pag 12 -->
+	<div class="page">
+		<h2 id="c12">¿Cómo funcionan los sensores inteligentes?</h2>
+		<p>En el ecosistema del Internet de las Cosas (IoT), los <strong>sensores inteligentes</strong> actúan como los verdaderos sistemas sensoriales de la red, encargados de percibir el mundo físico y traducirlo al lenguaje digital. A diferencia de un sensor tradicional que únicamente genera una alerta eléctrica básica ante estímulos como la temperatura o la presión, un sensor inteligente está dotado de capacidad de procesamiento local y conectividad de red. Este concepto fundamental permite no solo detectar variaciones en el entorno, sino también filtrar ruido, autocalibrar señales y tomar decisiones preliminares antes de enviar la información a la nube.</p>
+		<figure>
+        <img loading="lazy" src="images/contenido/21.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Sensores inteligentes: datos que entienden el mundo</figcaption></figure>	
+				
+	</div>
+	
+	<!-- pag 13 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/22.png" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>¿Cómo funcionan los sensores?</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 14 -->
+	<div class="page">
+		<p>Para lograr esta autonomía y eficiencia funcional, la arquitectura interna de estos dispositivos se estructura en cuatro <strong>componentes principales</strong>:</p>
+		<p><strong>Elemento transductor:</strong> Capta la magnitud física y la convierte en una señal analógica continua temporal, representada como un voltaje $V(t)$.</p>
+		<p><strong>Convertidor Analógico-Digital (ADC):</strong> Circuito responsable de discretizar y medir la señal eléctrica sin procesar.</p>
+		<p><strong>Microcontrolador:</strong> Cerebro local que procesa la información digitalizada mediante algoritmos integrados.</p>
+		<p><strong>Transceptor de comunicación:</strong> Módulo que envía y recibe datos mediante protocolos inalámbricos como Wi-Fi, Zigbee o LoRaWAN.</p>
+		<p>Durante sus <strong>procesos internos</strong>, la transformación de la señal física a un dato útil computacional es la etapa más crítica. La exactitud con la que el sensor reconoce una variación física depende fuertemente de la resolución de su ADC. Matemáticamente, el tamaño del escalón lógico o "cuanto" de cuantificación se define mediante la siguiente ecuación:</p>
+		$$Q = \frac{V_{max} - V_{min}}{2^n}$$
+		<p>Donde $V_{max}$ y $V_{min}$ representan el límite superior e inferior del rango de voltaje operativo del sensor, y $n$ es el número de bits de resolución. Una vez que el microcontrolador obtiene este valor $Q$, ejecuta algoritmos para calcular promedios o detectar anomalías mediante una técnica conocida como <i>Edge Computing</i> (computación en el borde).</p>
+		
+	</div>
+
+	<!-- pag 15 -->
+	<div class="page">
+		<figure class="flotad">
+        <img class=" image_expand" loading="lazy" src="images/contenido/23.png" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>Así funcionan los sensores</figcaption></figure>
+		<p>La principal <strong>ventaja</strong> del <em>Edge Computing</em> integrado en los sensores es la drástica reducción de la latencia y el ahorro en el ancho de banda. Si un componente térmico registra la temperatura, en lugar de transmitir cientos de lecturas redundantes por minuto, el sensor calcula variables como la tasa de cambio térmico ($\Delta T / \Delta t$) y solo transmite un paquete de datos de alerta si el resultado supera un umbral crítico preprogramado. Esta eficiencia energética permite que los nodos de IoT operen durante años impulsados por baterías del tamaño de una moneda.</p>
+		<p>La robustez de este principio de funcionamiento ha impulsado innumerables <strong>aplicaciones prácticas</strong> en el mundo moderno. Un <strong>caso real</strong> paradigmático se observa en la agricultura de precisión, donde sondas inteligentes enterradas en los cultivos miden la humedad del sustrato. Al procesar localmente que el nivel freático ha caído y cruzar esta información con pronósticos ambientales, el sensor se comunica autónomamente con las válvulas de riego para suministrar el volumen de agua exacto. Sin embargo, no están exentos de <strong>desafíos o limitaciones</strong>; el principal obstáculo actual es la ciberseguridad. Al poseer microprocesadores y estar permanentemente conectados, cada sensor inteligente representa una posible puerta de entrada para ataques informáticos si los datos no están correctamente cifrados, exigiendo arquitecturas de seguridad robustas desde su fase de diseño.</p>
+		
+	</div>
+	
+	<!-- pag 16 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/24.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 17 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/24.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 18 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">¿Cómo funciona el IoT?</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p18.png" width="540" height="680" scale="90%" src="interactivos/i21.html"></div>
+            <figcaption prefix="Objeto interactivo">Explicado por pasos.</figcaption>
+          </figure>
+        </div>
+		</div>
+	
+	</div>
+	
+	<!-- pag 19 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Puzle hexagonal</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p19.png" width="540" height="680" scale="90%" src="interactivos/i22.html"></div>
+            <figcaption prefix="Objeto interactivo">Descubre los sensores inteligentes.</figcaption>
+          </figure>
+        </div>
+		</div>		
+	
+	</div>
+
+	<!-- pag 20 -->
+	<div class="page">
+		<h2 id="c13">¿Cómo funcionan los dispositivos conectados?</h2>
+		<p>Los dispositivos conectados, piedra angular del ecosistema del Internet de las Cosas (IoT), son objetos físicos diseñados para interactuar de forma autónoma tanto con su entorno como con otros sistemas a través de una red. Desde su <strong>concepto fundamental</strong>, estos dispositivos operan bajo el principio continuo de captura, procesamiento y transmisión de datos. A diferencia de los aparatos electrónicos tradicionales que requieren de una intervención humana constante, un dispositivo IoT actúa como un nodo inteligente capaz de percibir variables físicas del mundo real, interpretarlas de manera preliminar y enviar esa información a la nube computacional (o a un servidor local) para su posterior análisis o para la toma de decisiones automatizada.</p>
+		<figure>
+        <img loading="lazy" src="images/contenido/31.png" style="border-radius:15px;cursor:pointer;width:97%;" onclick="openImage(this)">
+        <figcaption>Objetos que sienten, conectan y actúan.</figcaption></figure>	
+				
+	</div>
+	
+	<!-- pag 21 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/32.png" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>Los datos se capturan en tiempo real.</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 22 -->
+	<div class="page">
+		<p>Para lograr este nivel de autonomía computacional, la arquitectura de cualquier dispositivo conectado se estructura invariablemente a partir de cuatro <strong>componentes principales</strong>:</p>
+		<p><strong>Sensores y actuadores:</strong> Los sensores recaban información física y química del entorno (como temperatura, humedad, presión o movimiento). Por el contrario, los actuadores ejecutan acciones físicas en respuesta a una señal o comando digital (como encender una bombilla o cerrar una válvula hidráulica).</p>
+		<p><strong>Microcontrolador (CPU):</strong> Constituye el "cerebro" local del equipo; ejecuta un sistema operativo básico o <i>firmware</i> y tiene la capacidad suficiente para gestionar los datos obtenidos de los sensores antes de transmitirlos.</p>
+		<p><strong>Módulo de comunicación:</strong> Es el hardware responsable de enlazar el dispositivo con el resto de la red. Utiliza diversos protocolos según sus requerimientos de alcance o energía, tales como Wi-Fi, Bluetooth Low Energy (BLE), Zigbee, o tecnologías celulares como NB-IoT y 5G.</p>
+		<p><strong>Fuente de alimentación:</strong> Proporciona la energía requerida, pudiendo ser desde una conexión directa a la red eléctrica hasta diminutas baterías de iones de litio o incluso sistemas de recolección de energía ambiental (paneles solares microscópicos).</p>	
+		<p>El <strong>proceso interno</strong> de estos equipos sigue una secuencia rigurosa para garantizar su eficiencia. Inicialmente, un sensor mide una magnitud física continua y genera una señal eléctrica analógica. Esta señal atraviesa un convertidor analógico-digital (ADC) para que el microprocesador pueda procesarla mediante bits discretos. Luego, el módulo de comunicación encapsula esta información y la transmite hacia el receptor.</p>
+	
+	</div>
+
+	<!-- pag 23 -->
+	<div class="page">
+		<p> En este punto, la optimización de la red puede analizarse mediante el tiempo necesario para enviar dicha información. El tiempo de transmisión teórico se formula como:</p>
+		$$T = \frac{D}{R}$$
+		<p>Donde $T$ es el tiempo de transmisión expresado en segundos, $D$ representa la carga útil de los datos a enviar (en bits), y $R$ es la tasa de transferencia o el ancho de banda del canal de comunicación local (en bits por segundo).</p>
+		<figure style="text-align: center">
+        <img class="image_expand" loading="lazy" src="images/contenido/33.png" style="border-radius:15px;cursor:pointer;width:80%;" onclick="openImage(this)">
+        <figcaption>Así funcionan los dispositivos conectados.</figcaption></figure>
+		
+	</div>
+
+	<!-- pag 24 -->
+	<div class="page">
+		<p>Las <strong>aplicaciones prácticas</strong> y los <strong>ejemplos reales</strong> de estos procesos son innumerables y están transformando múltiples sectores de manera profunda. En los hogares inteligentes contemporáneos, un ejemplo clásico es el termostato automatizado (como el caso comercial de Google Nest); este dispositivo detecta continuamente la temperatura y la presencia física, aprendiendo de los patrones de los usuarios para decidir, sin ayuda, en qué momento encender o apagar la calefacción. En el sector manufacturero, conocido como el Internet de las Cosas Industrial (IIoT), se instalan diminutos sensores de vibración acústica en motores de miles de caballos de fuerza. Estos sensores envían constantemente patrones de frecuencia a la nube con el único fin de alertar sobre posibles fallos en los rodamientos meses antes de que se produzca una rotura real.</p>
+		<p> En las redes IoT de largo alcance y bajo consumo (LPWAN), la tasa $R$ suele ser sumamente baja, por lo que ingenieros y desarrolladores deben comprimir el tamaño del dato $D$ al mínimo posible para conservar la energía de las baterías.</p>
+	
+		<p>El auge global de esta tecnología aporta notables <strong>beneficios y ventajas</strong>, destacándose la automatización radical, la drástica reducción de costos operativos y la posibilidad de ejecutar el mantenimiento predictivo, lo cual prolonga la vida útil de grandes maquinarias. No obstante, el manejo de millones de estos dispositivos hiperconectados también conlleva importantes <strong>desafíos o limitaciones</strong>. La seguridad cibernética es la barrera más crítica: cualquier dispositivo conectado con un cifrado de bajo nivel representa una potencial puerta trasera o vulnerabilidad para redes empresariales completas. A esto se suma el problema de la interoperabilidad entre fabricantes y los obstáculos inherentes de lidiar con la latencia en áreas de infraestructura tecnológica deficiente.</p>
+		
+	</div>
+	
+	<!-- pag 25 -->
+	<div class="page">
+		<figure>
+            <div class="interactive" poster="posters/p25.png" width="540" height="720" scale="97%" src="interactivos/i30.html"></div>
+            <figcaption style="margin-top:-0.5em" prefix="Objeto interactivo">Simulación fábrica inteligente, diseñada con Gemini 3.6 flash.</figcaption>
+          </figure>
+	
+	</div>
+	
+	<!-- pag 26 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/34.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 27 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/34.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 28 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">¿Cómo funcionan los dispositivos conectados?</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p28.png" width="540" height="680" scale="90%" src="interactivos/i31.html"></div>
+            <figcaption prefix="Objeto interactivo">Explicado por pasos.</figcaption>
+          </figure>
+        </div>
+		</div>
+	
+	</div>
+	
+	<!-- pag 29 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Cuestionario con temporizador</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p29.png" width="540" height="680" scale="90%" src="interactivos/i32.html"></div>
+            <figcaption prefix="Objeto interactivo">Responde las preguntas.</figcaption>
+          </figure>
+        </div>
+		</div>		
+	
+	</div>
+
+	<!-- pag 30 -->
+	<div class="page">
+		<h2 id="c14">¿Cómo funciona la comunicación <br>entre dispositivos?</h2>
+		<p>La comunicación entre dispositivos en el marco del Internet de las Cosas (IoT) obedece al <strong>concepto fundamental</strong> de la comunicación máquina a máquina (M2M), un paradigma que permite a los objetos físicos intercambiar información de forma autónoma, sin la necesidad de intervención humana.</p>
+		<figure style="text-align: center">
+        <img class="image_expand" loading="lazy" src="images/contenido/41.png" style="border-radius:15px;cursor:pointer;width:97%;" onclick="openImage(this)">
+        <figcaption>Así funcionan los dispositivos conectados.</figcaption></figure>
+		<p>En cuanto a su <strong>principio de funcionamiento</strong>, este ecosistema requiere que los dispositivos "hablen un mismo idioma" a través de protocolos de red estandarizados, como <strong>MQTT</strong>, <strong>CoAP</strong> o <strong>HTTP</strong>. </p>
+		
+	</div>
+	
+	<!-- pag 31 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/42.png" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>Así funciona la comunicación entre dispositivos.</figcaption></figure>	
+	
+	</div>
+	
+	<!-- pag 32 -->
+	<div class="page">
+		<p>Cuando un dispositivo detecta un evento, traduce inmediatamente esa variable del entorno físico a un formato digital, empaquetándolo en fragmentos de datos manejables y transmitiéndolo mediante ondas electromagnéticas o medios físicos hacia un concentrador central. Para que la transferencia de estos paquetes de datos sea operativa y escalable, intervienen procesos internos específicos ejecutados a través de tres <strong>componentes principales</strong>:</p>
+		<p><strong>Nodos de borde (Edge devices):</strong> Compuestos por sensores que capturan métricas en tiempo real y actuadores que ejecutan acciones físicas.</p>
+		<p><strong>Gateways (Puertas de enlace):</strong> Dispositivos intermedios encargados de filtrar la información local y traducir los protocolos de comunicación de bajo voltaje o rango corto hacia redes IP estándar.</p>
+		<p><strong>Plataformas en la nube:</strong> Servidores donde los sistemas computacionales procesan, almacenan y catalogan los datos mediante inteligencia artificial, emitiendo instrucciones de vuelta hacia los niveles inferiores.</p>
+		<p>No obstante, esta interconexión y convergencia de red se enfrenta a importantes <strong>desafíos o limitaciones</strong> físicos. La eficacia en la comunicación inalámbrica se ve fuertemente restringida por la capacidad del medio y la propagación de la señal. El límite máximo para enviar información libre de errores se modela mediante el <strong>teorema de Shannon-Hartley</strong>:</p>
+		$$C = B \log_2 \left( 1 + \frac{S}{N} \right)$$
+		<p style="text-align-last: justify">Donde $C$ denota la capacidad del canal (en bits por segundo), $B$ el ancho de banda disponible, $S$ la potencia media de la señal transmitida</p>
+	
+	</div>
+
+	<!-- pag 33 -->
+	<div class="page">
+		<p> y $N$ representa la potencia del ruido. Sumado a esto, las caídas de potencia a medida que la señal viaja por el espacio limitan la distancia máxima efectiva, fenómeno ilustrado por la <strong>ecuación de transmisión de Friis</strong>:</p>
+		$$P_r = P_t G_t G_r \left( \frac{\lambda}{4 \pi d} \right)^2$$	
+		<p>Donde $P_r$ es la potencia recibida por el dispositivo destino, $P_t$ es la potencia de transmisión, $G_t$ y $G_r$ son las ganancias relativas de las antenas, $\lambda$ es la longitud de onda y $d$ la distancia de separación. Estas fórmulas dictan un profundo compromiso en el diseño de ingeniería: aumentar el rango o la velocidad ineludiblemente incrementa las exigencias de consumo energético ($S$ o $P_t$).</p><p>Estas mismas barreras físicas definen y segmentan las <strong>aplicaciones prácticas</strong> y el catálogo de protocolos según el escenario del usuario. Para un <strong>caso real</strong> residencial, como una bombilla inteligente, se adoptan estándares de corta distancia pero de alto ancho de banda como <strong>Wi-Fi</strong> o <strong>Zigbee</strong>, ya que los aparatos se encuentran a pocos metros del router y poseen suministro constante de electricidad. Diametralmente opuesto es el entorno de la agricultura inteligente; medir la humedad en un inmenso campo agrícola emplea redes <strong>LPWAN</strong> (como <strong>LoRaWAN</strong> o <strong>Sigfox</strong>), sacrificando intencionalmente la capacidad del canal ($C$) a cambio de prolongar la batería por un lustro y alcanzar distancias remotas superiores a los quince kilómetros.</p>
+		<p>A pesar de sus vicisitudes de implementación, dominar la eficiencia en este flujo de comunicación proporciona inmensas <strong>beneficios y ventajas</strong> a los esquemas de producción e infraestructura de la sociedad civil.</p>
+		
+	</div>
+	
+	<!-- pag 34 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/44.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 35 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/44.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 36 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Comunicación entre dispositivos</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p36.png" width="540" height="680" scale="90%" src="interactivos/i41.html"></div>
+            <figcaption prefix="Objeto interactivo">Explicado por pasos.</figcaption>
+          </figure>
+        </div>
+		</div>
+	
+	</div>
+	
+	<!-- pag 37 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Cuestionario falso o verdadero</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p37.png" width="540" height="680" scale="90%" src="interactivos/i42.html"></div>
+            <figcaption prefix="Objeto interactivo">Responde las preguntas.</figcaption>
+          </figure>
+        </div>
+		</div>		
+	
+	</div>
+
+	<!-- pag 38 -->
+	<div class="page">
+		<h2 id="c15">¿Cómo funciona una casa inteligente?</h2>
+		<p>Una casa inteligente es la manifestación más cotidiana del <strong>Internet de las Cosas (IoT)</strong>, transformando una vivienda tradicional en un ecosistema digital interconectado. Su <strong>concepto fundamental</strong> se basa en dotar de conectividad a objetos de uso diario para que se comuniquen entre sí, generando un entorno autónomo. El <strong>principio de funcionamiento</strong> radica en la recopilación constante de información del entorno físico, la cual es enviada a la nube o a un procesador local para ser analizada en tiempo real. De este modo, los electrodomésticos, sistemas de iluminación y de climatización dejan de ser aparatos aislados y se convierten en nodos inteligentes capaces de tomar decisiones programadas o de aprender las rutinas de los usuarios.</p>
+		<figure style="text-align: center">
+        <img class="image_expand" loading="lazy" src="images/contenido/51.png" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>¿Cómo funciona una casa inteligente?</figcaption></figure>
+				
+	</div>
+	
+	<!-- pag 39 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/52.png" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>Así funciona una casa inteligente.</figcaption></figure>	
+	
+	</div>
+	
+	<!-- pag 40 -->
+	<div class="page">
+		<p>Para que esta intercomunicación sea viable, la arquitectura tecnológica se apoya en tres <strong>componentes principales</strong>:</p>
+		<p><strong>Sensores:</strong> Actúan como los "sentidos" del hogar (termostatos, fotocélulas, detectores de humo y movimiento), encargados de capturar los datos físicos del ambiente.</p>
+		<p><strong>Gestor de red o Hub:</strong> Es el núcleo por donde transita la información, utilizando protocolos de comunicación inalámbrica orientados al bajo consumo, como Wi-Fi, MQTT, Zigbee o Z-Wave.</p>
+		<p><strong>Actuadores:</strong> Son los mecanismos físicos (relés, válvulas, motores) que ejecutan la orden final, como encender una bombilla o bloquear una puerta.</p>
+		<p>A través de estos componentes, los <strong>procesos internos</strong> fluyen en un ciclo lógico ininterrumpido: los sensores captan un estímulo material, el gestor traduce y envía esos paquetes de datos mediante algoritmos de control, y finalmente se emite un mandato hacia los actuadores correspondientes.</p>
+		<p>Las <strong>aplicaciones prácticas</strong> y los <strong>casos reales</strong> de esta tecnología abarcan desde el confort absoluto hasta la seguridad integral. Un ejemplo representativo es la gestión automática de la iluminación matutina. Al detectar a través del <i>smartphone</i> que el usuario ha despertado, el sistema abre las persianas motorizadas, enciende gradualmente luces cálidas y ordena a la cafetera comenzar a preparar el desayuno. En el ámbito de la seguridad, si un sistema magnético detecta la apertura inusual de una ventana cuando la casa está vacía, activa inmediatamente una sirena, envía una notificación móvil, y comienza a respaldar el video de las cámaras de seguridad directamente en servidores externos, todo en milisegundos.</p>			
+	
+	</div>
+
+	<!-- pag 41 -->
+	<div class="page">
+		<p>Uno de los principales <strong>beneficios y ventajas</strong> de una vivienda automatizada es la maximización de la eficiencia energética. Desde el punto de vista de la física y la ingeniería eléctrica, la energía total consumida ($E$) por un electrodoméstico es proporcional a su potencia instalada ($P$) y al tiempo de funcionamiento ($t$):</p>
+		$$E = P \cdot t$$
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/53.png" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>EL HUB IoT en una casa inteligente.</figcaption></figure>	
+	
+	</div>
+
+	<!-- pag 42 -->
+	<div class="page">
+		<p>Considerando que en corriente alterna la potencia depende voltaje ($V$), la corriente ($I$) y el factor de potencia ($\cos \phi$), la ecuación de gasto energético se define como:</p>
+		$$E = (V \cdot I \cdot \cos \phi) \cdot t$$
+		<p>Un sistema IoT no puede alterar las características físicas de los electrodomésticos (es decir, asume $V$, $I$ y $\cos \phi$ como constantes), pero la inteligencia artificial interviene directamente sobre la variable del tiempo ($t$). Al predecir horarios y apagar dispositivos fantasma o sistemas de climatización en habitaciones vacías, se minimiza $t$ de forma inteligente, garantizando que el consumo total $E$ disminuya drásticamente en la factura a final de mes.</p>
+		<p>A pesar de sus formidables ventajas, las casas inteligentes no están exentas de <strong>desafíos o limitaciones</strong>. El obstáculo más crítico es la vulnerabilidad de la ciberseguridad; si la red doméstica no posee cifrado avanzado, un atacante cibernético podría interceptar las comunicaciones, invadiendo la privacidad del usuario o incluso controlando las cerraduras digitales. Asimismo, la domótica moderna presenta una altísima dependencia tecnológica: las interrupciones imprevistas en el suministro eléctrico o la caída del proveedor de internet pueden inutilizar por completo la lógica del sistema, reduciendo temporalmente una vivienda de última generación a un conjunto de aparatos inertes.</p>
+		<p>En el siguiente objeto interactivo, presentamos una simulación de la cocina inteligente, que incluye: Encimera, Olla / Hervidor Conectado, campana extractora domótica, frigorífico inteligente IoT con pantalla táctil integrada y asistente Robótico de Cocina (Chef Bot).</p>
+		
+	</div>
+	
+	<!-- pag 43 -->
+	<div class="page">
+		<figure>
+            <div class="interactive" poster="posters/p43.png" width="540" height="720" scale="97%" src="interactivos/i50.html"></div>
+            <figcaption style="margin-top:-0.5em" prefix="Objeto interactivo">Simulación cocina inteligente, diseñada con Gemini 3.6 flash.</figcaption>
+          </figure>
+	
+	</div>
+	
+	<!-- pag 44 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/54.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 45 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/54.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 46 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Casa inteligente</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p46.png" width="540" height="680" scale="90%" src="interactivos/i51.html"></div>
+            <figcaption prefix="Objeto interactivo">Explicado por pasos.</figcaption>
+          </figure>
+        </div>
+		</div>
+	
+	</div>
+	
+	<!-- pag 47 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Cuestionario</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p47.png" width="540" height="680" scale="90%" src="interactivos/i52.html"></div>
+            <figcaption prefix="Objeto interactivo">Responde las preguntas.</figcaption>
+          </figure>
+        </div>
+		</div>		
+	
+	</div>
+
+	<!-- pag 48 -->
+	<div class="page">
+		<h2 id="c16">¿Cómo funciona una ciudad inteligente?</h2>
+		<p>Una ciudad inteligente es un ecosistema urbano hiperconectado que utiliza las tecnologías del <strong>Internet de las Cosas (IoT)</strong> para recolectar datos en tiempo real, optimizar sus recursos y mejorar la calidad de vida de sus habitantes. El <strong>concepto fundamental</strong> radica en transformar la infraestructura urbana estática, como calles, tuberías y edificios, en una red viva y reactiva. Para lograr esto, se apoya en tres <strong>componentes principales</strong>: una capa de hardware que comprende millones de sensores y actuadores desplegados por toda la ciudad, una arquitectura de red inalámbrica para asegurar la transmisión fluida de la información, y centros vitales de computación en la nube o <em>Edge Computing</em>, impulsados por inteligencia artificial para el análisis de macrodatos (Big Data).</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/61.png" style="border-radius:15px;cursor:pointer;width:90%;" onclick="openImage(this)">
+        <figcaption>¿Cómo funciona una ciudad inteligente?</figcaption></figure>
+		
+	</div>
+	
+	<!-- pag 49 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/62.png" style="border-radius:15px;cursor:pointer;width:96%;" onclick="openImage(this)">
+        <figcaption>Así funciona una ciudad inteligente</figcaption></figure>	
+	
+	</div>
+	
+	<!-- pag 50 -->
+	<div class="page">
+		<p>El <strong>principio de funcionamiento</strong> de esta metrópolis tecnológica se basa en un ciclo continuo de percepción, comunicación y acción. Los <strong>procesos internos</strong> inician cuando los dispositivos de recolección, como medidores de agua inteligentes o monitores acústicos, transforman eventos físicos cotidianos en datos digitales. Estos datos, al ser codificados, viajan de manera encriptada a través del tejido de conectividad urbana hacia plataformas de control central. Allí, algoritmos sofisticados procesan la información y disparan respuestas automatizadas directas hacia los actuadores. Por ejemplo, detectar la aglomeración de vehículos en una calle genera una orden de cambio en el patrón computarizado de los semáforos, sin intervención humana directa.</p>
+		<p>No obstante, el procesamiento de este flujo masivo de información impone retos ingenieriles críticos, ya que la comunicación a gran escala en el IoT urbano está sujeta a las leyes de la física. Para garantizar operaciones fiables, se debe calcular la capacidad máxima por cada enlace de la red utilizando el teorema de Shannon-Hartley, el cual define la tasa máxima teórica a la que los datos pueden transmitirse sin errores. Dicho límite, que fundamenta las telecomunicaciones de toda ciudad tecnológica, se expresa como:</p>
+		$$C = B \log_2 \left( 1 + \frac{S}{N} \right)$$
+		<p>Donde $C$ es la capacidad del canal en bits por segundo, $B$ es el ancho de banda en hercios, $S$ es la potencia promedio de la señal y $N$ representa la potencia del ruido. Esta restricción matemática basada en la proporción $S/N$ explica por qué en zonas urbanas de alta densidad —con interferencia electromagnética severa— las metrópolis requieren desplegar tecnologías vanguardistas como el 5G o redes de área amplia de baja potencia (LPWAN) para evitar colapsos al manejar los datos.</p>
+	
+	</div>
+
+	<!-- pag 51 -->
+	<div class="page">
+		<p>Gracias a estas arquitecturas superan dichos límites, surgiendo múltiples <strong>aplicaciones prácticas</strong> que cambian el día a día ciudadano:</p>
+		<p><strong>Movilidad adaptativa:</strong> Semáforos que alteran sus luces basándose en los flujos exactos del tráfico mediante cámaras termográficas.</p>
+		<p><strong>Gestión de residuos ultrasónica:</strong> Contenedores de basura con sensores que miden su volumen interior para rediseñar las rutas diarias de los camiones recolectores solo a aquellos que están llenos.</p>
+		<p><strong>Redes eléctricas (Smart Grids):</strong> Infraestructuras que detectan los picos en el consumo para inyectar automáticamente energía verde acumulada a distritos en momentos de estrés, previniendo apagones masivos.</p>
+		<figure class="flotai">
+        <img loading="lazy" src="images/contenido/63.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>La red inteligente optimiza el funcionamiento de la ciudad</figcaption></figure>	
+		<p>Estas aplicaciones muestran <strong>beneficios y ventajas</strong> innegables: se genera una reducción radical en la huella de carbono, optimización del presupuesto municipal y respuestas instantáneas ante emergencias policiales o de salud. Un <strong>caso real</strong> emblemático es el estado de Singapur, cuyo programa <em>Smart Nation</em> utiliza peajes dinámicos controlados por IoT para evitar congestiones. Sin embargo, la vulnerabilidad ante ciberataques podría paralizar suministros críticos completos, y la extrema vigilancia digital sitúa sobre la mesa un severo debate ético sobre la privacidad civil.</p>
+		
+	</div>
+	
+	<!-- pag 52 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/64.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 53 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/64.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 54 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Ciudad inteligente</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p54.png" width="540" height="680" scale="90%" src="interactivos/i61.html"></div>
+            <figcaption prefix="Objeto interactivo">Explicado por pasos.</figcaption>
+          </figure>
+        </div>
+		</div>
+	
+	</div>
+	
+	<!-- pag 55 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Cuestionario</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p55.png" width="540" height="680" scale="90%" src="interactivos/i62.html"></div>
+            <figcaption prefix="Objeto interactivo">Responde las preguntas.</figcaption>
+          </figure>
+        </div>
+		</div>		
+	
+	</div>
+
+	<!-- pag 56 -->
+	<div class="page">
+		<h2 id="c17">¿Cómo funciona el IoT industrial?</h2>
+		<p>El <strong>Internet de las Cosas Industrial (IIoT)</strong>, a diferencia de su contraparte de consumo, opera en la intersección de las Tecnologías de la Información (IT) y la Tecnología Operativa (OT). Su principio de funcionamiento se basa en dotar a la maquinaria pesada, líneas de ensamblaje e infraestructuras críticas de una "percepción digital" de su entorno y estado. Esto se logra mediante la interconexión a gran escala de instrumentos y dispositivos inteligentes que recopilan, procesan e intercambian datos en tiempo real. Debido a que en un entorno industrial industrial un fallo de microsegundos puede resultar en pérdidas millonarias o riesgos de seguridad graves, el IIoT funciona bajo arquitecturas robustas que garantizan una altísima fiabilidad y una muy baja latencia.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/71.png" style="border-radius:15px;cursor:pointer;width:90%;" onclick="openImage(this)">
+        <figcaption>Máquinas que piensan, datos que deciden</figcaption></figure>
+		
+	</div>
+	
+	<!-- pag 57 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/72.png" style="border-radius:15px;cursor:pointer;width:96%;" onclick="openImage(this)">
+        <figcaption>Sensores capturan datos</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 58 -->
+	<div class="page">
+		<p>Para ejecutar este complejo flujo de datos, los sistemas IIoT dependen de varios <strong>componentes principales</strong>, los cuales llevan a cabo procesos internos altamente coordinados en diferentes capas tecnológicas:</p>
+		<p><strong>Sensores y actuadores de grado industrial:</strong> Son la interfaz física. Capturan variables continuas (temperatura, presión, nivel de vibración) y ejecutan comandos mecánicos de respuesta inmediata.</p>
+		<p><strong>Edge Computing (Computación en el borde):</strong> Consiste en procesadores ubicados físicamente cerca de la maquinaria. Filtran y analizan datos críticos en milisegundos sin depender de una conexión remota, permitiendo acciones automáticas y de emergencia.</p>
+		<p><strong>Gateways o pasarelas de enlace industrial:</strong> Equipos que recolectan la información del "borde", traducen protocolos industriales antiguos a estándares de Internet modernos y cifran los datos antes de su envío.</p>
+		<p><strong>Plataformas en la nube:</strong> Servidores centralizados y masivos donde algoritmos avanzados procesan los terabytes de datos históricos para extraer conocimiento estratégico a largo plazo.</p>
+		<p>Uno de los principales <strong>beneficios y ventajas</strong> de implementar esta tecnología es la mejora medible y sistemática de la eficiencia en el piso de producción. El funcionamiento del ecosistema interconectado maximiza la Eficiencia General de los Equipos (conocida como OEE, por sus siglas en inglés), un indicador matemático vital en la manufactura que se define como:</p>
+		$$OEE = D \times R \times C$$
+		<p style="text-align-last: justify">Donde $D$ representa la Disponibilidad (el tiempo operativo neto frente al planificado), $R$ es el Rendimiento (la velocidad real de </p>
+	
+	</div>
+
+	<!-- pag 59 -->
+	<div class="page">
+		<p>producción) y $C$ es la Calidad (la proporción de unidades procesadas sin defectos). Al monitorear flujos de trabajo en tiempo real, un sistema IIoT puede, por ejemplo, detectar el calentamiento anómalo de un motor e indicarle al actuador que reduzca la carga de trabajo ($R$) para evitar un daño catastrófico que provoque un paro prolongado de la planta ($D$), manteniendo así métricas óptimas y asegurando la rentabilidad global.</p><p>En cuanto a sus <strong>aplicaciones prácticas y casos reales</strong>, el paradigma moderno del <em>mantenimiento predictivo</em> es el estandarte del IIoT. En una fábrica automotriz tradicional, los motores o brazos robóticos suelen revisarse siguiendo un calendario fijo, o directamente se reparan una vez que fallan. Sin embargo, con el IoT industrial, el análisis acústico y de vibraciones ejecutado por inteligencia artificial en los sensores permite detectar la fatiga sutil de un rodamiento semanas antes de que ocurra una rotura física. Este sistema predice con exactitud estadística cuándo fallará la máquina y agenda el mantenimiento de manera desatendida, evitando por completo las paralizaciones masivas y el despilfarro de mano de obra.</p>
+		<p>No obstante, el funcionamiento del IoT industrial también enfrenta importantes <strong>desafíos y limitaciones</strong>. La ciberseguridad se alza como el riesgo número uno; históricamente, los equipos y maquinaria industrial operaban aislados de internet (una medida conocida como <i>air-gap</i>). Conectar infraestructuras enteras a redes globales abre vectores de ataques informáticos que podrían paralizar plantas de agua, redes eléctricas completas o sistemas de manufactura. A esto se suma el problema técnico de la interoperabilidad: las fábricas poseen equipos heredados (<i>legacy</i>) con décadas de antigüedad y docenas de protocolos cerrados de distintos fabricantes, lo que hace que unificar y sincronizar todas las máquinas en un solo estándar requiera una elevadísima inversión monetaria inicial.</p>
+		
+	</div>
+	
+	<!-- pag 60 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/74.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 61 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/74.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 62 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">El IoT industrial</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p62.png" width="540" height="680" scale="90%" src="interactivos/i71.html"></div>
+            <figcaption prefix="Objeto interactivo">Explicado por pasos.</figcaption>
+          </figure>
+        </div>
+		</div>
+	
+	</div>
+	
+	<!-- pag 63 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Cuestionario</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p63.png" width="540" height="680" scale="90%" src="interactivos/i72.html"></div>
+            <figcaption prefix="Objeto interactivo">Responde las preguntas.</figcaption>
+          </figure>
+        </div>
+		</div>		
+	
+	</div>
+
+	<!-- pag 64 -->
+	<div class="page">
+		<h2 id="c18">¿Cómo funciona la computación en el borde (Edge Computing)?</h2>
+		<p>Para entender el <strong>concepto fundamental</strong> de la computación en el borde (o <em>Edge Computing</em>), resulta útil imaginar una gran corporación multinacional. Si cada decisión menor tuviera que ser consultada y aprobada por la sede central, la empresa colapsaría por la lentitud operativa. En el <strong>Internet de las Cosas (IoT)</strong> ocurre exactamente lo mismo: los dispositivos generan una inmensa cantidad de datos constantemente y, en lugar de enviar toda esa información bruta a un servidor central en la nube, el <em>Edge Computing</em> traslada el poder de procesamiento computacional lo más cerca posible de la fuente de los datos. De esta manera, el procesamiento tiene lugar en el "borde" geográfico de la red, lo que permite que la tecnología filtre, analice y actúe de forma casi instantánea.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/81.png" style="border-radius:15px;cursor:pointer;width:86%;" onclick="openImage(this)">
+        <figcaption>IA y datos en tiempo real.</figcaption></figure>
+		
+	</div>
+	
+	<!-- pag 65 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/82.png" style="border-radius:15px;cursor:pointer;width:96%;" onclick="openImage(this)">
+        <figcaption>Así funciona la computación en el borde (Edge Computing)</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 66 -->
+	<div class="page">
+		<p>En cuanto a sus <strong>procesos internos</strong>, el flujo de trabajo cambia radicalmente en comparación con el IoT tradicional. Cuando un sensor capta una lectura del mundo físico, en lugar de transmitirla ciegamente mediante internet, la envía a un micro-servidor local. Este equipo ejecuta algoritmos (frecuentemente de inteligencia artificial) e infiere resultados <i>in situ</i>. La razón física y matemática para hacer esto radica en el retardo de la transmisión bidireccional. Si modelamos el tiempo total de respuesta ($T_{total}$) de un sistema basado estrictamente en la nube, observamos una fuerte dependencia del tiempo que tarda el paquete de red en viajar ($T_{red}$):</p>
+		$$T_{total} = T_{procesamiento} + 2 \cdot T_{red}$$
+		<p>Donde $2 \cdot T_{red}$ representa el viaje de ida vuelta de los datos hacia los servidores en la nube más las latencias de enrutamiento. Al implementar <i>Edge Computing</i>, el componente dependiente de la red extensa ($T_{red}$) tiende prácticamente a cero, permitiendo que las decisiones se ejecuten en una fracción de milisegundo.</p>
+		<p>Para orquestar esta arquitectura descentralizada, es necesaria la interacción armónica de varios <strong>componentes principales</strong>:</p>
+		<p><strong>Dispositivos de borde (End-devices):</strong> Sensores, cámaras y actuadores que recogen pasivamente o interaccionan directamente con el mundo físico.</p>
+		<p><strong>Pasarelas de borde (Edge Gateways):</strong> Hardware alojado en las propias instalaciones, dotado de capacidad de cálculo local y memoria que centraliza de forma temporal los datos de los sensores.</p>
+		<p><strong>Infraestructura de conectividad local:</strong> Tecnologías de escasa latencia como Wi-Fi 6, Bluetooth o redes 5G privadas que comunican los sensores con los gateways.</p>
+	
+	</div>
+
+	<!-- pag 67 -->
+	<div class="page">
+		<p><strong>La Nube (Cloud Central):</strong> Aunque ya no procesa datos crudos, se mantiene para realizar almacenamientos históricos, entrenar modelos complejos de <i>Machine Learning</i> y perfilar análisis a largo plazo.</p>
+		<p>El uso de un paradigma de este tipo proporciona notables <strong>beneficios y ventajas</strong> al ecosistema IoT. El ahorro del ancho de banda es fenomenal; un <i>gateway</i> en el borde solo enviará alertas específicas o estadísticas comprimidas a la nube, ahorrando costes inmensos de transmisión de datos inútiles. Simultáneamente, otorga una drástica mejora en la privacidad, ya que datos sensibles o grabaciones en vídeo o audio no abandonan nunca el perímetro local, protegiéndolos contra intercepciones. Además, confiere una gran autonomía a la infraestructura: si el servicio de internet exterior falla por una tormenta o un corte de cable, el sistema de borde interno continuará sus funciones de control y alerta ininterrumpidamente.</p>
+		<p>Podemos observar la importancia vital de esta tecnología analizando <strong>ejemplos y casos reales</strong>, siendo quizás el más ilustrativo el de los vehículos autónomos. Un coche inteligente moderno y pertrechado con sensores y radares LiDAR está constantemente calculando entornos, produciendo gigabytes de información por segundo. Si el vehículo dependiera de la nube para decidir si frenar ante un paso de peatones, la latencia de la red resultaría literalmente en un accidente fatal. Al emplear procesadores internos (en el <em>borde</em> del propio automóvil), el cómputo de la orden demora solo instantes. No obstante, esto impone importantes <strong>desafíos o limitaciones</strong> al sector: el hardware en el borde tiene restricciones de espacio, un control estricto del consumo energético y de disipación de calor, además de presentar un innegable reto logístico de mantenimiento al tener miles de microcomputadoras desplegadas físicamente por todo el globo.</p>
+		
+	</div>
+	
+	<!-- pag 68 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/84.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 69 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/84.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 70 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">La computación en el borde (Edge Computing)</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p70.png" width="540" height="680" scale="90%" src="interactivos/i81.html"></div>
+            <figcaption prefix="Objeto interactivo">Explicado por pasos.</figcaption>
+          </figure>
+        </div>
+		</div>
+	
+	</div>
+	
+	<!-- pag 71 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Cuestionario</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p71.png" width="540" height="680" scale="90%" src="interactivos/i82.html"></div>
+            <figcaption prefix="Objeto interactivo">Responde las preguntas.</figcaption>
+          </figure>
+        </div>
+		</div>		
+	
+	</div>
+
+	<!-- pag 72 -->
+	<div class="page">
+		<h2 id="c19">¿Cómo funciona la seguridad en el IoT?</h2>
+		<p>La seguridad en el Internet de las Cosas (IoT) es la práctica de salvaguardar los dispositivos conectados y las redes en las que operan, garantizando el <strong>concepto fundamental</strong> de la confidencialidad, integridad y disponibilidad de los datos. A diferencia de los ordenadores tradicionales, el contexto del IoT presenta grandes <strong>desafíos y limitaciones</strong> que radican en la propia naturaleza de los equipos: suelen tener capacidades de procesamiento extremadamente bajas, cuentan con poca memoria y a menudo operan con pequeñas baterías. Esto significa que no siempre pueden ejecutar soluciones de seguridad complejas o antivirus pesados, lo que crea una vasta superficie de ataque cibernético si no se aplican protocolos eficientes y ligeros desde su diseño original.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/91.png" style="border-radius:15px;cursor:pointer;width:91%;" onclick="openImage(this)">
+        <figcaption>Seguridad en el IoT.</figcaption></figure>
+		
+	</div>
+	
+	<!-- pag 73 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/92.png" style="border-radius:15px;cursor:pointer;width:96%;" onclick="openImage(this)">
+        <figcaption>Así funciona la seguridad en el IoT</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 74 -->
+	<div class="page">
+		<p>Para resolver este problema, la infraestructura se apoya en <strong>componentes principales</strong> como la autenticación biométrica o multifactorial, los cortafuegos perimetrales para redes y, de manera irremplazable, la criptografía de datos. Durante sus <strong>procesos internos</strong>, los microcontroladores IoT utilizan algoritmos de cifrado para transformar la lectura del sensor en texto cifrado antes de transmitirla. Por ejemplo, en los esquemas de criptografía asimétrica como RSA, el proceso matemático base para encriptar un mensaje inicial $m$ y transformarlo en un texto cifrado $c$ utiliza una clave pública $(e, n)$ mediante la siguiente relación modular:</p>
+		$$c \equiv m^e \pmod{n}$$
+		<p>Posteriormente, el servidor central o dispositivo receptor legítimo utiliza su clave privada $d$ para descifrar la información aplicando la operación inversa, garantizando matemáticamente que si un pirata informático intercepta los datos inalámbricos, solo obtenga secuencias numéricas aleatorias indescifrables.</p>
+		<p>El <strong>principio de funcionamiento</strong> en un ecosistema IoT resiliente se inspira en la "Defensa en Profundidad", estableciendo múltiples barreras de seguridad. Esta estrategia se divide típicamente en tres frentes estructurales:</p>
+		<p><strong>Seguridad a nivel dispositivo:</strong> Exige el uso de un arranque seguro (<i>Secure Boot</i>) que verifica mediante firmas digitales que el <i>firmware</i> operativo no ha sido alterado de manera perjudicial.</p>
+		<p><strong>Seguridad a nivel red:</strong> Utiliza protocolos de transporte seguro diseñados para baja latencia (como TLS o DTLS) para aislar flujos de información y asegurar conexiones puente (<i>gateways</i>).</p>
+			
+	</div>
+
+	<!-- pag 75 -->
+	<div class="page">
+		<p><strong>Gestión del ciclo de vida:</strong> Implementa sistemas de actualización remota (<i>Over-The-Air</i>) para parchear rápidamente nuevas vulnerabilidades descubiertas y renovar de manera continua las credenciales locales.</p>
+		<p>Comprender la importancia vital de esta estructura requiere analizar <strong>casos reales</strong> donde la ausencia de medidas de seguridad causó estragos. Un ejemplo infame es el ataque de la <i>botnet Mirai</i> en 2016, donde ciberdelincuentes secuestraron cientos de miles de cámaras IP y enrutadores domésticos, rastreando puertos abiertos y aprovechando contraseñas por defecto predecibles. Estos equipos formaron involuntariamente un ejército cibernético para lanzar un ataque masivo de denegación de servicio (DDoS) que llegó a paralizar partes cruciales de internet. Este evento histórico reconfiguró las <strong>aplicaciones prácticas</strong> del sector tecnológico actual; hoy en día, desde cámaras de seguridad hasta marcapasos médicos conectados, los marcos regulatorios exigen la eliminación de credenciales genéricas de fábrica y fuerzan dinámicamente configuraciones personalizadas del usuario.</p>
+		<p>Finalmente, invertir recursos físicos e intelectuales en resolver esto ofrece valiosos <strong>beneficios y ventajas</strong> a largo plazo. Una arquitectura IoT bien blindada no solo protege la privacidad del individuo evitando fugas de información personal, sino que garantiza la continuidad material en ramas como el Internet de las Cosas Industrial (IIoT). Cuando la seguridad funciona silenciosamente en segundo plano repeliendo amenazas, se fomenta la confianza pública, lo cual permite que miles de millones de sensores converjan globalmente para automatizar procesos agrícolas, optimizar el consumo de energía en hogares inteligentes y mejorar nuestras ciudades sin temor al sabotaje digital.</p>
+		
+	</div>
+	
+	<!-- pag 76 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/94.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 77 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/94.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 78 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">La seguridad en el IoT</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p78.png" width="540" height="680" scale="90%" src="interactivos/i91.html"></div>
+            <figcaption prefix="Objeto interactivo">Explicado por pasos.</figcaption>
+          </figure>
+        </div>
+		</div>
+	
+	</div>
+	
+	<!-- pag 79 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Cuestionario</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p79.png" width="540" height="680" scale="90%" src="interactivos/i92.html"></div>
+            <figcaption prefix="Objeto interactivo">Responde las preguntas.</figcaption>
+          </figure>
+        </div>
+		</div>		
+	
+	</div>
+
+	<!-- pag 80 -->
+	<div class="page">
+		<h2 id="c110">¿Cómo funcionará el futuro del Internet de las Cosas?</h2>
+		<p>El futuro del Internet de las Cosas (IoT) representa un salto evolutivo desde la simple recolección de datos hacia la autonomía inteligente, dando lugar a lo que se conoce como <strong>AIoT</strong> (Inteligencia Artificial de las Cosas). En su <strong>concepto fundamental</strong>, las redes dejarán de ser meras transmisoras de información para convertirse en "sistemas nerviosos" cognitivos capaces de tomar decisiones en tiempo real sin intervención humana. Entre los <strong>componentes principales</strong> que harán posible esta arquitectura destacan las futuras redes de conectividad inalámbrica extrema (como el 6G), los microprocesadores neuromórficos y los revolucionarios sensores cuánticos.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/101.png" style="border-radius:15px;cursor:pointer;width:91%;" onclick="openImage(this)">
+        <figcaption>El mundo conectado del futuro.</figcaption></figure>
+		
+	</div>
+	
+	<!-- pag 81 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/102.png" style="border-radius:15px;cursor:pointer;width:96%;" onclick="openImage(this)">
+        <figcaption>Sensores en todas partes</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 82 -->
+	<div class="page">
+		<p>Para comprender el <strong>principio de funcionamiento</strong> que sostendrá estas inmensas redes hiperconectadas, es fundamental analizar las leyes físicas de la transmisión de datos. A medida que exponencialmente más de dispositivos busquen comunicarse, el flujo de información estará gobernado por el Teorema de Shannon-Hartley, el cual define la capacidad máxima teórica de un canal de comunicación. Esta ley se expresa mediante la ecuación:</p>
+		$$C = B \log_2 \left( 1 + \frac{S}{N} \right)$$
+		<p>Donde $C$ es la capacidad del canal (en bits por segundo), $B$ el ancho de banda disponible en hercios, $S$ la potencia de la señal útil y $N$ la potencia del ruido subyacente. Para evitar el colapso de la red ante billones de conexiones, el futuro del IoT requiere expandir radicalmente $B$ utilizando frecuencias de terahercios y mejorar drásticamente la relación señal/ruido ($\frac{S}{N}$) a través de metamateriales y antenas de formación de haces dinámicos.</p>
+		<p>A nivel de <strong>procesos internos</strong>, el futuro ecosistema solucionará los cuellos de botella mediante el <i>Edge Computing</i> (computación en el borde). En lugar de enviar todos los datos brutos a servidores en la nube centralizados, el procesamiento mediante algoritmos de redes neuronales ocurrirá localmente en el propio microcontrolador del dispositivo. Los <strong>beneficios y ventajas</strong> de esta descentralización son monumentales: una latencia casi nula (frecuentemente inferior a $1$ milisegundo), un ahorro drástico en el consumo de ancho de banda y una mejora intrínseca en la privacidad, ya que los datos personales sensibles nunca abandonan físicamente el entorno del usuario.</p>
+		<p>Las <strong>aplicaciones prácticas</strong> y los <strong>casos reales</strong> proyectados para este nuevo horizonte tecnológico transformarán radicalmente industrias enteras y nuestra forma de interactuar con el entorno:</p>	
+	
+	</div>
+
+	<!-- pag 83 -->
+	<div class="page">
+		<figure class="flotad">
+        <img loading="lazy" src="images/contenido/103.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>La IA tomará decisiones</figcaption></figure>
+		<p><strong>Vehículos completamente autónomos (V2X):</strong> Automóviles comunicándose en modo enjambre tanto con otros coches como con los semáforos, ajustando sus trayectorias mediante predicción matemática para reducir los embotellamientos e incidentes viales a cero.</p>
+		<p><strong>Salud predictiva intervencionista:</strong> Nanosensores biométricos integrados en el torrente sanguíneo que no solo monitorizan glucosa u oxígeno, sino que logran anticipar accidentes cardiovasculares y liberan autónomamente un fármaco para prevenir el evento horas antes de que ocurra.</p>
+		<p><strong>Agricultura algorítmica:</strong> Cultivos monitorizados planta por planta, donde drones polinizadores e irrigadores precisos ajustan constantemente los niveles de humedad mediante análisis de microclimas, ahorrando millones de litros de agua dulce al año.</p>
+		<p>Por supuesto, materializar esta visión conlleva formidables <strong>desafíos y limitaciones</strong>. El primer gran obstáculo es la ciberseguridad; la ampliación masiva de la superficie de ataque significa que una vulnerabilidad en un simple termostato doméstico podría servir como puerta de entrada para vulnerar infraestructuras críticas. Paralelamente, existe un límite termodinámico crucial: el consumo energético y la vida útil de las baterías. Lograr un ecosistema de IoT ecológicamente sostenible exigirá el perfeccionamiento del <i>energy harvesting</i> para que no dependamos de millones de baterías altamente contaminantes.</p>
+		
+	</div>
+	
+	<!-- pag 84 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/104.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 85 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/104.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 86 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">El futuro del Internet de las Cosas</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p86.png" width="540" height="680" scale="90%" src="interactivos/i101.html"></div>
+            <figcaption prefix="Objeto interactivo">Explicado por pasos.</figcaption>
+          </figure>
+        </div>
+		</div>
+	
+	</div>
+	
+	<!-- pag 87 -->	
+	<div class="page">
+		<div class="caja5" style="width: 100%; margin-left:0%; background-color: rgba(0,180,255,0.5)">
+        <h5 class="modo5" style="font-size: 24px; margin-left:auto; margin-right: auto; background-color: blue">Iceberg</h5>
+		<div class="content" style="text-align: center; padding: 5px; padding-bottom: 0px; padding-left: 7px; background-color: rgba(255,180,0,0.0)">
+          <figure>
+            <div class="interactive" poster="posters/p87.png" width="540" height="680" scale="90%" src="interactivos/i102.html"></div>
+            <figcaption prefix="Objeto interactivo">Profundiza un poco más.</figcaption>
+          </figure>
+        </div>
+		</div>		
+	
+	</div>
+
+	
+	<!--  -->
+	<div class="page invertcolor" num="" style="background-image: radial-gradient(white, #ecf0f1, #e3e5e7); display:flex; align-items:center; justify-content:center;">
+			<a style="width:50%" target="_blank" href="https://descartes.matem.unam.mx/"><img loading="lazy" src="images/general/logo_descartes.svg" width="100%"></a>
+	</div>
+	
+	<!-- [cierra] pages_container -->
+	</div>
+
+	<!-- [cierra] book_container -->
+	</div>
+
+</body>
+</html>
