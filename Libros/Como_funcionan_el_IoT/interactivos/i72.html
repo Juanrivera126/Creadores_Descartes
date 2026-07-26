@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario: IoT Industrial (IIoT)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            max-width: 550px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: var(--text-primary);
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: var(--border-color);
+            height: 6px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            transition: width 0.4s ease;
+            border-radius: 10px;
+        }
+
+        .question-info {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        #questionContainer p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        /* Elements to Drag / Interact */
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .option {
+            background-color: #2e3b4e;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .option:hover {
+            background-color: #3b4b61;
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, var(--accent-blue), #2563eb);
+            border-color: var(--accent-blue);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .droppable {
+            display: inline-block;
+            border: 2px dashed var(--accent-blue);
+            background-color: rgba(59, 130, 246, 0.05);
+            border-radius: 8px;
+            min-width: 140px;
+            height: 22px;
+            line-height: 22px;
+            text-align: center;
+            padding: 4px 12px;
+            margin: 0 6px;
+            vertical-align: middle;
+            color: var(--accent-blue);
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .droppable.drag-over {
+            background-color: rgba(59, 130, 246, 0.2);
+            transform: scale(1.05);
+        }
+
+        .droppable.filled {
+            border-style: solid;
+            background-color: rgba(16, 185, 129, 0.1);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        /* Action Buttons */
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            background-color: var(--accent-blue);
+            border: none;
+            color: white;
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #2563eb;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        button:disabled {
+            background-color: #1e293b;
+            border: 1px solid var(--border-color);
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        #nextButton {
+            background-color: #475569;
+        }
+
+        #nextButton:hover:not(:disabled) {
+            background-color: #334155;
+        }
+
+        /* Results Display */
+        #results {
+            margin-top: 20px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            min-height: 24px;
+        }
+
+        #finalResults {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .score-badge {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin: 15px 0;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body style="overflow: hidden">
+    <div class="container">
+        <h1>Cuestionario: IoT Industrial (IIoT)</h1>
+		<p>Arrastra la respuesta al espacio vacío</p>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="question-info" id="questionInfo"></div>
+        <div id="questionContainer"></div>
+        <div class="buttons">
+            <button id="checkButton" onclick="checkAnswer()">Verificar</button>
+            <button id="nextButton" onclick="nextQuestion()" disabled>Siguiente</button>
+        </div>
+        <div id="results"></div>
+        <div id="finalResults"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                text: "El IoT industrial (IIoT) se enfoca en interconectar sensores, instrumentos y ____ en entornos de manufactura y producción.",
+                options: ["maquinaria", "redes sociales", "electrodomésticos", "smartphones"],
+                correctAnswer: "maquinaria"
+            },
+            {
+                text: "El mantenimiento ____ utiliza datos en tiempo real recogidos por sensores para predecir fallas antes de que ocurran en los equipos.",
+                options: ["predictivo", "correctivo", "reactivo", "manual"],
+                correctAnswer: "predictivo"
+            },
+            {
+                text: "El protocolo ____ es un estándar muy extendido en IIoT por ser ligero y optimizado para la transmisión de mensajes de bajo ancho de banda.",
+                options: ["MQTT", "HTTP", "FTP", "SMTP"],
+                correctAnswer: "MQTT"
+            },
+            {
+                text: "El procesamiento ____ (Edge Computing) analiza los datos cerca de donde se generan, reduciendo la latencia y la carga en la nube.",
+                options: ["en el borde", "en la nube", "centralizado", "manual"],
+                correctAnswer: "en el borde"
+            },
+            {
+                text: "Un ____ digital es una representación virtual e idéntica de un activo o proceso físico utilizada para simulaciones y monitoreo.",
+                options: ["gemelo", "sensor", "servidor", "algoritmo"],
+                correctAnswer: "gemelo"
+            },
+            {
+                text: "Un industrial ____ permite conectar dispositivos tradicionales a redes modernas traduciendo diferentes protocolos de comunicación.",
+                options: ["gateway", "firewall", "router", "switch"],
+                correctAnswer: "gateway"
+            },
+            {
+                text: "Los controladores lógicos ____ (PLC) interactúan con plataformas IIoT para automatizar procesos industriales en tiempo real.",
+                options: ["programables", "analógicos", "mecánicos", "pasivos"],
+                correctAnswer: "programables"
+            },
+            {
+                text: "La ____ industrial es clave para evitar accesos no autorizados e interrupciones en las redes operativas (OT).",
+                options: ["ciberseguridad", "virtualización", "compresión", "fidelidad"],
+                correctAnswer: "ciberseguridad"
+            },
+            {
+                text: "La convergencia de las tecnologías de la información (IT) y las tecnologías de la ____ (OT) es indispensable en la digitalización industrial.",
+                options: ["operación", "organización", "optimización", "oficina"],
+                correctAnswer: "operación"
+            },
+            {
+                text: "El desarrollo e integración masiva del IIoT es uno de los pilares fundamentales de la Industria ____.",
+                options: ["4.0", "3.0", "5.0", "2.0"],
+                correctAnswer: "4.0"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let draggedElement = null;
+        let correctAnswers = 0;
+
+        function displayQuestion() {
+            const question = questions[currentQuestion];
+            
+            // Actualizar información y barra de progreso
+            document.getElementById('questionInfo').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            const progressPercent = ((currentQuestion) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+
+            let html = `<p>${question.text.replace('____', '<span class="droppable" id="dropZone"></span>')}</p>`;
+            html += '<div class="options">';
+            question.options.forEach((option, index) => {
+                html += `<div class="option" draggable="true" data-index="${index}">${option}</div>`;
+            });
+            html += '</div>';
+            document.getElementById('questionContainer').innerHTML = html;
+
+            const options = document.querySelectorAll('.option');
+            const droppable = document.getElementById('dropZone');
+
+            // Listeners para arrastrar (Drag and Drop)
+            options.forEach(option => {
+                option.addEventListener('dragstart', dragStart);
+                option.addEventListener('dragend', dragEnd);
+                
+                // Listener para clics (Alternativa táctil y ágil para móvil/escritorio)
+                option.addEventListener('click', () => selectOption(option));
+            });
+
+            droppable.addEventListener('dragover', dragOver);
+            droppable.addEventListener('dragleave', dragLeave);
+            droppable.addEventListener('drop', drop);
+
+            document.getElementById('nextButton').disabled = true;
+            document.getElementById('checkButton').disabled = false;
+        }
+
+        function dragStart(e) {
+            draggedElement = e.target;
+            setTimeout(() => {
+                e.target.style.opacity = '0.4';
+            }, 0);
+        }
+
+        function dragEnd(e) {
+            setTimeout(() => {
+                e.target.style.opacity = '1';
+            }, 0);
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+            e.target.classList.add('drag-over');
+        }
+
+        function dragLeave(e) {
+            e.target.classList.remove('drag-over');
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            e.target.classList.remove('drag-over');
+            if (e.target.id === 'dropZone' && draggedElement) {
+                applySelection(draggedElement.textContent);
+                highlightSelectedOption(draggedElement.textContent);
+            }
+        }
+
+        // Selección por clic (alternativa de usabilidad)
+        function selectOption(element) {
+            applySelection(element.textContent);
+            highlightSelectedOption(element.textContent);
+        }
+
+        function applySelection(value) {
+            const droppable = document.getElementById('dropZone');
+            if (droppable) {
+                droppable.textContent = value;
+                droppable.classList.add('filled');
+            }
+        }
+
+        function highlightSelectedOption(value) {
+            const options = document.querySelectorAll('.option');
+            options.forEach(opt => {
+                if (opt.textContent === value) {
+                    opt.classList.add('selected');
+                } else {
+                    opt.classList.remove('selected');
+                }
+            });
+        }
+
+        function checkAnswer() {
+            const question = questions[currentQuestion];
+            const droppable = document.getElementById('dropZone');
+            
+            if (!droppable || droppable.textContent.trim() === "") {
+                document.getElementById('results').textContent = 'Por favor, selecciona una respuesta antes de continuar.';
+                document.getElementById('results').style.color = 'var(--accent-red)';
+                return;
+            }
+
+            let correct = droppable.textContent === question.correctAnswer;
+
+            if (correct) {
+                correctAnswers++;
+                document.getElementById('results').textContent = '✓ ¡Correcto!';
+                document.getElementById('results').style.color = 'var(--accent-green)';
+            } else {
+                document.getElementById('results').textContent = `✗ Incorrecto. La respuesta es: ${question.correctAnswer}`;
+                document.getElementById('results').style.color = 'var(--accent-red)';
+            }
+
+            document.getElementById('checkButton').disabled = true;
+            document.getElementById('nextButton').disabled = false;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                displayQuestion();
+                document.getElementById('results').textContent = '';
+            } else {
+                showFinalResults();
+            }
+        }
+
+        function showFinalResults() {
+            document.getElementById('progressBar').style.width = '100%';
+            document.getElementById('questionContainer').style.display = 'none';
+            document.querySelector('.buttons').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('questionInfo').style.display = 'none';
+            
+            const percentage = (correctAnswers / questions.length) * 100;
+            
+            let message = `<div class="score-badge">${correctAnswers} / ${questions.length}</div>`;
+            message += `<p>Porcentaje de aciertos: <strong>${percentage.toFixed(0)}%</strong></p>`;
+            
+            if (percentage === 100) {
+                message += '<p style="color: var(--accent-green)">¡Excelente! Tienes un dominio completo de los conceptos fundamentales del IoT Industrial.</p>';
+            } else if (percentage >= 80) {
+                message += '<p style="color: var(--accent-blue)">¡Muy bien! Demuestras un conocimiento avanzado sobre el IoT industrial y la arquitectura IIoT.</p>';
+            } else if (percentage >= 60) {
+                message += '<p style="color: var(--text-primary)">Buen trabajo. Comprendes los fundamentos, pero te sugerimos revisar algunos conceptos clave de IIoT.</p>';
+            } else {
+                message += '<p style="color: var(--text-secondary)">Aún hay conceptos clave por dominar. Te sugerimos investigar más sobre el IoT industrial para mejorar tu rendimiento.</p>';
+            }
+
+            message += `<button class="restart-btn" onclick="resetQuiz()">Volver a intentar</button>`;
+            
+            document.getElementById('finalResults').innerHTML = message;
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            correctAnswers = 0;
+            document.getElementById('questionContainer').style.display = 'block';
+            document.querySelector('.buttons').style.display = 'flex';
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('results').textContent = '';
+            document.getElementById('questionInfo').style.display = 'block';
+            document.getElementById('finalResults').innerHTML = '';
+            displayQuestion();
+        }
+
+        // Inicializar cuestionario
+        displayQuestion();
+    </script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario: Computación en el Borde (Edge Computing)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            /* Fondo con un degradado moderno y tecnológico */
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f766e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #ffffff;
+            text-align: center;
+            text-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .quiz-container {
+            background-color: rgba(255, 255, 255, 0.96);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            transition: all 0.3s ease;
+        }
+
+        /* Estilo para el indicador dinámico de procesamiento en el borde */
+        .battery-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+            justify-content: center;
+            border: 1px solid #cbd5e1;
+        }
+
+        .battery-body {
+            width: 50px;
+            height: 22px;
+            border: 3px solid #334155;
+            border-radius: 4px;
+            position: relative;
+            padding: 2px;
+        }
+
+        .battery-body::after {
+            content: '';
+            position: absolute;
+            right: -7px;
+            top: 4px;
+            width: 4px;
+            height: 8px;
+            background: #334155;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .battery-level {
+            height: 100%;
+            width: 0%;
+            background-color: #10b981;
+            transition: width 0.4s ease, background-color 0.4s ease;
+        }
+
+        .battery-text {
+            font-weight: bold;
+            color: #334155;
+            font-size: 14px;
+        }
+
+        h2 {
+            color: #1e293b;
+            font-size: 1.15rem;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            background-color: #0f766e;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: #0d9488;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            background-color: #cbd5e1;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        .correct {
+            background-color: #10b981 !important;
+            color: #ffffff !important;
+        }
+
+        .incorrect {
+            background-color: #ef4444 !important;
+            color: #ffffff !important;
+        }
+
+        .dynamic-status {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .status-success {
+            color: #10b981;
+        }
+
+        .status-fail {
+            color: #ef4444;
+        }
+
+        .explanation {
+            background-color: #f8fafc;
+            border-left: 5px solid #0f766e;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.95rem;
+        }
+
+        .score {
+            font-size: 16px;
+            font-weight: bold;
+            color: #475569;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #next-btn {
+            background-color: #3b82f6;
+            text-align: center;
+        }
+
+        #next-btn:hover {
+            background-color: #2563eb;
+        }
+    </style>
+</head>
+<body style="overflow-x: hidden">
+   
+    <div id="quiz-container" class="quiz-container">
+        <!-- El indicador dinámico de procesamiento en el borde se inserta aquí -->
+        <div class="battery-indicator">
+            <div class="battery-body">
+                <div id="battery-level" class="battery-level"></div>
+            </div>
+            <span id="battery-text" class="battery-text">Procesamiento Edge: 0%</span>
+        </div>
+        
+        <h2 id="question"></h2>
+        <div id="answers"></div>
+        <div id="explanation-container">
+            <div id="dynamic-status" class="dynamic-status" style="display: none;"></div>
+            <div id="explanation" class="explanation" style="display: none;"></div>
+        </div>
+        <button id="next-btn" class="btn" style="display: none;">Siguiente Pregunta</button>
+        <div id="score" class="score"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                "question": "¿Cuál es el objetivo principal de la Computación en el Borde (Edge Computing)?",
+                "options": [
+                    "Procesar los datos lo más cerca posible de la fuente que los genera para reducir la latencia",
+                    "Centralizar todo el almacenamiento de datos en un único centro de datos global",
+                    "Reemplazar completamente el uso de servidores en la nube por redes sociales",
+                    "Eliminar la necesidad de utilizar sensores y dispositivos IoT en las empresas"
+                ],
+                "correctAnswer": 0,
+                "explanation": "El Edge Computing busca acercar el procesamiento informático y el almacenamiento de datos a la ubicación del dispositivo origen. Esto reduce los tiempos de respuesta (latencia) y el uso de ancho de banda hacia la nube.",
+                "citation": "Arquitecturas de Cómputo Distribuido y Edge Computing"
+            },
+            {
+                "question": "¿Qué beneficio clave ofrece el Edge Computing respecto al ancho de banda de red?",
+                "options": [
+                    "Incrementa el tráfico constante hacia la nube centralizada",
+                    "Reduce la cantidad de datos que deben transmitirse hacia los servidores centrales",
+                    "Aumenta exponencialmente el gasto en transferencias de datos móviles",
+                    "Exige que todos los archivos multimedia se descarguen simultáneamente"
+                ],
+                "correctAnswer": 1,
+                "explanation": "Al filtrar y procesar la información de forma local, solo se envían a la nube los datos más relevantes o resumidos, lo que descongestiona la red y ahorra ancho de banda.",
+                "citation": "Arquitecturas de Cómputo Distribuido y Edge Computing"
+            },
+            {
+                "question": "¿Cómo se denomina al paradigma que extiende el Edge Computing hacia una capa intermedia entre los dispositivos finales y la nube?",
+                "options": [
+                    "Fog Computing (Computación en la Niebla)",
+                    "Quantum Computing",
+                    "Blockchain Computing",
+                    "Mainframe Computing"
+                ],
+                "correctAnswer": 0,
+                "explanation": "El Fog Computing (computación en la niebla) actúa como una capa intermedia descentralizada que conecta la nube con el borde extremo (Edge), coordinando el cómputo y el almacenamiento local.",
+                "citation": "Arquitecturas de Cómputo Distribuido y Edge Computing"
+            },
+            {
+                "question": "¿Por qué el Edge Computing es crucial para vehículos autónomos y sistemas industriales en tiempo real?",
+                "options": [
+                    "Porque requieren tomar decisiones críticas en milisegundos sin depender de la conectividad en la nube",
+                    "Porque los vehículos autónomos no poseen procesadores internos ni batería",
+                    "Porque permite transmitir videos en resolución 8K de forma continua sin límite",
+                    "Porque reemplaza la necesidad de usar radares y cámaras LiDAR"
+                ],
+                "correctAnswer": 0,
+                "explanation": "En sistemas críticos como la conducción autónoma, una latencia de red de cientos de milisegundos puede provocar un accidente. El procesamiento en el borde permite tomar decisiones vitales al instante.",
+                "citation": "Arquitecturas de Cómputo Distribuido y Edge Computing"
+            },
+            {
+                "question": "¿Qué ventaja ofrece el Edge Computing en materia de privacidad y seguridad de los datos?",
+                "options": [
+                    "Permite mantener la información sensible almacenada y procesada localmente sin exponerla en la red",
+                    "Garantiza que todos los datos sensibles sean públicos automáticamente",
+                    "Elimina la necesidad de utilizar contraseñas o cifrado en los dispositivos",
+                    "Desactiva las políticas de cumplimiento normativo como el GDPR"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Al mantener los datos personales o empresariales confidenciales dentro de la red local (On-Premise o en el nodo de borde), se minimiza el riesgo de interceptación durante la transferencia hacia la nube.",
+                "citation": "Arquitecturas de Cómputo Distribuido y Edge Computing"
+            },
+            {
+                "question": "¿Cuál de los siguientes es un ejemplo típico de un nodo o dispositivo de borde (Edge device)?",
+                "options": [
+                    "Un centro de datos masivo hiperescalable en otro continente",
+                    "Un gateway industrial con capacidad de procesamiento o una cámara inteligente",
+                    "Una base de datos relacional centralizada en la nube pública",
+                    "Un cable submarino de fibra óptica de transmisión transatlántica"
+                ],
+                "correctAnswer": 1,
+                "explanation": "Los gateways inteligentes, micro data centers locales, cámaras con IA integrada y sensores avanzados son ejemplos de dispositivos capaces de realizar cómputo en el borde.",
+                "citation": "Arquitecturas de Cómputo Distribuido y Edge Computing"
+            },
+            {
+                "question": "¿Cómo interactúa la Computación en la Nube (Cloud Computing) con el Edge Computing?",
+                "options": [
+                    "Se complementan: la nube analiza tendencias a largo plazo y el borde procesa eventos inmediatos",
+                    "Son tecnologías enemigas e incompatibles que no pueden usarse juntas",
+                    "El Edge Computing elimina por completo la existencia de la nube",
+                    "La nube solo procesa datos analógicos y el borde procesa datos mecánicos"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Ambas tecnologías son complementarias. El Edge atiende tareas críticas de baja latencia en tiempo real, mientras que la nube realiza análisis masivos, almacenamiento a largo plazo y entrenamiento de modelos de IA.",
+                "citation": "Arquitecturas de Cómputo Distribuido y Edge Computing"
+            },
+            {
+                "question": "¿Qué estándar de redes móviles facilita de forma determinante la expansión del Edge Computing gracias a su ultrabaja latencia?",
+                "options": [
+                    "5G (MEC - Multi-access Edge Computing)",
+                    "2G (GSM)",
+                    "3G (UMTS)",
+                    "Dial-up telefónico"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Las redes 5G integran la tecnología MEC (Multi-access Edge Computing), lo que permite ejecutar cargas de trabajo de cómputo directamente en las estaciones base de telefonía celular, logrando latencias de pocos milisegundos.",
+                "citation": "Arquitecturas de Cómputo Distribuido y Edge Computing"
+            },
+            {
+                "question": "¿Qué reto principal presenta la gestión de una infraestructura de Edge Computing a gran escala?",
+                "options": [
+                    "La complejidad de administrar, actualizar y asegurar miles de nodos físicamente distribuidos",
+                    "La falta de datos generados por los dispositivos IoT",
+                    "La imposibilidad de utilizar software de virtualización o contenedores",
+                    "La velocidad excesiva de la luz en la transmisión de señales de radio"
+                ],
+                "correctAnswer": 0,
+                "explanation": "A diferencia de un centro de datos centralizado, el Edge implica gestionar cientos o miles de nodos dispersos geográficamente, lo que complica el mantenimiento físico, las actualizaciones de software y la ciberseguridad.",
+                "citation": "Arquitecturas de Cómputo Distribuido y Edge Computing"
+            },
+            {
+                "question": "¿Qué tecnología de software suele emplearse en Edge Computing para empaquetar aplicaciones ligeras y desplegarlas fácilmente en nodos heterogéneos?",
+                "options": [
+                    "Contenedores (por ejemplo, Docker o Kubernetes ligero como K3s)",
+                    "Archivos ejecutables de MS-DOS",
+                    "Máquinas virtuales pesadas tipo Mainframe IBM",
+                    "Hojas de cálculo en formato CSV"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Los contenedores y orquestadores ligeros (como K3s o MicroK8s) permiten desplegar y actualizar software de manera ágil, eficiente y portátil en dispositivos de borde con recursos limitados.",
+                "citation": "Arquitecturas de Cómputo Distribuido y Edge Computing"
+            }
+        ];
+
+        // Función para mezclar el orden de las preguntas
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Mezclar las preguntas al iniciar la carga de la página
+        shuffle(questions);
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answeredCorrectly = false;
+
+        const quizContainer = document.getElementById('quiz-container');
+        let questionElement = document.getElementById('question');
+        let answersElement = document.getElementById('answers');
+        let dynamicStatusElement = document.getElementById('dynamic-status');
+        let explanationElement = document.getElementById('explanation');
+        let nextButton = document.getElementById('next-btn');
+        let scoreElement = document.getElementById('score');
+        let batteryLevelElement = document.getElementById('battery-level');
+        let batteryTextElement = document.getElementById('battery-text');
+
+        function loadQuestion() {
+            if (currentQuestion >= questions.length) {
+                showFinalScore();
+                return;
+            }
+
+            const question = questions[currentQuestion];
+            questionElement.textContent = `${currentQuestion + 1}. ${question.question}`;
+            answersElement.innerHTML = '';
+            
+            dynamicStatusElement.style.display = 'none';
+            explanationElement.style.display = 'none';
+            nextButton.style.display = 'none';
+            answeredCorrectly = false;
+
+            // Actualizar la barra dinámica basada en el progreso actual
+            updateBatteryProgress();
+
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('btn');
+                button.addEventListener('click', () => selectAnswer(index));
+                answersElement.appendChild(button);
+            });
+
+            updateScore();
+        }
+
+        function updateBatteryProgress() {
+            // Calcula el progreso en base a las preguntas respondidas
+            const percentage = Math.round((currentQuestion / questions.length) * 100);
+            if (batteryLevelElement && batteryTextElement) {
+                batteryLevelElement.style.width = `${percentage}%`;
+                batteryTextElement.textContent = `Procesamiento Edge: ${percentage}%`;
+                
+                // Cambia el color de la barra según el nivel de avance
+                if (percentage < 30) {
+                    batteryLevelElement.style.backgroundColor = '#ef4444'; // Rojo (alta latencia / inicio)
+                } else if (percentage < 70) {
+                    batteryLevelElement.style.backgroundColor = '#f59e0b'; // Amarillo (procesamiento medio)
+                } else {
+                    batteryLevelElement.style.backgroundColor = '#10b981'; // Verde (procesamiento óptimo)
+                }
+            }
+        }
+
+        function selectAnswer(index) {
+            if (answeredCorrectly) return;
+
+            const question = questions[currentQuestion];
+            const buttons = answersElement.getElementsByTagName('button');
+
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                if (i === question.correctAnswer) {
+                    buttons[i].classList.add('correct');
+                } else if (i === index) {
+                    buttons[i].classList.add('incorrect');
+                }
+            }
+
+            const isCorrect = (index === question.correctAnswer);
+            
+            if (isCorrect) {
+                score++;
+                answeredCorrectly = true;
+                dynamicStatusElement.textContent = "⚡ ¡Procesamiento en el borde completado con ultrabaja latencia!";
+                dynamicStatusElement.className = "dynamic-status status-success";
+            } else {
+                dynamicStatusElement.textContent = "⚠️ ¡Cuello de botella en la red central o alta latencia!";
+                dynamicStatusElement.className = "dynamic-status status-fail";
+            }
+
+            explanationElement.innerHTML = `
+                <p><strong>Explicación:</strong> ${question.explanation}</p>
+                <p style="margin-top: 8px; font-size: 0.85rem; color: #64748b;"><strong>Referencia:</strong> "${question.citation}"</p>
+            `;
+            
+            dynamicStatusElement.style.display = 'block';
+            explanationElement.style.display = 'block';
+            nextButton.style.display = 'block';
+            updateScore();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        function showFinalScore() {
+            // Carga completa al terminar
+            if (batteryLevelElement && batteryTextElement) {
+                batteryLevelElement.style.width = '100%';
+                batteryLevelElement.style.backgroundColor = '#10b981';
+                batteryTextElement.textContent = 'Borde Optimizado';
+            }
+
+            quizContainer.innerHTML = `
+                <div class="battery-indicator">
+                    <div class="battery-body">
+                        <div class="battery-level" style="width: 100%; background-color: #10b981;"></div>
+                    </div>
+                    <span class="battery-text">Borde Optimizado</span>
+                </div>
+                <h2 style="text-align: center; font-size: 1.5rem;">Cuestionario Completado</h2>
+                <p style="text-align: center; font-size: 1.1rem; margin-bottom: 20px;">Tu puntuación final sobre Edge Computing es:</p>
+                <div style="font-size: 3rem; font-weight: 700; text-align: center; color: #0f766e; margin-bottom: 20px;">
+                    ${score} / ${questions.length}
+                </div>
+                <button class="btn" style="text-align: center;" onclick="restartQuiz()">Reiniciar Cuestionario</button>
+            `;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answeredCorrectly = false;
+            
+            // Reconstruir estructura original del contenedor
+            quizContainer.innerHTML = `
+                <div class="battery-indicator">
+                    <div class="battery-body">
+                        <div id="battery-level" class="battery-level"></div>
+                    </div>
+                    <span id="battery-text" class="battery-text">Procesamiento Edge: 0%</span>
+                </div>
+                <h2 id="question"></h2>
+                <div id="answers"></div>
+                <div id="explanation-container">
+                    <div id="dynamic-status" class="dynamic-status" style="display: none;"></div>
+                    <div id="explanation" class="explanation" style="display: none;"></div>
+                </div>
+                <button id="next-btn" class="btn" style="display: none;">Siguiente Pregunta</button>
+                <div id="score" class="score"></div>
+            `;
+            
+            // Reasignar referencias del DOM
+            questionElement = document.getElementById('question');
+            answersElement = document.getElementById('answers');
+            dynamicStatusElement = document.getElementById('dynamic-status');
+            explanationElement = document.getElementById('explanation');
+            nextButton = document.getElementById('next-btn');
+            scoreElement = document.getElementById('score');
+            batteryLevelElement = document.getElementById('battery-level');
+            batteryTextElement = document.getElementById('battery-text');
+            
+            setupEventListeners();
+            loadQuestion();
+        }
+
+        function updateScore() {
+            if (scoreElement) {
+                scoreElement.textContent = `Aciertos: ${score} / ${questions.length}`;
+            }
+        }
+
+        function setupEventListeners() {
+            if (nextButton) {
+                nextButton.addEventListener('click', nextQuestion);
+            }
+        }
+
+        // Inicialización de la aplicación
+        setupEventListeners();
+        loadQuestion();
+    </script>
+</body>
+</html>

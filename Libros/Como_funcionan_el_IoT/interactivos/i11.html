@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Sensores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d1015;
+    --case:#171c23;
+    --panel:#1b2129;
+    --panel-raised:#222a33;
+    --line:#2a323d;
+    --text:#e9e4d8;
+    --text-muted:#8b93a1;
+    --amber:#e8a33d;
+    --cyan:#5fd0dd;
+    --coral:#e2665a;
+    --cold:#3a6fa5;
+    --hot:#c94f3d;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; height:100%;
+    background:
+      radial-gradient(ellipse at 50% 0%, #1a2027 0%, var(--bg) 60%);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Sans', sans-serif;
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  .device{
+    width:min(420px, 92vw);
+    aspect-ratio: 3 / 4;
+    background:var(--case);
+    border-radius:22px;
+    padding:14px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    box-shadow:
+      0 30px 60px -20px rgba(0,0,0,0.6),
+      inset 0 0 0 1px rgba(255,255,255,0.03);
+  }
+
+  /* ---------- VIEWPORT ---------- */
+  .viewport{
+    position:relative;
+    flex:0 0 44%;
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--panel);
+    box-shadow: inset 0 0 0 1px var(--line), inset 0 2px 10px rgba(0,0,0,0.5);
+  }
+  .viewport svg{ width:100%; height:100%; display:block; }
+  .readout{
+    position:absolute; top:10px; left:12px;
+    display:flex; flex-direction:column; gap:2px;
+    font-family:'JetBrains Mono', monospace;
+    text-shadow:0 1px 4px rgba(0,0,0,0.6);
+  }
+  .readout #tempReadout{ font-size:1.5rem; font-weight:700; letter-spacing:0.5px; }
+  .readout #stateReadout{ font-size:0.62rem; letter-spacing:2px; color:var(--text-muted); }
+  .alert-badge{
+    position:absolute; top:10px; right:12px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.6rem; letter-spacing:1.5px;
+    padding:3px 7px; border-radius:4px;
+    background:rgba(226,102,90,0.15);
+    color:var(--coral);
+    border:1px solid rgba(226,102,90,0.4);
+    opacity:0;
+    transition:opacity .25s ease;
+  }
+  .alert-badge.on{ opacity:1; }
+
+  /* ---------- PANEL ---------- */
+  .panel{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+  }
+  .panel-header{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.68rem;
+    letter-spacing:3px;
+    color:var(--text-muted);
+    padding:2px 4px 8px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:6px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .panel-header .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--cyan);
+    box-shadow:0 0 6px var(--cyan);
+  }
+  .controls{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    gap:6px;
+    min-height:0;
+  }
+  .control{
+    background:var(--panel);
+    border-radius:10px;
+    padding:7px 10px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    box-shadow: inset 0 0 0 1px var(--line);
+    flex:1;
+    min-height:0;
+  }
+  .badge{
+    flex:0 0 auto;
+    width:30px; height:30px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--panel-raised);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .badge svg{ width:16px; height:16px; }
+  .control-body{
+    flex:1; min-width:0;
+    display:flex; flex-direction:column; gap:2px;
+  }
+  .control-body label{
+    font-size:0.66rem;
+    letter-spacing:0.4px;
+    color:var(--text-muted);
+    display:flex; justify-content:space-between;
+  }
+  .control-body label .unit{ opacity:0.6; font-size:0.6rem; }
+  .value{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem;
+    color:var(--text);
+    white-space:nowrap;
+  }
+  .row-flex{ display:flex; align-items:center; gap:8px; }
+
+  input[type="range"]{
+    -webkit-appearance:none;
+    appearance:none;
+    width:100%;
+    height:3px;
+    border-radius:2px;
+    background:var(--line);
+    outline:none;
+    flex:1;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:13px; height:13px; border-radius:50%;
+    background:var(--accent, var(--cyan));
+    box-shadow:0 0 0 3px rgba(255,255,255,0.05), 0 0 8px var(--accent, var(--cyan));
+    cursor:pointer;
+    margin-top:-5px;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:13px; height:13px; border-radius:50%; border:none;
+    background:var(--accent, var(--cyan));
+    box-shadow:0 0 8px var(--accent, var(--cyan));
+    cursor:pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track{
+    height:3px; border-radius:2px; background:var(--line);
+  }
+  input[type="range"]:focus-visible::-webkit-slider-thumb{
+    outline:2px solid var(--text); outline-offset:2px;
+  }
+
+  #tempSlider{ --accent: var(--coral); }
+  #humiditySlider{ --accent: var(--cyan); }
+  #lightSlider{ --accent: var(--amber); }
+
+  .toggle{
+    position:relative;
+    width:34px; height:18px;
+    border-radius:20px;
+    background:var(--panel-raised);
+    box-shadow: inset 0 0 0 1px var(--line);
+    border:none;
+    cursor:pointer;
+    flex:0 0 auto;
+    padding:0;
+  }
+  .toggle .knob{
+    position:absolute; top:2px; left:2px;
+    width:14px; height:14px; border-radius:50%;
+    background:var(--text-muted);
+    transition:transform .2s ease, background .2s ease;
+  }
+  .toggle.on{ box-shadow: inset 0 0 0 1px var(--coral); }
+  .toggle.on .knob{
+    transform:translateX(16px);
+    background:var(--coral);
+    box-shadow:0 0 8px var(--coral);
+  }
+  .toggle:focus-visible{ outline:2px solid var(--text); outline-offset:2px; }
+
+  .gps-pad{
+    position:relative;
+    width:38px; height:38px;
+    border-radius:8px;
+    background:var(--panel-raised);
+    box-shadow: inset 0 0 0 1px var(--line);
+    flex:0 0 auto;
+    touch-action:none;
+    cursor:crosshair;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:9.5px 9.5px;
+  }
+  .gps-marker{
+    position:absolute;
+    width:8px; height:8px;
+    border-radius:50%;
+    background:var(--cyan);
+    box-shadow:0 0 8px var(--cyan);
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    * { animation-duration:0.001ms !important; transition-duration:0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="device">
+
+  <div class="viewport" id="viewport">
+    <svg viewBox="0 0 300 260" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop id="wallStop1" offset="0%" stop-color="#3a6fa5"/>
+          <stop id="wallStop2" offset="100%" stop-color="#1c2b3d"/>
+        </linearGradient>
+        <radialGradient id="lampGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ffdf9e" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#ffdf9e" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="fogGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#dfe9ee" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#dfe9ee" stop-opacity="0.5"/>
+        </linearGradient>
+      </defs>
+
+      <rect id="wallRect" width="300" height="260" fill="url(#wallGrad)"/>
+      <rect y="215" width="300" height="45" fill="#12161c"/>
+
+      <!-- lamp glow -->
+      <circle id="lampGlow" cx="228" cy="55" r="58" fill="url(#lampGrad)" opacity="0.3"/>
+      <line x1="228" y1="22" x2="228" y2="46" stroke="#4a5561" stroke-width="2"/>
+      <circle id="lampBulb" cx="228" cy="55" r="7" fill="#ffe9b8"/>
+
+      <!-- window -->
+      <rect x="26" y="26" width="92" height="112" rx="3" fill="#0c1015" stroke="#0a0d11" stroke-width="5"/>
+      <rect id="windowPane" x="30.5" y="30.5" width="83" height="103" fill="#16222e"/>
+      <line x1="72" y1="30.5" x2="72" y2="133.5" stroke="#0c1015" stroke-width="3"/>
+      <line x1="30.5" y1="82" x2="113.5" y2="82" stroke="#0c1015" stroke-width="3"/>
+      <g id="droplets"></g>
+
+      <!-- fog / humidity overlay -->
+      <rect id="fogOverlay" width="300" height="260" fill="url(#fogGrad)" opacity="0"/>
+
+      <!-- heat shimmer -->
+      <g id="shimmer" opacity="0" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1" fill="none">
+        <path d="M150,10 Q160,20 150,30 Q140,40 150,50"/>
+        <path d="M170,10 Q180,20 170,30 Q160,40 170,50"/>
+        <path d="M190,10 Q200,20 190,30 Q180,40 190,50"/>
+      </g>
+
+      <!-- silhouette figure -->
+      <g id="figure" opacity="0">
+        <ellipse cx="0" cy="176" rx="12" ry="4" fill="#000000" opacity="0.3"/>
+        <circle cx="0" cy="150" r="7" fill="#0b0e12"/>
+        <rect x="-6" y="157" width="12" height="20" rx="5" fill="#0b0e12"/>
+      </g>
+
+      <!-- mini radar / GPS inset -->
+      <g id="miniRadar" transform="translate(246,182)">
+        <rect width="40" height="40" rx="4" fill="#0c1015" stroke="#2a323d"/>
+        <line x1="20" y1="4" x2="20" y2="36" stroke="#20262e" stroke-width="1"/>
+        <line x1="4" y1="20" x2="36" y2="20" stroke="#20262e" stroke-width="1"/>
+        <circle id="miniRadarDot" cx="20" cy="20" r="2.6" fill="#5fd0dd"/>
+        <g id="radarSweep" transform="translate(20,20)">
+          <path d="M0,0 L0,-16 A16,16 0 0,1 11,-11 Z" fill="#5fd0dd" opacity="0.18"/>
+        </g>
+      </g>
+    </svg>
+
+    <div class="readout">
+      <span id="tempReadout">22°C</span>
+      <span id="stateReadout">TEMPLADO</span>
+    </div>
+    <div class="alert-badge" id="alertBadge">● MOVIMIENTO</div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <span>PANEL DE SENSORES</span>
+      <span class="dot"></span>
+    </div>
+
+    <div class="controls">
+
+      <div class="control">
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--coral)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0Z"/>
+          </svg>
+        </div>
+        <div class="control-body">
+          <label>Temperatura <span class="unit">°C</span></label>
+          <div class="row-flex">
+            <input type="range" id="tempSlider" min="-10" max="45" value="22" step="1">
+            <span class="value" id="tempValue">22°C</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="control">
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2.5s7 8 7 12.5a7 7 0 1 1-14 0c0-4.5 7-12.5 7-12.5Z"/>
+          </svg>
+        </div>
+        <div class="control-body">
+          <label>Humedad <span class="unit">%</span></label>
+          <div class="row-flex">
+            <input type="range" id="humiditySlider" min="0" max="100" value="45" step="1">
+            <span class="value" id="humidityValue">45%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="control">
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--coral)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12c2-3 4-3 6 0s4 3 6 0 4-3 6 0"/>
+            <path d="M2 17c2-3 4-3 6 0s4 3 6 0 4-3 6 0" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="control-body">
+          <label>Movimiento Detectado</label>
+          <div class="row-flex">
+            <button class="toggle" id="motionToggle" role="switch" aria-checked="false" aria-label="Movimiento detectado"><span class="knob"></span></button>
+            <span class="value" id="motionValue">Sin movimiento</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="control">
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4.5"/>
+            <path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/>
+          </svg>
+        </div>
+        <div class="control-body">
+          <label>Luz <span class="unit">Lux</span></label>
+          <div class="row-flex">
+            <input type="range" id="lightSlider" min="0" max="1000" value="300" step="10">
+            <span class="value" id="lightValue">300</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="control">
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21s7-6.6 7-12a7 7 0 1 0-14 0c0 5.4 7 12 7 12Z"/>
+            <circle cx="12" cy="9" r="2.3"/>
+          </svg>
+        </div>
+        <div class="control-body">
+          <label>Ubicación GPS</label>
+          <div class="row-flex">
+            <div class="gps-pad" id="gpsPad"><div class="gps-marker" id="gpsMarker"></div></div>
+            <span class="value" id="gpsValue">LAT 00.0 · LON 00.0</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const tempSlider = document.getElementById('tempSlider');
+  const humiditySlider = document.getElementById('humiditySlider');
+  const lightSlider = document.getElementById('lightSlider');
+  const motionToggle = document.getElementById('motionToggle');
+  const gpsPad = document.getElementById('gpsPad');
+  const gpsMarker = document.getElementById('gpsMarker');
+
+  const tempValue = document.getElementById('tempValue');
+  const humidityValue = document.getElementById('humidityValue');
+  const lightValue = document.getElementById('lightValue');
+  const motionValue = document.getElementById('motionValue');
+  const gpsValue = document.getElementById('gpsValue');
+
+  const tempReadout = document.getElementById('tempReadout');
+  const stateReadout = document.getElementById('stateReadout');
+  const alertBadge = document.getElementById('alertBadge');
+
+  const wallStop1 = document.getElementById('wallStop1');
+  const wallStop2 = document.getElementById('wallStop2');
+  const shimmer = document.getElementById('shimmer');
+  const fogOverlay = document.getElementById('fogOverlay');
+  const droplets = document.getElementById('droplets');
+  const lampGlow = document.getElementById('lampGlow');
+  const lampBulb = document.getElementById('lampBulb');
+  const windowPane = document.getElementById('windowPane');
+  const figure = document.getElementById('figure');
+  const miniRadarDot = document.getElementById('miniRadarDot');
+
+  function lerpColor(a, b, t){
+    const ah = parseInt(a.slice(1),16), bh = parseInt(b.slice(1),16);
+    const ar=(ah>>16)&255, ag=(ah>>8)&255, ab=ah&255;
+    const br=(bh>>16)&255, bg=(bh>>8)&255, bb=bh&255;
+    const r=Math.round(ar+(br-ar)*t), g=Math.round(ag+(bg-ag)*t), bl=Math.round(ab+(bb-ab)*t);
+    return '#'+[r,g,bl].map(v=>v.toString(16).padStart(2,'0')).join('');
+  }
+
+  function updateTemp(){
+    const v = parseInt(tempSlider.value,10);
+    tempValue.textContent = v+'°C';
+    tempReadout.textContent = v+'°C';
+    const t = (v+10)/55; // 0..1
+    const cold = '#3a6fa5', hot = '#c94f3d';
+    const skyTop = lerpColor(cold, hot, t);
+    const skyBottom = lerpColor('#1c2b3d', '#3d1f1a', t);
+    wallStop1.setAttribute('stop-color', skyTop);
+    wallStop2.setAttribute('stop-color', skyBottom);
+
+    let state, hex;
+    if(v < 5){ state='FRÍO'; hex=cold; }
+    else if(v < 20){ state='FRESCO'; hex='#5f9bc4'; }
+    else if(v < 28){ state='TEMPLADO'; hex='#e8a33d'; }
+    else if(v < 36){ state='CÁLIDO'; hex='#d97a3d'; }
+    else { state='CALUROSO'; hex=hot; }
+    stateReadout.textContent = state;
+    tempReadout.style.color = hex;
+
+    shimmer.style.opacity = v > 32 ? Math.min(1,(v-32)/13) : 0;
+  }
+
+  function updateHumidity(){
+    const v = parseInt(humiditySlider.value,10);
+    humidityValue.textContent = v+'%';
+    fogOverlay.style.opacity = (v/100 * 0.85).toFixed(2);
+
+    droplets.innerHTML = '';
+    const count = Math.round((v/100) * 14);
+    const positions = [[42,48],[58,60],[70,90],[46,105],[95,55],[100,95],[55,40],[80,120],[38,75],[90,72],[65,110],[105,45],[48,90],[75,50]];
+    for(let i=0;i<count;i++){
+      const p = positions[i];
+      const drop = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      drop.setAttribute('cx', p[0]);
+      drop.setAttribute('cy', p[1]);
+      drop.setAttribute('r', 1.6);
+      drop.setAttribute('fill', '#cfe6f2');
+      drop.setAttribute('opacity', 0.55);
+      droplets.appendChild(drop);
+    }
+    windowPane.setAttribute('fill', v > 60 ? '#22333f' : '#16222e');
+  }
+
+  function updateLight(){
+    const v = parseInt(lightSlider.value,10);
+    lightValue.textContent = v;
+    const t = v/1000;
+    lampGlow.style.opacity = (0.15 + t*0.75).toFixed(2);
+    lampBulb.setAttribute('fill', lerpColor('#7a6a4a', '#ffe9b8', t));
+    document.getElementById('viewport').style.filter = `brightness(${(0.55 + t*0.65).toFixed(2)})`;
+  }
+
+  function updateMotion(){
+    const on = motionToggle.classList.toggle('on');
+    motionToggle.setAttribute('aria-checked', on);
+    motionValue.textContent = on ? 'Movimiento activo' : 'Sin movimiento';
+    alertBadge.classList.toggle('on', on);
+    figure.style.transition = 'opacity .3s ease';
+    figure.style.opacity = on ? '1' : '0';
+    if(on){
+      figure.style.animation = 'none';
+      void figure.offsetWidth;
+      figure.animate(
+        [{ transform:'translateX(20px)' }, { transform:'translateX(75px)' }],
+        { duration: 3200, iterations: Infinity, direction:'alternate', easing:'ease-in-out' }
+      );
+    } else {
+      figure.getAnimations().forEach(a=>a.cancel());
+    }
+  }
+
+  // GPS drag pad
+  let dragging = false;
+  function setGpsFromEvent(e){
+    const rect = gpsPad.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    let x = (clientX - rect.left) / rect.width;
+    let y = (clientY - rect.top) / rect.height;
+    x = Math.max(0, Math.min(1, x));
+    y = Math.max(0, Math.min(1, y));
+    gpsMarker.style.left = (x*100)+'%';
+    gpsMarker.style.top = (y*100)+'%';
+    const lat = (90 - y*180).toFixed(1);
+    const lon = (x*360 - 180).toFixed(1);
+    gpsValue.textContent = `LAT ${lat} · LON ${lon}`;
+    miniRadarDot.setAttribute('cx', 4 + x*32);
+    miniRadarDot.setAttribute('cy', 4 + y*32);
+  }
+  gpsPad.addEventListener('pointerdown', e=>{ dragging = true; setGpsFromEvent(e); });
+  window.addEventListener('pointermove', e=>{ if(dragging) setGpsFromEvent(e); });
+  window.addEventListener('pointerup', ()=> dragging = false);
+
+  // radar sweep animation
+  const radarSweep = document.getElementById('radarSweep');
+  let angle = 0;
+  function spin(){
+    angle = (angle + 2) % 360;
+    radarSweep.setAttribute('transform', `translate(20,20) rotate(${angle})`);
+    requestAnimationFrame(spin);
+  }
+  spin();
+
+  tempSlider.addEventListener('input', updateTemp);
+  humiditySlider.addEventListener('input', updateHumidity);
+  lightSlider.addEventListener('input', updateLight);
+  motionToggle.addEventListener('click', updateMotion);
+
+  updateTemp();
+  updateHumidity();
+  updateLight();
+})();
+</script>
+
+</body>
+</html>

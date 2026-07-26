@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ciudad Inteligente - Telemetría IoT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030712;
+    --case: #0b1320;
+    --panel: #101b2d;
+    --panel-raised: #17263c;
+    --line: #1e3352;
+    --text: #f0f6fc;
+    --text-muted: #627b9b;
+    --amber: #ffb703;
+    --cyan: #00f0ff;
+    --coral: #ff2a5f;
+    --green: #00ff88;
+    --purple: #a855f7;
+    --cold: #00a8ff;
+    --hot: #ff3333;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: radial-gradient(circle at 50% 15%, #0d1e36 0%, var(--bg) 85%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Chakra Petch', sans-serif;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  .device {
+    width: min(440px, 94vw);
+    aspect-ratio: 3 / 4.15;
+    background: linear-gradient(165deg, #132238 0%, var(--case) 100%);
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    box-shadow:
+      0 0 50px rgba(0, 0, 0, 0.9),
+      0 0 30px rgba(0, 240, 255, 0.08),
+      inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    position: relative;
+  }
+
+  .device::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 20%; right: 20%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  }
+
+  /* ---------- VIEWPORT (SCENE) ---------- */
+  .viewport {
+    position: relative;
+    flex: 0 0 46%;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #060a12;
+    border: 1px solid var(--line);
+    box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.85);
+  }
+
+  /* Corner HUD Elements */
+  .hud-corner {
+    position: absolute;
+    width: 10px; height: 10px;
+    border: 2px solid var(--cyan);
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+  .hud-corner.tl { top: 6px; left: 6px; border-right: none; border-bottom: none; }
+  .hud-corner.tr { top: 6px; right: 6px; border-left: none; border-bottom: none; }
+  .hud-corner.bl { bottom: 6px; left: 6px; border-right: none; border-top: none; }
+  .hud-corner.br { bottom: 6px; right: 6px; border-left: none; border-top: none; }
+
+  .viewport svg { width: 100%; height: 100%; display: block; }
+
+  .readout {
+    position: absolute;
+    top: 12px; left: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-family: 'JetBrains Mono', monospace;
+    z-index: 5;
+    text-shadow: 0 0 8px rgba(0,0,0,0.9);
+  }
+
+  .readout .label-hud {
+    font-size: 0.55rem;
+    letter-spacing: 1.5px;
+    color: var(--cyan);
+    font-weight: 700;
+  }
+
+  .readout #tempReadout {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+  }
+
+  .readout #stateReadout {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    font-weight: 600;
+  }
+
+  .alert-badge {
+    position: absolute;
+    top: 12px; right: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(0, 255, 136, 0.15);
+    color: var(--green);
+    border: 1px solid var(--green);
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all .25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 5;
+  }
+  .alert-badge.on { opacity: 1; transform: scale(1); }
+
+  /* ---------- CONTROL PANEL ---------- */
+  .panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .panel-header {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2.5px;
+    color: var(--text-muted);
+    padding: 0 4px 6px;
+    border-bottom: 1px dashed var(--line);
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .panel-header .status-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--cyan);
+  }
+
+  .panel-header .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 6px;
+    min-height: 0;
+  }
+
+  .control {
+    background: var(--panel);
+    border-radius: 8px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--line);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .control:hover {
+    border-color: rgba(0, 240, 255, 0.35);
+  }
+
+  .badge {
+    flex: 0 0 auto;
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+  }
+  .badge svg { width: 17px; height: 17px; }
+
+  .control-body {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+
+  .control-body label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    display: flex; justify-content: space-between;
+  }
+  .control-body label .unit { opacity: 0.6; font-size: 0.6rem; font-family: 'JetBrains Mono', monospace; }
+
+  .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .row-flex { display: flex; align-items: center; gap: 8px; }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--line);
+    outline: none;
+    flex: 1;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 3px;
+    background: var(--accent, var(--cyan));
+    box-shadow: 0 0 10px var(--accent, var(--cyan));
+    cursor: pointer;
+    margin-top: -5px;
+    transition: transform 0.1s ease;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px; border-radius: 2px; background: var(--line);
+  }
+
+  #tempSlider { --accent: var(--coral); }
+  #humiditySlider { --accent: var(--cyan); }
+  #lightSlider { --accent: var(--amber); }
+
+  .toggle {
+    position: relative;
+    width: 36px; height: 18px;
+    border-radius: 4px;
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    cursor: pointer;
+    flex: 0 0 auto;
+    padding: 0;
+  }
+
+  .toggle .knob {
+    position: absolute; top: 2px; left: 2px;
+    width: 12px; height: 12px;
+    border-radius: 2px;
+    background: var(--text-muted);
+    transition: transform .2s ease, background .2s ease;
+  }
+
+  .toggle.on { border-color: var(--green); box-shadow: 0 0 8px rgba(0, 255, 136, 0.3); }
+  .toggle.on .knob {
+    transform: translateX(18px);
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+  }
+
+  .gps-pad {
+    position: relative;
+    width: 40px; height: 32px;
+    border-radius: 4px;
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    flex: 0 0 auto;
+    touch-action: none;
+    cursor: crosshair;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 8px 8px;
+  }
+
+  .gps-marker {
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="device">
+
+  <!-- VIEWPORT SCENE -->
+  <div class="viewport" id="viewport">
+    <div class="hud-corner tl"></div>
+    <div class="hud-corner tr"></div>
+    <div class="hud-corner bl"></div>
+    <div class="hud-corner br"></div>
+
+    <svg viewBox="0 0 320 240" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <!-- Dynamic Sky Gradient -->
+        <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop id="wallStop1" offset="0%" stop-color="#0a1526"/>
+          <stop id="wallStop2" offset="100%" stop-color="#040912"/>
+        </linearGradient>
+
+        <!-- Streetlight / Central Tower Glow -->
+        <radialGradient id="lampGrad" cx="50%" cy="10%" r="85%">
+          <stop offset="0%" stop-color="#00f0ff" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#00f0ff" stop-opacity="0"/>
+        </radialGradient>
+
+        <!-- Fog / Humidity Overlay Gradient -->
+        <linearGradient id="fogGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#8baac9" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#b8d4e8" stop-opacity="0.65"/>
+        </linearGradient>
+
+        <!-- Perspective Grid Background -->
+        <pattern id="gridPattern" width="16" height="16" patternUnits="userSpaceOnUse">
+          <path d="M 16 0 L 0 0 0 16" fill="none" stroke="#12233b" stroke-width="0.8"/>
+        </pattern>
+      </defs>
+
+      <!-- Sky Background & Grid -->
+      <rect id="wallRect" width="320" height="240" fill="url(#wallGrad)"/>
+      <rect width="320" height="170" fill="url(#gridPattern)"/>
+
+      <!-- Distant Skyline Silhouette -->
+      <path d="M 0 170 L 15 170 L 15 130 L 35 130 L 35 170 L 50 170 L 50 110 L 75 110 L 75 170 L 100 170 L 100 140 L 125 140 L 125 170 L 160 170 L 160 90 L 190 90 L 190 170 L 220 170 L 220 120 L 250 120 L 250 170 L 280 170 L 280 135 L 320 135 L 320 170 Z" fill="#091321"/>
+
+      <!-- Foreground Smart Skyscrapers -->
+      <!-- Building 1 (Left) -->
+      <rect x="20" y="95" width="40" height="90" fill="#0e1b2e" stroke="#00f0ff" stroke-width="0.8" stroke-opacity="0.4"/>
+      <line x1="25" y1="105" x2="55" y2="105" stroke="#00f0ff" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <line x1="25" y1="120" x2="55" y2="120" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="4 2"/>
+      <line x1="25" y1="135" x2="55" y2="135" stroke="#00f0ff" stroke-width="1.5" stroke-dasharray="2 3"/>
+
+      <!-- Building 2 (Central Tower with Antenna) -->
+      <rect x="135" y="65" width="50" height="120" fill="#0c1728" stroke="#00f0ff" stroke-width="1"/>
+      <line x1="160" y1="20" x2="160" y2="65" stroke="#00f0ff" stroke-width="2"/>
+      <circle cx="160" cy="20" r="3" fill="#ff2a5f"/>
+      <!-- Window Lights Matrix -->
+      <rect x="143" y="80" width="10" height="6" fill="#00f0ff" opacity="0.8"/>
+      <rect x="162" y="80" width="10" height="6" fill="#00ff88" opacity="0.8"/>
+      <rect x="143" y="95" width="10" height="6" fill="#ffb703" opacity="0.8"/>
+      <rect x="162" y="95" width="10" height="6" fill="#00f0ff" opacity="0.8"/>
+      <rect x="143" y="110" width="10" height="6" fill="#00f0ff" opacity="0.8"/>
+      <rect x="162" y="110" width="10" height="6" fill="#ff2a5f" opacity="0.8"/>
+
+      <!-- Building 3 (Right - Eco-Tower with Turbines) -->
+      <rect x="230" y="85" width="45" height="100" fill="#0e1b2e" stroke="#00ff88" stroke-width="0.8" stroke-opacity="0.5"/>
+      <!-- Wind Turbines on roof -->
+      <circle cx="242" cy="75" r="2" fill="#00ff88"/>
+      <line x1="242" y1="75" x2="242" y2="85" stroke="#00ff88" stroke-width="1"/>
+      <circle cx="262" cy="75" r="2" fill="#00ff88"/>
+      <line x1="262" y1="75" x2="262" y2="85" stroke="#00ff88" stroke-width="1"/>
+
+      <!-- Central Floodlight / Smart City Beam -->
+      <polygon id="lampGlow" points="160,20 40,220 280,220" fill="url(#lampGrad)" opacity="0.4"/>
+      <circle id="lampBulb" cx="160" cy="20" r="6" fill="#00f0ff"/>
+
+      <!-- Elevated Smart Highway / Monorail -->
+      <path d="M -10 185 Q 160 175 330 185" stroke="#1c2f4a" stroke-width="10" fill="none"/>
+      <path d="M -10 185 Q 160 175 330 185" stroke="#00f0ff" stroke-width="1.5" stroke-dasharray="10 8" fill="none"/>
+      <!-- Highway Support Pillars -->
+      <line x1="50" y1="184" x2="50" y2="240" stroke="#121f33" stroke-width="5"/>
+      <line x1="160" y1="180" x2="160" y2="240" stroke="#121f33" stroke-width="6"/>
+      <line x1="270" y1="184" x2="270" y2="240" stroke="#121f33" stroke-width="5"/>
+
+      <!-- Smart Ground Street / Smart Grid -->
+      <rect y="210" width="320" height="30" fill="#080d17"/>
+      <line x1="0" y1="210" x2="320" y2="210" stroke="#00ff88" stroke-width="1" stroke-opacity="0.5"/>
+
+      <!-- Atmospheric Rain / Steam Layer -->
+      <g id="droplets"></g>
+      <rect id="fogOverlay" width="320" height="240" fill="url(#fogGrad)" opacity="0" pointer-events="none"/>
+
+      <!-- Heat Island Waves / Heat Shimmer -->
+      <g id="shimmer" opacity="0" stroke="#ff3333" stroke-opacity="0.4" stroke-width="1.5" fill="none">
+        <path d="M40,90 Q45,80 40,70 Q35,60 40,50"/>
+        <path d="M160,60 Q165,50 160,40 Q155,30 160,20"/>
+        <path d="M250,80 Q255,70 250,60 Q245,50 250,40"/>
+      </g>
+
+      <!-- Autonomous Vehicle / Air Taxi Drone (Motion Figure) -->
+      <g id="figure" opacity="0">
+        <!-- Drone Body -->
+        <ellipse cx="0" cy="100" rx="16" ry="5" fill="#00ff88"/>
+        <ellipse cx="0" cy="98" rx="8" ry="4" fill="#050a14"/>
+        <circle cx="-14" cy="100" r="3" fill="#00f0ff"/>
+        <circle cx="14" cy="100" r="3" fill="#00f0ff"/>
+        <!-- Scanner Cone -->
+        <polygon points="0,103 -15,175 15,175" fill="#00ff88" opacity="0.2"/>
+      </g>
+
+      <!-- Urban IoT Radar / GPS Inset -->
+      <g id="miniRadar" transform="translate(265,185)">
+        <rect width="45" height="45" rx="4" fill="#080e18" stroke="#1d314a" stroke-width="1.5"/>
+        <circle cx="22.5" cy="22.5" r="16" fill="none" stroke="#132438" stroke-width="1"/>
+        <circle cx="22.5" cy="22.5" r="9" fill="none" stroke="#132438" stroke-width="1"/>
+        <line x1="22.5" y1="4" x2="22.5" y2="41" stroke="#132438" stroke-width="1"/>
+        <line x1="4" y1="22.5" x2="41" y2="22.5" stroke="#132438" stroke-width="1"/>
+        <circle id="miniRadarDot" cx="22.5" cy="22.5" r="2.5" fill="#00f0ff"/>
+        <g id="radarSweep" transform="translate(22.5,22.5)">
+          <path d="M0,0 L0,-16 A16,16 0 0,1 11,-11 Z" fill="#00f0ff" opacity="0.3"/>
+        </g>
+      </g>
+    </svg>
+
+    <!-- Viewport HUD Readouts -->
+    <div class="readout">
+      <span class="label-hud">TELEMETRÍA URBANA</span>
+      <span id="tempReadout">22°C</span>
+      <span id="stateReadout" style="color:var(--cyan)">CONFORT URBANO</span>
+    </div>
+    <div class="alert-badge" id="alertBadge">● TRÁFICO AUTÓNOMO</div>
+  </div>
+
+  <!-- CONTROLS PANEL -->
+  <div class="panel">
+    <div class="panel-header">
+      <span>RED DE SENSORES URBANOS</span>
+      <span class="status-tag"><span class="dot"></span> SMART GRID</span>
+    </div>
+
+    <div class="controls">
+
+      <!-- Temperature Control -->
+      <div class="control">
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--coral)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0Z"/>
+          </svg>
+        </div>
+        <div class="control-body">
+          <label>Clima Urbano <span class="unit">°C</span></label>
+          <div class="row-flex">
+            <input type="range" id="tempSlider" min="-10" max="45" value="22" step="1">
+            <span class="value" id="tempValue">22°C</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Humidity Control -->
+      <div class="control">
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2.5s7 8 7 12.5a7 7 0 1 1-14 0c0-4.5 7-12.5 7-12.5Z"/>
+          </svg>
+        </div>
+        <div class="control-body">
+          <label>Humedad / Precipitaciones <span class="unit">% HR</span></label>
+          <div class="row-flex">
+            <input type="range" id="humiditySlider" min="0" max="100" value="45" step="1">
+            <span class="value" id="humidityValue">45%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Motion Switch -->
+      <div class="control">
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 12 10s-6.7.6-8.5 1.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"/>
+            <circle cx="7" cy="17" r="2"/>
+            <circle cx="17" cy="17" r="2"/>
+          </svg>
+        </div>
+        <div class="control-body">
+          <label>Movilidad Autónoma (Drones / AGV)</label>
+          <div class="row-flex">
+            <button class="toggle" id="motionToggle" role="switch" aria-checked="false" aria-label="Sensor de movimiento urbano"><span class="knob"></span></button>
+            <span class="value" id="motionValue">Desactivado</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Light Control -->
+      <div class="control">
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4.5"/>
+            <path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/>
+          </svg>
+        </div>
+        <div class="control-body">
+          <label>Alumbrado Inteligente <span class="unit">Lux</span></label>
+          <div class="row-flex">
+            <input type="range" id="lightSlider" min="0" max="1000" value="500" step="10">
+            <span class="value" id="lightValue">500</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- GPS / District Pad -->
+      <div class="control">
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21s7-6.6 7-12a7 7 0 1 0-14 0c0 5.4 7 12 7 12Z"/>
+            <circle cx="12" cy="9" r="2.3"/>
+          </svg>
+        </div>
+        <div class="control-body">
+          <label>Ubicación / Sector Urbano</label>
+          <div class="row-flex">
+            <div class="gps-pad" id="gpsPad"><div class="gps-marker" id="gpsMarker"></div></div>
+            <span class="value" id="gpsValue">DISTRITO 02 · ZONA CENTRO</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const tempSlider = document.getElementById('tempSlider');
+  const humiditySlider = document.getElementById('humiditySlider');
+  const lightSlider = document.getElementById('lightSlider');
+  const motionToggle = document.getElementById('motionToggle');
+  const gpsPad = document.getElementById('gpsPad');
+  const gpsMarker = document.getElementById('gpsMarker');
+
+  const tempValue = document.getElementById('tempValue');
+  const humidityValue = document.getElementById('humidityValue');
+  const lightValue = document.getElementById('lightValue');
+  const motionValue = document.getElementById('motionValue');
+  const gpsValue = document.getElementById('gpsValue');
+
+  const tempReadout = document.getElementById('tempReadout');
+  const stateReadout = document.getElementById('stateReadout');
+  const alertBadge = document.getElementById('alertBadge');
+
+  const wallStop1 = document.getElementById('wallStop1');
+  const wallStop2 = document.getElementById('wallStop2');
+  const shimmer = document.getElementById('shimmer');
+  const fogOverlay = document.getElementById('fogOverlay');
+  const droplets = document.getElementById('droplets');
+  const lampGlow = document.getElementById('lampGlow');
+  const lampBulb = document.getElementById('lampBulb');
+  const figure = document.getElementById('figure');
+  const miniRadarDot = document.getElementById('miniRadarDot');
+
+  function lerpColor(a, b, t){
+    const ah = parseInt(a.slice(1),16), bh = parseInt(b.slice(1),16);
+    const ar=(ah>>16)&255, ag=(ah>>8)&255, ab=ah&255;
+    const br=(bh>>16)&255, bg=(bh>>8)&255, bb=bh&255;
+    const r=Math.round(ar+(br-ar)*t), g=Math.round(ag+(bg-ag)*t), bl=Math.round(ab+(bb-ab)*t);
+    return '#'+[r,g,bl].map(v=>v.toString(16).padStart(2,'0')).join('');
+  }
+
+  function updateTemp(){
+    const v = parseInt(tempSlider.value, 10);
+    tempValue.textContent = v + '°C';
+    tempReadout.textContent = v + '°C';
+    const t = (v + 10) / 55; // 0..1
+
+    const cold = '#00a8ff', hot = '#ff3333';
+    const skyTop = lerpColor('#0a1526', '#330a18', t);
+    const skyBottom = lerpColor('#040912', '#14040a', t);
+    wallStop1.setAttribute('stop-color', skyTop);
+    wallStop2.setAttribute('stop-color', skyBottom);
+
+    let state, hex;
+    if (v < 5) { state = 'HELADA URBANA'; hex = cold; }
+    else if (v < 18) { state = 'FRESCO'; hex = '#00f0ff'; }
+    else if (v < 26) { state = 'CONFORT URBANO'; hex = '#00ff88'; }
+    else if (v < 34) { state = 'ISLA DE CALOR'; hex = '#ffb703'; }
+    else { state = 'ALERTA TÉRMICA'; hex = hot; }
+
+    stateReadout.textContent = state;
+    stateReadout.style.color = hex;
+    tempReadout.style.color = hex;
+
+    shimmer.style.opacity = v > 32 ? Math.min(1, (v - 32) / 13) : 0;
+  }
+
+  function updateHumidity(){
+    const v = parseInt(humiditySlider.value, 10);
+    humidityValue.textContent = v + '%';
+    fogOverlay.style.opacity = (v / 100 * 0.8).toFixed(2);
+
+    droplets.innerHTML = '';
+    const count = Math.round((v / 100) * 18);
+    // Rain particles falling on the city skyline
+    for (let i = 0; i < count; i++) {
+      const drop = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      const x = (i * 18 + 10) % 320;
+      const y = (i * 12 + 20) % 160;
+      drop.setAttribute('x1', x);
+      drop.setAttribute('y1', y);
+      drop.setAttribute('x2', x - 2);
+      drop.setAttribute('y2', y + 8);
+      drop.setAttribute('stroke', '#a8d5ff');
+      drop.setAttribute('stroke-width', '1.2');
+      drop.setAttribute('opacity', '0.65');
+      droplets.appendChild(drop);
+    }
+  }
+
+  function updateLight(){
+    const v = parseInt(lightSlider.value, 10);
+    lightValue.textContent = v;
+    const t = v / 1000;
+    lampGlow.style.opacity = (0.1 + t * 0.85).toFixed(2);
+    lampBulb.setAttribute('fill', lerpColor('#0d3b4a', '#00f0ff', t));
+    document.getElementById('viewport').style.filter = `brightness(${(0.6 + t * 0.55).toFixed(2)})`;
+  }
+
+  function updateMotion(){
+    const on = motionToggle.classList.toggle('on');
+    motionToggle.setAttribute('aria-checked', on);
+    motionValue.textContent = on ? 'Tráfico activo' : 'Desactivado';
+    alertBadge.classList.toggle('on', on);
+    figure.style.transition = 'opacity .3s ease';
+    figure.style.opacity = on ? '1' : '0';
+
+    if (on) {
+      figure.style.animation = 'none';
+      void figure.offsetWidth;
+      figure.animate(
+        [{ transform: 'translateX(20px)' }, { transform: 'translateX(280px)' }],
+        { duration: 4500, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out' }
+      );
+    } else {
+      figure.getAnimations().forEach(a => a.cancel());
+    }
+  }
+
+  // GPS / City District Drag Pad
+  let dragging = false;
+  function setGpsFromEvent(e){
+    const rect = gpsPad.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    let x = (clientX - rect.left) / rect.width;
+    let y = (clientY - rect.top) / rect.height;
+    x = Math.max(0, Math.min(1, x));
+    y = Math.max(0, Math.min(1, y));
+    gpsMarker.style.left = (x * 100) + '%';
+    gpsMarker.style.top = (y * 100) + '%';
+
+    const districts = ['NORTE', 'CENTRO', 'ESTE', 'SUR'];
+    const distIndex = Math.min(3, Math.floor(x * 4));
+    const secX = (x * 99).toFixed(0);
+    const secY = (y * 99).toFixed(0);
+    gpsValue.textContent = `DISTRITO 0${distIndex + 1} · ZONA ${districts[distIndex]}`;
+
+    // Map pad coordinates to radar grid
+    miniRadarDot.setAttribute('cx', 6.5 + x * 32);
+    miniRadarDot.setAttribute('cy', 6.5 + y * 32);
+  }
+
+  gpsPad.addEventListener('pointerdown', e => { dragging = true; setGpsFromEvent(e); });
+  window.addEventListener('pointermove', e => { if (dragging) setGpsFromEvent(e); });
+  window.addEventListener('pointerup', () => dragging = false);
+
+  // Radar sweep animation
+  const radarSweep = document.getElementById('radarSweep');
+  let angle = 0;
+  function spin(){
+    angle = (angle + 2.5) % 360;
+    radarSweep.setAttribute('transform', `translate(22.5,22.5) rotate(${angle})`);
+    requestAnimationFrame(spin);
+  }
+  spin();
+
+  // Event Listeners
+  tempSlider.addEventListener('input', updateTemp);
+  humiditySlider.addEventListener('input', updateHumidity);
+  lightSlider.addEventListener('input', updateLight);
+  motionToggle.addEventListener('click', updateMotion);
+
+  // Initial State Setup
+  updateTemp();
+  updateHumidity();
+  updateLight();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuestionario: Seguridad en el IoT</title>
+  <style>
+    /* Estilos modernos inspirados en ciberseguridad y tecnología */
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #f8fafc;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .cuestionario {
+      max-width: 650px;
+      width: 100%;
+      margin: 20px auto;
+      padding: 35px;
+      background-color: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+      color: #1e293b;
+    }
+
+    /* Barra decorativa inspirada en ciberseguridad */
+    .cuestionario::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(90deg, #0284c7 0%, #2563eb 50%, #0d9488 100%);
+    }
+    
+    h2 {
+      margin-top: 0;
+      color: #0f172a;
+      font-size: 26px;
+      border-bottom: 2px dashed #cbd5e1;
+      padding-bottom: 18px;
+      margin-bottom: 25px;
+      text-align: center;
+      letter-spacing: -0.5px;
+    }
+    
+    .pregunta p {
+      font-size: 19px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+    
+    .opcion {
+      display: flex;
+      align-items: center;
+      margin-bottom: 14px;
+      padding: 16px 20px;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: #ffffff;
+    }
+    
+    .opcion:hover {
+      background-color: #f8fafc;
+      border-color: #0284c7;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
+    }
+    
+    .opcion.correcta {
+      background-color: #ecfdf5;
+      border-color: #10b981;
+    }
+    
+    .opcion.incorrecta {
+      background-color: #fff1f2;
+      border-color: #f43f5e;
+    }
+    
+    .opcion .letra {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      min-height: 36px;
+      border-radius: 50%;
+      background-color: #475569;
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 16px;
+      margin-right: 18px;
+      transition: background-color 0.2s ease;
+    }
+    
+    .opcion.correcta .letra {
+      background-color: #10b981;
+    }
+    
+    .opcion.incorrecta .letra {
+      background-color: #f43f5e;
+    }
+    
+    .opcion .respuesta {
+      font-size: 16px;
+      line-height: 1.5;
+      color: #334155;
+      font-weight: 500;
+    }
+    
+    .siguiente {
+      display: block;
+      width: 100%;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #ffffff;
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 25px;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 6px rgba(2, 132, 199, 0.2);
+    }
+    
+    .siguiente:hover {
+      background: linear-gradient(135deg, #0369a1 0%, #0c4a6e 100%);
+      box-shadow: 0 6px 12px rgba(2, 132, 199, 0.3);
+    }
+    
+    .resultado {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 30px;
+      padding: 25px;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border: 1px solid #bae6fd;
+      border-radius: 14px;
+      color: #0369a1;
+      text-align: center;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+  </style>
+</head>
+<body>
+  <div class="cuestionario">
+    <h2>🔒 Seguridad en el IoT 🌐</h2>
+    
+    <!-- Pregunta 1 -->
+    <div class="pregunta" id="pregunta-1">
+      <p>Pregunta 1: ¿Por qué los dispositivos de IoT (Internet de las Cosas) suelen representar un riesgo de ciberseguridad mayor que una PC o un smartphone?</p>
+      <div class="opcion">
+        <span class="letra">A</span>
+        <span class="respuesta">Porque consumen más energía eléctrica y sobrecalientan los routers domésticos.</span>
+      </div>
+      <div class="opcion" data-correcta="true">
+        <span class="letra">B</span>
+        <span class="respuesta">Porque a menudo cuentan con recursos limitados para implementar cifrado robusto y suelen carecer de parches de seguridad frecuentes.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">C</span>
+        <span class="respuesta">Porque no utilizan direcciones IP para conectarse a las redes locales.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">D</span>
+        <span class="respuesta">Porque solo se pueden infectar si el usuario los manipula físicamente de forma errónea.</span>
+      </div>
+      <button class="siguiente" id="siguiente-1">Siguiente pregunta</button>
+    </div>
+
+    <!-- Pregunta 2 -->
+    <div class="pregunta" id="pregunta-2" style="display: none;">
+      <p>Pregunta 2: ¿Cuál es uno de los peligros principales asociados al uso de contraseñas predeterminadas de fábrica en dispositivos IoT?</p>
+      <div class="opcion" data-correcta="true">
+        <span class="letra">A</span>
+        <span class="respuesta">Facilita que atacantes automatizados las exploten masivamente mediante diccionarios de credenciales conocidas.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">B</span>
+        <span class="respuesta">Provoca que el dispositivo pierda la garantía del fabricante al conectarse a Internet.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">C</span>
+        <span class="respuesta">Impide que el dispositivo reciba señal Wi-Fi a más de 5 metros de distancia.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">D</span>
+        <span class="respuesta">Hace que el dispositivo se bloquee permanentemente tras 24 horas de uso continuo.</span>
+      </div>
+      <button class="siguiente" id="siguiente-2">Siguiente pregunta</button>
+    </div>
+
+    <!-- Pregunta 3 -->
+    <div class="pregunta" id="pregunta-3" style="display: none;">
+      <p>Pregunta 3: En el contexto de la ciberseguridad IoT, ¿qué es una "botnet" (como Mirai)?</p>
+      <div class="opcion">
+        <span class="letra">A</span>
+        <span class="respuesta">Un sistema operativo seguro diseñado para altavoces inteligentes y cámaras IP.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">B</span>
+        <span class="respuesta">Una aplicación móvil que escanea vulnerabilidades en la red doméstica.</span>
+      </div>
+      <div class="opcion" data-correcta="true">
+        <span class="letra">C</span>
+        <span class="respuesta">Una red de dispositivos infectados y controlados remotamente por un atacante para realizar ciberataques masivos (como DDoS).</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">D</span>
+        <span class="respuesta">Un protocolo de transmisión inalámbrica que reemplaza al Bluetooth.</span>
+      </div>
+      <button class="siguiente" id="siguiente-3">Siguiente pregunta</button>
+    </div>
+
+    <!-- Pregunta 4 -->
+    <div class="pregunta" id="pregunta-4" style="display: none;">
+      <p>Pregunta 4: ¿Por qué es crítico mantener actualizado el firmware de los dispositivos IoT?</p>
+      <div class="opcion">
+        <span class="letra">A</span>
+        <span class="respuesta">Para cambiar automáticamente el idioma predeterminado del sistema.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">B</span>
+        <span class="respuesta">Para aumentar la memoria RAM física disponible en el chip del dispositivo.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">C</span>
+        <span class="respuesta">Para evitar que el proveedor cobre suscripciones mensuales de uso.</span>
+      </div>
+      <div class="opcion" data-correcta="true">
+        <span class="letra">D</span>
+        <span class="respuesta">Para corregir vulnerabilidades de seguridad descubiertas y proteger el dispositivo contra nuevas amenazas.</span>
+      </div>
+      <button class="siguiente" id="siguiente-4">Siguiente pregunta</button>
+    </div>
+
+    <!-- Pregunta 5 -->
+    <div class="pregunta" id="pregunta-5" style="display: none;">
+      <p>Pregunta 5: ¿Qué buena práctica de red previene que un atacante salte de un dispositivo IoT comprometido a computadoras con información confidencial?</p>
+      <div class="opcion" data-correcta="true">
+        <span class="letra">A</span>
+        <span class="respuesta">Implementar segmentación de red (creando una VLAN aislada o red de invitados para IoT).</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">B</span>
+        <span class="respuesta">Aumentar la potencia de transmisión del router principal.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">C</span>
+        <span class="respuesta">Desactivar la protección por contraseña en la red Wi-Fi de la empresa.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">D</span>
+        <span class="respuesta">Conectar todos los equipos al mismo canal físico mediante duplicadores Ethernet.</span>
+      </div>
+      <button class="siguiente" id="siguiente-5">Siguiente pregunta</button>
+    </div>
+
+    <!-- Pregunta 6 -->
+    <div class="pregunta" id="pregunta-6" style="display: none;">
+      <p>Pregunta 6: ¿Qué riesgo de privacidad acarrea la recolección masiva de datos mediante sensores en aparatos del hogar inteligente?</p>
+      <div class="opcion">
+        <span class="letra">A</span>
+        <span class="respuesta">La duplicación no autorizada de las claves de las tarjetas SIM de los teléfonos móviles cercanos.</span>
+      </div>
+      <div class="opcion" data-correcta="true">
+        <span class="letra">B</span>
+        <span class="respuesta">La creación de perfiles detallados sobre hábitos, rutinas y presencia de los usuarios en la vivienda.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">C</span>
+        <span class="respuesta">El formateo accidental de los discos duros conectados a la misma red local.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">D</span>
+        <span class="respuesta">La interrupción repentina del suministro de energía en la zona residencial.</span>
+      </div>
+      <button class="siguiente" id="siguiente-6">Siguiente pregunta</button>
+    </div>
+
+    <!-- Pregunta 7 -->
+    <div class="pregunta" id="pregunta-7" style="display: none;">
+      <p>Pregunta 7: En el envío de datos IoT, ¿qué significa garantizar la seguridad "en tránsito"?</p>
+      <div class="opcion">
+        <span class="letra">A</span>
+        <span class="respuesta">Proteger el dispositivo físicamente cuando se transporta en vehículos comerciales.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">B</span>
+        <span class="respuesta">Cifrar la memoria del dispositivo antes de que sea embalado en fábrica.</span>
+      </div>
+      <div class="opcion" data-correcta="true">
+        <span class="letra">C</span>
+        <span class="respuesta">Proteger la información mediante protocolos cifrados (como TLS/MQTT con cifrado) mientras viaja por la red.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">D</span>
+        <span class="respuesta">Asegurar que los cables de red tengan revestimiento antiincendios.</span>
+      </div>
+      <button class="siguiente" id="siguiente-7">Siguiente pregunta</button>
+    </div>
+
+    <!-- Pregunta 8 -->
+    <div class="pregunta" id="pregunta-8" style="display: none;">
+      <p>Pregunta 8: ¿Qué función cumple el protocolo MQTT en IoT y qué consideración de seguridad requiere?</p>
+      <div class="opcion" data-correcta="true">
+        <span class="letra">A</span>
+        <span class="respuesta">Es un protocolo ligero de mensajería que debe ser configurado con autenticación y cifrado TLS para evitar la interceptación de datos.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">B</span>
+        <span class="respuesta">Es un software antivirus que elimina el malware en sensores autónomos de temperatura.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">C</span>
+        <span class="respuesta">Es una norma estandarizada que impide la conexión de dispositivos sin pantalla táctil.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">D</span>
+        <span class="respuesta">Es un sistema de almacenamiento masivo que cifrar automáticamente las copias de seguridad locales.</span>
+      </div>
+      <button class="siguiente" id="siguiente-8">Siguiente pregunta</button>
+    </div>
+
+    <!-- Pregunta 9 -->
+    <div class="pregunta" id="pregunta-9" style="display: none;">
+      <p>Pregunta 9: ¿A qué hace referencia el modelo "Zero Trust" (Confianza Cero) aplicado a ecosistemas IoT?</p>
+      <div class="opcion">
+        <span class="letra">A</span>
+        <span class="respuesta">A no confiar en proveedores extranjeros para adquirir dispositivos inteligentes.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">B</span>
+        <span class="respuesta">A asumir que todo dispositivo sin pantalla es defectuoso y debe aislarse físicamente.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">C</span>
+        <span class="respuesta">A evitar el uso de cualquier tipo de autenticación basada en contraseñas o datos biométricos.</span>
+      </div>
+      <div class="opcion" data-correcta="true">
+        <span class="letra">D</span>
+        <span class="respuesta">A un enfoque donde no se confía automáticamente en ningún dispositivo ni usuario, requiriendo autenticación y verificación constante.</span>
+      </div>
+      <button class="siguiente" id="siguiente-9">Siguiente pregunta</button>
+    </div>
+
+    <!-- Pregunta 10 -->
+    <div class="pregunta" id="pregunta-10" style="display: none;">
+      <p>Pregunta 10: ¿Qué es el protocolo UPnP (Universal Plug and Play) y por qué suele recomendarse desactivarlo en routers para mejorar la seguridad del IoT?</p>
+      <div class="opcion">
+        <span class="letra">A</span>
+        <span class="respuesta">Es un sistema antivirus que ralentiza la velocidad de transmisión del Wi-Fi en un 50%.</span>
+      </div>
+      <div class="opcion" data-correcta="true">
+        <span class="letra">B</span>
+        <span class="respuesta">Permite a los dispositivos abrir puertos automáticamente en el router, lo que puede ser aprovechado por malware para exponer equipos a Internet.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">C</span>
+        <span class="respuesta">Es un estándar de cifrado antiguo que destruye las claves WPA3 de las redes inalámbricas.</span>
+      </div>
+      <div class="opcion">
+        <span class="letra">D</span>
+        <span class="respuesta">Es un servicio de pago obligatorio para conectar más de 3 dispositivos en una misma red doméstica.</span>
+      </div>
+      <button class="siguiente" id="siguiente-10">Finalizar cuestionario</button>
+    </div>
+
+    <div class="resultado" style="display: none;">
+      <p>🏛️ ¡Cuestionario Completado! 🏛️</p>
+      <p>Has respondido correctamente <span id="correctas">0</span> de <span id="total">10</span> preguntas.</p>
+    </div>
+  </div>
+
+  <script>
+    // Lógica interna del cuestionario interactivo
+    const preguntas = document.querySelectorAll('.pregunta');
+    const opciones = document.querySelectorAll('.opcion');
+    const siguiente = document.querySelectorAll('.siguiente');
+    const resultado = document.querySelector('.resultado');
+    const correctas = document.getElementById('correctas');
+    const total = document.getElementById('total');
+    
+    let indicePregunta = 0;
+    let respuestasCorrectas = 0;
+    
+    siguiente.forEach((boton, indice) => {
+      boton.addEventListener('click', () => {
+        if (indice === preguntas.length - 1) {
+          resultado.style.display = 'block';
+          correctas.textContent = respuestasCorrectas;
+          total.textContent = preguntas.length;
+        } else {
+          preguntas[indicePregunta].style.display = 'none';
+          indicePregunta++;
+          preguntas[indicePregunta].style.display = 'block';
+        }
+      });
+    });
+    
+    opciones.forEach((opcion) => {
+      opcion.addEventListener('click', () => {
+        opcion.parentNode.querySelectorAll('.opcion').forEach((op) => {
+          op.style.pointerEvents = 'none';
+        });
+        
+        if (opcion.getAttribute('data-correcta') === 'true') {
+          opcion.classList.add('correcta');
+          respuestasCorrectas++;
+        } else {
+          opcion.classList.add('incorrecta');
+        }
+        
+        opcion.parentNode.querySelectorAll('.opcion').forEach((op) => {
+          if (op.getAttribute('data-correcta') === 'true' && op !== opcion) {
+            op.classList.add('correcta');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

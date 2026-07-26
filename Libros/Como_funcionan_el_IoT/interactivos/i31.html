@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="es" style="--bg-color-light: #e3f2fd; --text-color-light: #0d47a1; --primary-color-light: #1976d2; --secondary-color-light: #1565c0; --card-bg-light: #ffffff; --border-color-light: #bbdefb; --accent-color-light: #f57c00; --shadow-color-light: rgba(21, 101, 192, 0.15); --success-color-light: #2e7d32; --error-color-light: #c62828; --bg-color-dark: #0a1f33; --text-color-dark: #bbdefb; --primary-color-dark: #64b5f6; --secondary-color-dark: #90caf9; --card-bg-dark: #112e4a; --border-color-dark: #1565c0; --accent-color-dark: #ffa726; --shadow-color-dark: rgba(100, 181, 246, 0.2); --success-color-dark: #81c784; --error-color-dark: #ef9a9a; --primary-color-light_alpha: rgba(25, 118, 210, 0.3); --primary-color-dark_alpha: rgba(100, 181, 246, 0.3);"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explicación: ¿Cómo funcionan los dispositivos conectados?</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js"></script>
+    <style>/* Estilos Generales y Variables CSS (Default Palette - "Oceanic") */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Lexend:wght@300..900&family=Space+Grotesk:wght@300..700&family=Poppins:wght@300..900&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+:root {
+    --bg-color-light: #e0f7fa;
+    --text-color-light: #004d40;
+    --primary-color-light: #00796b;
+    --secondary-color-light: #004d40;
+    --card-bg-light: #ffffff;
+    --border-color-light: #b2dfdb;
+    --accent-color-light: #ff6f00;
+    --shadow-color-light: rgba(0, 77, 64, 0.15);
+
+    --bg-color-dark: #00251a;
+    --text-color-dark: #b2dfdb;
+    --primary-color-dark: #4db6ac;
+    --secondary-color-dark: #80cbc4;
+    --card-bg-dark: #003d33;
+    --border-color-dark: #004d40;
+    --accent-color-dark: #ffa000;
+    --shadow-color-dark: rgba(77, 182, 172, 0.2);
+
+    --font-family-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --success-color-light: #2e7d32;
+    --success-color-dark: #81c784;
+    --error-color-light: #c62828;
+    --error-color-dark: #ef9a9a;
+    --radius-lg: 15px;
+    --radius-md: 10px;
+    --radius-sm: 8px;
+    --card-shadow: 0 8px 25px var(--shadow-color-light);
+}
+
+/* --- Visual Themes --- */
+.theme-default {
+    --radius-lg: 15px; --radius-md: 10px; --radius-sm: 8px;
+    --font-family-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.theme-moderno {
+    --radius-lg: 16px; --radius-md: 12px; --radius-sm: 10px;
+    --font-family-main: 'Poppins', 'Segoe UI', sans-serif;
+}
+.theme-corporativo {
+    --radius-lg: 6px; --radius-md: 4px; --radius-sm: 4px;
+    --font-family-main: 'Georgia', 'Times New Roman', serif;
+}
+.theme-creativo {
+    --radius-lg: 28px; --radius-md: 22px; --radius-sm: 18px;
+    --font-family-main: 'Poppins', 'Segoe UI', sans-serif;
+}
+.theme-minimalista {
+    --radius-lg: 4px; --radius-md: 2px; --radius-sm: 2px;
+    --font-family-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --card-shadow: none;
+}
+.theme-glass {
+    --radius-lg: 20px; --radius-md: 16px; --radius-sm: 14px;
+    --font-family-main: 'Poppins', 'Segoe UI', sans-serif;
+}
+body.theme-glass {
+    background: linear-gradient(135deg, var(--primary-color-light), var(--secondary-color-light));
+    background-attachment: fixed;
+}
+body.dark-mode.theme-glass {
+    background: linear-gradient(135deg, var(--primary-color-dark), var(--secondary-color-dark));
+}
+body.theme-glass .container, body.theme-glass .tutorial-step {
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    background-color: rgba(255,255,255,0.55) !important;
+}
+body.dark-mode.theme-glass .container, body.dark-mode.theme-glass .tutorial-step {
+    background-color: rgba(0,0,0,0.55) !important;
+}
+.theme-darkneon {
+    --radius-lg: 14px; --radius-md: 10px; --radius-sm: 8px;
+    --font-family-main: 'Poppins', 'Segoe UI', sans-serif;
+}
+body.theme-darkneon {
+    background-color: #0a0e1a !important; color: #e8ecff !important;
+}
+body.theme-darkneon .container { background-color: #11172a !important; border-color: #232c4d; }
+body.theme-darkneon .tutorial-step { background-color: #161d35 !important; border-color: #232c4d; }
+body.theme-darkneon header { border-bottom-color: #232c4d; }
+body.theme-darkneon footer { border-top-color: #232c4d; color: #8b93b8; }
+body.theme-darkneon h1, body.theme-darkneon h3 { color: #818cf8 !important; }
+body.theme-darkneon .control-group label { color: #8b93b8; }
+body.theme-darkneon #topicInput, body.theme-darkneon #expertInput, body.theme-darkneon #paletteSelect, body.theme-darkneon #textModelSelect, body.theme-darkneon #imageModelSelect, body.theme-darkneon #artStyleSelect {
+    background-color: #161d35; color: #e8ecff; border-color: #232c4d;
+}
+.theme-brutalista {
+    --radius-lg: 0px; --radius-md: 0px; --radius-sm: 0px;
+    --font-family-main: 'Poppins', 'Segoe UI', sans-serif;
+}
+body.theme-brutalista .container { border: 3px solid #111; box-shadow: 8px 8px 0 #111; }
+body.theme-brutalista .tutorial-step { border: 2.5px solid #111; box-shadow: 5px 5px 0 #111; }
+body.theme-brutalista button { border: 2px solid #111; box-shadow: 3px 3px 0 #111; }
+.theme-vibrante {
+    --radius-lg: 18px; --radius-md: 14px; --radius-sm: 12px;
+    --font-family-main: 'Poppins', 'Segoe UI', sans-serif;
+}
+body.theme-vibrante {
+    background: linear-gradient(120deg, #f093fb 0%, #f5576c 100%) !important;
+}
+body.dark-mode.theme-vibrante {
+    background: linear-gradient(120deg, #301b3f 0%, #1a0033 100%) !important;
+}
+body.theme-vibrante header h1 { color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+.theme-editorial {
+    --radius-lg: 0px; --radius-md: 0px; --radius-sm: 6px;
+    --font-family-main: 'Georgia', 'Times New Roman', serif;
+    --card-shadow: none;
+}
+body.theme-editorial header { border-bottom: 3px double var(--primary-color-light); }
+body.theme-editorial .tutorial-step { border: none; border-top: 1px solid var(--primary-color-light); box-shadow: none; }
+body.dark-mode.theme-editorial header { border-bottom-color: var(--primary-color-dark); }
+body.dark-mode.theme-editorial .tutorial-step { border-top-color: var(--primary-color-dark); }
+.theme-terminal {
+    --radius-lg: 0px; --radius-md: 0px; --radius-sm: 0px;
+    --font-family-main: 'Courier New', 'Consolas', monospace;
+}
+body.theme-terminal {
+    background-color: #050505 !important;
+    color: #33ff33 !important;
+}
+body.theme-terminal .container {
+    background-color: #0a0a0a !important;
+    border: 1px solid #33ff33;
+    box-shadow: 0 0 15px rgba(51, 255, 51, 0.2);
+}
+body.theme-terminal .tutorial-step {
+    background-color: #0e0e0e !important;
+    border: 1px dashed #33ff33;
+}
+body.theme-terminal button {
+    background-color: #151515 !important;
+    color: #33ff33 !important;
+    border: 1px solid #33ff33 !important;
+}
+body.theme-terminal input, body.theme-terminal select {
+    background-color: #0f0f0f !important;
+    color: #33ff33 !important;
+    border: 1px solid #33ff33 !important;
+}
+.theme-infografico {
+    --radius-lg: 24px; --radius-md: 18px; --radius-sm: 14px;
+    --font-family-main: 'Poppins', 'Segoe UI', sans-serif;
+}
+body.theme-infografico .tutorial-step { border: 2.5px dashed var(--border-color-light); }
+body.dark-mode.theme-infografico .tutorial-step { border-style: dashed; }
+.theme-retro {
+    --radius-lg: 12px; --radius-md: 8px; --radius-sm: 6px;
+    --font-family-main: 'Georgia', serif;
+}
+body.theme-retro {
+    background-color: #f4edd8 !important;
+    color: #5b4636 !important;
+}
+body.theme-retro .container {
+    background-color: #fdfaf2 !important;
+    border: 2px solid #d3c2a0;
+}
+body.theme-retro .tutorial-step { border: 2px solid var(--border-color-light); }
+body.dark-mode.theme-retro .tutorial-step { border-color: var(--border-color-dark); }
+.theme-neobrutalismo {
+    --radius-lg: 12px; --radius-md: 8px; --radius-sm: 6px;
+    --font-family-main: 'Poppins', 'Segoe UI', sans-serif;
+}
+body.theme-neobrutalismo .container { border: 3px solid #000807; box-shadow: 6px 6px 0 #000807; }
+body.theme-neobrutalismo .tutorial-step { border: 3px solid #000807; box-shadow: 6px 6px 0 #000807; }
+body.theme-neobrutalismo button { border: 2px solid #000807; box-shadow: 4px 4px 0 #000807; }
+.theme-cyberpunk {
+    --radius-lg: 4px; --radius-md: 2px; --radius-sm: 2px;
+    --font-family-main: 'Courier New', monospace;
+}
+body.theme-cyberpunk {
+    background-color: #0d0c1d !important; color: #00f0ff !important;
+}
+body.theme-cyberpunk .container { background-color: #14132b !important; border-color: #ff0055; border-left: 5px solid #ff0055; }
+body.theme-cyberpunk .tutorial-step { background-color: #1d1b3d !important; border-color: #00f0ff; }
+body.theme-cyberpunk header { border-bottom-color: #ff0055; }
+body.theme-cyberpunk footer { border-top-color: #ff0055; color: #757299; }
+body.theme-cyberpunk h1, body.theme-cyberpunk h3 { color: #ff0055 !important; text-shadow: 0 0 8px #ff0055; }
+body.theme-cyberpunk .control-group label { color: #757299; }
+body.theme-cyberpunk #topicInput, body.theme-cyberpunk #expertInput, body.theme-cyberpunk #paletteSelect, body.theme-cyberpunk #textModelSelect, body.theme-cyberpunk #imageModelSelect, body.theme-cyberpunk #artStyleSelect {
+    background-color: #1d1b3d; color: #00f0ff; border-color: #ff0055;
+}
+.theme-organico {
+    --radius-lg: 24px; --radius-md: 16px; --radius-sm: 12px;
+    --font-family-main: 'Poppins', 'Segoe UI', sans-serif;
+}
+body.theme-organico .tutorial-step { border-radius: var(--radius-md) 4px var(--radius-md) 4px; }
+.theme-noir {
+    --radius-lg: 14px; --radius-md: 10px; --radius-sm: 8px;
+    --font-family-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+body.theme-noir {
+    background-color: #1a1a2e !important; color: #e0e0e0 !important;
+}
+body.theme-noir .container {
+    background-color: #16213e !important; border: 1px solid #0f3460;
+}
+body.theme-noir .tutorial-step {
+    background-color: #1a1a2e !important; border-color: #0f3460;
+}
+body.theme-noir header { border-bottom-color: #0f3460; }
+body.theme-noir footer { border-top-color: #0f3460; color: #8899aa; }
+body.theme-noir #topicInput, body.theme-noir #expertInput, body.theme-noir #paletteSelect, body.theme-noir #textModelSelect, body.theme-noir #imageModelSelect, body.theme-noir #artStyleSelect {
+    background-color: #0f3460; color: #e0e0e0; border-color: #1a1a2e;
+}
+body.theme-noir h1, body.theme-noir h3 { color: #e94560 !important; }
+body.theme-noir .control-group label { color: #8899aa; }
+body.theme-noir header h1 { color: #e94560; }
+
+/* --- Nuevos Estilos Visuales --- */
+
+/* 1. Educativo */
+.theme-educativo {
+    --radius-lg: 12px; --radius-md: 8px; --radius-sm: 6px;
+    --font-family-main: 'Lexend', sans-serif;
+}
+body.theme-educativo {
+    background-color: #f7f9fc !important;
+    color: #2c3e50 !important;
+}
+body.theme-educativo .container {
+    background-color: #ffffff !important;
+    border: 1px solid #d1d8e0;
+    border-top: 6px solid #3498db;
+    box-shadow: 0 10px 30px rgba(52, 152, 219, 0.08);
+}
+body.theme-educativo .tutorial-step {
+    background-color: #fcfdfe !important;
+    border-left: 4px solid #2ecc71;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+body.theme-educativo header h1 {
+    color: #2980b9 !important;
+}
+
+/* 2. Infantil */
+.theme-infantil {
+    --radius-lg: 32px; --radius-md: 20px; --radius-sm: 14px;
+    --font-family-main: 'Fredoka', sans-serif;
+}
+body.theme-infantil {
+    background-color: #fff9db !important;
+    color: #6d4c41 !important;
+}
+body.theme-infantil .container {
+    background-color: #ffffff !important;
+    border: 4px solid #ffb74d;
+    box-shadow: 0 12px 0 #ffe082;
+}
+body.theme-infantil .tutorial-step {
+    background-color: #f1f8e9 !important;
+    border: 3px solid #aed581;
+    box-shadow: 0 6px 0 #c5e1a5;
+}
+body.theme-infantil button {
+    background-color: #ff8a65 !important;
+    color: white !important;
+    border: 3px solid #ff7043 !important;
+    box-shadow: 0 4px 0 #e64a19 !important;
+    transform: none !important;
+}
+body.theme-infantil button:hover {
+    background-color: #ff7043 !important;
+    transform: translateY(2px) !important;
+    box-shadow: 0 2px 0 #e64a19 !important;
+}
+body.theme-infantil header h1 {
+    color: #ec407a !important;
+    font-size: 3.2em;
+    text-shadow: 2px 2px 0px #f8bbd0;
+}
+
+/* 3. Científico */
+.theme-cientifico {
+    --radius-lg: 4px; --radius-md: 4px; --radius-sm: 2px;
+    --font-family-main: 'Space Grotesk', 'Courier Prime', monospace;
+}
+body.theme-cientifico {
+    background-color: #0b0f19 !important;
+    color: #8da2fb !important;
+}
+body.theme-cientifico .container {
+    background-color: #121829 !important;
+    border: 1px solid #3b82f6;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+body.theme-cientifico .tutorial-step {
+    background-color: #18223f !important;
+    border: 1px solid #10b981;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
+}
+body.theme-cientifico header h1 {
+    color: #60a5fa !important;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+body.theme-cientifico button {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+    border: 1px solid #1d4ed8 !important;
+}
+body.theme-cientifico #topicInput, body.theme-cientifico #expertInput, body.theme-cientifico #paletteSelect, body.theme-cientifico #textModelSelect, body.theme-cientifico #imageModelSelect, body.theme-cientifico #artStyleSelect {
+    background-color: #1e293b; color: #f8fafc; border-color: #475569;
+}
+
+
+/* --- Estilos base del DOM --- */
+.container {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+}
+.tutorial-step {
+    border-radius: var(--radius-md);
+    box-shadow: var(--card-shadow);
+}
+#topicInput, #expertInput, #paletteSelect, #textModelSelect, #imageModelSelect, #artStyleSelect {
+    border-radius: var(--radius-sm);
+}
+button {
+    border-radius: var(--radius-sm);
+}
+
+body {
+    font-family: var(--font-family-main);
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color-light);
+    color: var(--text-color-light);
+    transition: background-color 0.5s, color 0.5s, font-family 0.5s;
+    line-height: 1.7;
+}
+
+body.dark-mode {
+    background-color: var(--bg-color-dark);
+    color: var(--text-color-dark);
+}
+
+.container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 25px;
+    background-color: var(--card-bg-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    transition: background-color 0.5s, box-shadow 0.5s;
+}
+
+body.dark-mode .container {
+    background-color: var(--card-bg-dark);
+    box-shadow: 0 8px 25px var(--shadow-color-dark);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 35px;
+    padding-bottom: 25px;
+    border-bottom: 2px solid var(--primary-color-light);
+}
+
+body.dark-mode header {
+    border-bottom-color: var(--primary-color-dark);
+}
+
+header h1 {
+    color: var(--primary-color-light);
+    font-size: 2.8em;
+    margin-bottom: 15px;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+body.dark-mode header h1 {
+    color: var(--primary-color-dark);
+}
+
+#generationControls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.control-group label {
+    font-size: 0.9em;
+    font-weight: 500;
+    color: var(--secondary-color-light);
+}
+
+body.dark-mode .control-group label {
+    color: var(--secondary-color-dark);
+}
+
+#topicInput,
+#expertInput,
+#paletteSelect,
+#textModelSelect,
+#imageModelSelect,
+#artStyleSelect {
+    padding: 10px 14px;
+    border: 2px solid var(--border-color-light);
+    font-size: 1em;
+    background-color: var(--bg-color-light);
+    color: var(--text-color-light);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+body.dark-mode #topicInput,
+body.dark-mode #expertInput,
+body.dark-mode #paletteSelect,
+body.dark-mode #textModelSelect,
+body.dark-mode #imageModelSelect,
+body.dark-mode #artStyleSelect {
+    background-color: var(--card-bg-dark);
+    color: var(--text-color-dark);
+    border-color: var(--border-color-dark);
+}
+
+#topicInput:focus,
+#expertInput:focus,
+#paletteSelect:focus,
+#textModelSelect:focus,
+#imageModelSelect:focus,
+#artStyleSelect:focus {
+    outline: none;
+    border-color: var(--primary-color-light);
+    box-shadow: 0 0 0 3px var(--primary-color-light_alpha, rgba(0, 121, 107, 0.3));
+}
+
+body.dark-mode #topicInput:focus,
+body.dark-mode #expertInput:focus,
+body.dark-mode #paletteSelect:focus,
+body.dark-mode #textModelSelect:focus,
+body.dark-mode #imageModelSelect:focus,
+body.dark-mode #artStyleSelect:focus {
+    border-color: var(--primary-color-dark);
+    box-shadow: 0 0 0 3px var(--primary-color-dark_alpha, rgba(77, 182, 172, 0.3));
+}
+
+.checkbox-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95em;
+    padding: 8px 0;
+}
+
+.checkbox-control input[type="checkbox"] {
+    transform: scale(1.2);
+    accent-color: var(--primary-color-light);
+}
+
+body.dark-mode .checkbox-control input[type="checkbox"] {
+    accent-color: var(--primary-color-dark);
+}
+
+.main-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+button {
+    padding: 10px 18px;
+    border: none;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+#generateTutorialBtn,
+#themeToggleBtn {
+    padding: 12px 22px;
+    font-size: 1em;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+    transform: translateY(0px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+button:disabled {
+    background-color: #ccc !important;
+    color: #666 !important;
+    cursor: not-allowed;
+    transform: translateY(0px);
+    box-shadow: none;
+}
+
+body.dark-mode button:disabled {
+    background-color: #555 !important;
+    color: #888 !important;
+}
+
+
+#generateTutorialBtn {
+    background-color: var(--primary-color-light);
+    color: white;
+}
+
+body.dark-mode #generateTutorialBtn {
+    background-color: var(--primary-color-dark);
+    color: var(--bg-color-dark);
+}
+
+#themeToggleBtn,
+#resetBtn,
+#downloadHtmlBtn,
+#downloadWordBtn {
+    background-color: var(--secondary-color-light);
+    color: white;
+}
+
+body.dark-mode #themeToggleBtn,
+body.dark-mode #resetBtn,
+body.dark-mode #downloadHtmlBtn,
+body.dark-mode #downloadWordBtn {
+    background-color: var(--secondary-color-dark);
+    color: var(--bg-color-dark);
+}
+
+#resetBtn {
+    background-color: var(--accent-color-light);
+}
+
+body.dark-mode #resetBtn {
+    background-color: var(--accent-color-dark);
+}
+
+
+#tutorialContainer {
+    margin-top: 30px;
+}
+
+#tutorialContainer img {
+    cursor: zoom-in;
+}
+
+.tutorial-step {
+    background-color: var(--card-bg-light);
+    border: 1px solid var(--border-color-light);
+    border-radius: var(--radius-md);
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: var(--card-shadow);
+    opacity: 0;
+    transform: translateY(25px);
+    animation: fadeInStep 0.6s ease-out forwards;
+    overflow: auto;
+}
+
+body.dark-mode .tutorial-step {
+    background-color: var(--card-bg-dark);
+    border-color: var(--border-color-dark);
+    box-shadow: 0 5px 15px var(--shadow-color-dark);
+}
+
+@keyframes fadeInStep {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tutorial-step h3 {
+    color: var(--accent-color-light);
+    margin-top: 0;
+    font-size: 1.7em;
+    border-bottom: 2px solid var(--accent-color-light);
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+    font-weight: 600;
+}
+
+body.dark-mode .tutorial-step h3 {
+    color: var(--accent-color-dark);
+    border-bottom-color: var(--accent-color-dark);
+}
+
+.tutorial-step p {
+    font-size: 1.1em;
+    color: var(--text-color-light);
+}
+
+body.dark-mode .tutorial-step p {
+    color: var(--text-color-dark);
+}
+
+body.dark-mode .container,
+body.dark-mode .tutorial-step,
+body.dark-mode .api-key-container,
+body.dark-mode #topicInput,
+body.dark-mode #expertInput,
+body.dark-mode #paletteSelect,
+body.dark-mode #textModelSelect,
+body.dark-mode #imageModelSelect,
+body.dark-mode #artStyleSelect,
+body.dark-mode #apiKeyInput {
+    background-color: var(--card-bg-dark) !important;
+    color: var(--text-color-dark) !important;
+    border-color: var(--border-color-dark) !important;
+}
+
+body.dark-mode .tutorial-step p,
+body.dark-mode .tutorial-step li,
+body.dark-mode .tutorial-step ul {
+    color: var(--text-color-dark) !important;
+}
+
+#loadingIndicator {
+    text-align: center;
+    padding: 25px;
+    font-size: 1.3em;
+    color: var(--primary-color-light);
+}
+
+body.dark-mode #loadingIndicator {
+    color: var(--primary-color-dark);
+}
+
+.spinner {
+    border: 5px solid var(--border-color-light);
+    border-top: 5px solid var(--primary-color-light);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 15px auto;
+}
+
+body.dark-mode .spinner {
+    border-color: var(--border-color-dark);
+    border-top-color: var(--primary-color-dark);
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+
+
+
+footer {
+    text-align: center;
+    margin-top: 45px;
+    padding: 25px;
+    font-size: 0.95em;
+    color: var(--secondary-color-light);
+    border-top: 1px solid var(--border-color-light);
+}
+
+body.dark-mode footer {
+    color: var(--secondary-color-dark);
+    border-top-color: var(--border-color-dark);
+}
+
+#multipleChoiceButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* BYOP Styles */
+.api-key-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding: 20px;
+    background: var(--card-bg-light);
+    border: 2px dashed var(--primary-color-light);
+    border-radius: var(--radius-md);
+    align-items: center;
+    box-shadow: 0 4px 15px var(--shadow-color-light);
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .api-key-container {
+    background: var(--card-bg-dark);
+    border-color: var(--primary-color-dark);
+    box-shadow: 0 4px 15px var(--shadow-color-dark);
+}
+
+#apiKeyInput {
+    flex-grow: 1;
+    padding: 12px 16px;
+    border: 2px solid var(--border-color-light);
+    border-radius: var(--radius-sm);
+    font-family: 'Courier New', Courier, monospace;
+    background: var(--bg-color-light);
+    color: var(--text-color-light);
+    font-size: 0.95em;
+}
+
+body.dark-mode #apiKeyInput {
+    border-color: var(--border-color-dark);
+    background: var(--bg-color-dark);
+    color: var(--text-color-dark);
+}
+
+#getApiKeyBtn {
+    background-color: var(--success-color-light);
+    color: white;
+    white-space: nowrap;
+    padding: 12px 20px;
+}
+
+body.dark-mode #getApiKeyBtn {
+    background-color: var(--success-color-dark);
+    color: var(--bg-color-dark);
+}
+
+.image-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 20px;
+}
+.image-modal-overlay img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.6);
+    cursor: pointer;
+    object-fit: contain;
+}
+</style>
+<script id="mathjax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><style type="text/css">.CtxtMenu_InfoClose {  top:.2em; right:.2em;}
+.CtxtMenu_InfoContent {  overflow:auto; text-align:left; font-size:80%;  padding:.4em .6em; border:1px inset; margin:1em 0px;  max-height:20em; max-width:30em; background-color:#EEEEEE;  white-space:normal;}
+.CtxtMenu_Info.CtxtMenu_MousePost {outline:none;}
+.CtxtMenu_Info {  position:fixed; left:50%; width:auto; text-align:center;  border:3px outset; padding:1em 2em; background-color:#DDDDDD;  color:black;  cursor:default; font-family:message-box; font-size:120%;  font-style:normal; text-indent:0; text-transform:none;  line-height:normal; letter-spacing:normal; word-spacing:normal;  word-wrap:normal; white-space:nowrap; float:none; z-index:201;  border-radius: 15px;                     /* Opera 10.5 and IE9 */  -webkit-border-radius:15px;               /* Safari and Chrome */  -moz-border-radius:15px;                  /* Firefox */  -khtml-border-radius:15px;                /* Konqueror */  box-shadow:0px 10px 20px #808080;         /* Opera 10.5 and IE9 */  -webkit-box-shadow:0px 10px 20px #808080; /* Safari 3 & Chrome */  -moz-box-shadow:0px 10px 20px #808080;    /* Forefox 3.5 */  -khtml-box-shadow:0px 10px 20px #808080;  /* Konqueror */  filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color="gray", Positive="true"); /* IE */}
+</style><style type="text/css">.CtxtMenu_MenuClose {  position:absolute;  cursor:pointer;  display:inline-block;  border:2px solid #AAA;  border-radius:18px;  -webkit-border-radius: 18px;             /* Safari and Chrome */  -moz-border-radius: 18px;                /* Firefox */  -khtml-border-radius: 18px;              /* Konqueror */  font-family: "Courier New", Courier;  font-size:24px;  color:#F0F0F0}
+.CtxtMenu_MenuClose span {  display:block; background-color:#AAA; border:1.5px solid;  border-radius:18px;  -webkit-border-radius: 18px;             /* Safari and Chrome */  -moz-border-radius: 18px;                /* Firefox */  -khtml-border-radius: 18px;              /* Konqueror */  line-height:0;  padding:8px 0 6px     /* may need to be browser-specific */}
+.CtxtMenu_MenuClose:hover {  color:white!important;  border:2px solid #CCC!important}
+.CtxtMenu_MenuClose:hover span {  background-color:#CCC!important}
+.CtxtMenu_MenuClose:hover:focus {  outline:none}
+</style><style type="text/css">.CtxtMenu_Menu {  position:absolute;  background-color:white;  color:black;  width:auto; padding:5px 0px;  border:1px solid #CCCCCC; margin:0; cursor:default;  font: menu; text-align:left; text-indent:0; text-transform:none;  line-height:normal; letter-spacing:normal; word-spacing:normal;  word-wrap:normal; white-space:nowrap; float:none; z-index:201;  border-radius: 5px;                     /* Opera 10.5 and IE9 */  -webkit-border-radius: 5px;             /* Safari and Chrome */  -moz-border-radius: 5px;                /* Firefox */  -khtml-border-radius: 5px;              /* Konqueror */  box-shadow:0px 10px 20px #808080;         /* Opera 10.5 and IE9 */  -webkit-box-shadow:0px 10px 20px #808080; /* Safari 3 & Chrome */  -moz-box-shadow:0px 10px 20px #808080;    /* Forefox 3.5 */  -khtml-box-shadow:0px 10px 20px #808080;  /* Konqueror */}
+.CtxtMenu_MenuItem {  padding: 1px 2em;  background:transparent;}
+.CtxtMenu_MenuArrow {  position:absolute; right:.5em; padding-top:.25em; color:#666666;  font-family: null; font-size: .75em}
+.CtxtMenu_MenuActive .CtxtMenu_MenuArrow {color:white}
+.CtxtMenu_MenuArrow.CtxtMenu_RTL {left:.5em; right:auto}
+.CtxtMenu_MenuCheck {  position:absolute; left:.7em;  font-family: null}
+.CtxtMenu_MenuCheck.CtxtMenu_RTL { right:.7em; left:auto }
+.CtxtMenu_MenuRadioCheck {  position:absolute; left: .7em;}
+.CtxtMenu_MenuRadioCheck.CtxtMenu_RTL {  right: .7em; left:auto}
+.CtxtMenu_MenuInputBox {  padding-left: 1em; right:.5em; color:#666666;  font-family: null;}
+.CtxtMenu_MenuInputBox.CtxtMenu_RTL {  left: .1em;}
+.CtxtMenu_MenuComboBox {  left:.1em; padding-bottom:.5em;}
+.CtxtMenu_MenuSlider {  left: .1em;}
+.CtxtMenu_SliderValue {  position:absolute; right:.1em; padding-top:.25em; color:#333333;  font-size: .75em}
+.CtxtMenu_SliderBar {  outline: none; background: #d3d3d3}
+.CtxtMenu_MenuLabel {  padding: 1px 2em 3px 1.33em;  font-style:italic}
+.CtxtMenu_MenuRule {  border-top: 1px solid #DDDDDD;  margin: 4px 3px;}
+.CtxtMenu_MenuDisabled {  color:GrayText}
+.CtxtMenu_MenuActive {  background-color: #606872;  color: white;}
+.CtxtMenu_MenuDisabled:focus {  background-color: #E8E8E8}
+.CtxtMenu_MenuLabel:focus {  background-color: #E8E8E8}
+.CtxtMenu_ContextMenu:focus {  outline:none}
+.CtxtMenu_ContextMenu .CtxtMenu_MenuItem:focus {  outline:none}
+.CtxtMenu_SelectionMenu {  position:relative; float:left;  border-bottom: none; -webkit-box-shadow:none; -webkit-border-radius:0px; }
+.CtxtMenu_SelectionItem {  padding-right: 1em;}
+.CtxtMenu_Selection {  right: 40%; width:50%; }
+.CtxtMenu_SelectionBox {  padding: 0em; max-height:20em; max-width: none;  background-color:#FFFFFF;}
+.CtxtMenu_SelectionDivider {  clear: both; border-top: 2px solid #000000;}
+.CtxtMenu_Menu .CtxtMenu_MenuClose {  top:-10px; left:-10px}
+</style><style id="MJX-CHTML-styles">
+mjx-container[jax="CHTML"] {
+  line-height: 0;
+}
+
+mjx-container [space="1"] {
+  margin-left: .111em;
+}
+
+mjx-container [space="2"] {
+  margin-left: .167em;
+}
+
+mjx-container [space="3"] {
+  margin-left: .222em;
+}
+
+mjx-container [space="4"] {
+  margin-left: .278em;
+}
+
+mjx-container [space="5"] {
+  margin-left: .333em;
+}
+
+mjx-container [rspace="1"] {
+  margin-right: .111em;
+}
+
+mjx-container [rspace="2"] {
+  margin-right: .167em;
+}
+
+mjx-container [rspace="3"] {
+  margin-right: .222em;
+}
+
+mjx-container [rspace="4"] {
+  margin-right: .278em;
+}
+
+mjx-container [rspace="5"] {
+  margin-right: .333em;
+}
+
+mjx-container [size="s"] {
+  font-size: 70.7%;
+}
+
+mjx-container [size="ss"] {
+  font-size: 50%;
+}
+
+mjx-container [size="Tn"] {
+  font-size: 60%;
+}
+
+mjx-container [size="sm"] {
+  font-size: 85%;
+}
+
+mjx-container [size="lg"] {
+  font-size: 120%;
+}
+
+mjx-container [size="Lg"] {
+  font-size: 144%;
+}
+
+mjx-container [size="LG"] {
+  font-size: 173%;
+}
+
+mjx-container [size="hg"] {
+  font-size: 207%;
+}
+
+mjx-container [size="HG"] {
+  font-size: 249%;
+}
+
+mjx-container [width="full"] {
+  width: 100%;
+}
+
+mjx-box {
+  display: inline-block;
+}
+
+mjx-block {
+  display: block;
+}
+
+mjx-itable {
+  display: inline-table;
+}
+
+mjx-row {
+  display: table-row;
+}
+
+mjx-row > * {
+  display: table-cell;
+}
+
+mjx-mtext {
+  display: inline-block;
+}
+
+mjx-mstyle {
+  display: inline-block;
+}
+
+mjx-merror {
+  display: inline-block;
+  color: red;
+  background-color: yellow;
+}
+
+mjx-mphantom {
+  visibility: hidden;
+}
+
+_::-webkit-full-page-media, _:future, :root mjx-container {
+  will-change: opacity;
+}
+
+mjx-assistive-mml {
+  position: absolute !important;
+  top: 0px;
+  left: 0px;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 1px 0px 0px 0px !important;
+  border: 0px !important;
+  display: block !important;
+  width: auto !important;
+  overflow: hidden !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+mjx-assistive-mml[display="block"] {
+  width: 100% !important;
+}
+
+mjx-c::before {
+  display: block;
+  width: 0;
+}
+
+.MJX-TEX {
+  font-family: MJXZERO, MJXTEX;
+}
+
+.TEX-B {
+  font-family: MJXZERO, MJXTEX-B;
+}
+
+.TEX-I {
+  font-family: MJXZERO, MJXTEX-I;
+}
+
+.TEX-MI {
+  font-family: MJXZERO, MJXTEX-MI;
+}
+
+.TEX-BI {
+  font-family: MJXZERO, MJXTEX-BI;
+}
+
+.TEX-S1 {
+  font-family: MJXZERO, MJXTEX-S1;
+}
+
+.TEX-S2 {
+  font-family: MJXZERO, MJXTEX-S2;
+}
+
+.TEX-S3 {
+  font-family: MJXZERO, MJXTEX-S3;
+}
+
+.TEX-S4 {
+  font-family: MJXZERO, MJXTEX-S4;
+}
+
+.TEX-A {
+  font-family: MJXZERO, MJXTEX-A;
+}
+
+.TEX-C {
+  font-family: MJXZERO, MJXTEX-C;
+}
+
+.TEX-CB {
+  font-family: MJXZERO, MJXTEX-CB;
+}
+
+.TEX-FR {
+  font-family: MJXZERO, MJXTEX-FR;
+}
+
+.TEX-FRB {
+  font-family: MJXZERO, MJXTEX-FRB;
+}
+
+.TEX-SS {
+  font-family: MJXZERO, MJXTEX-SS;
+}
+
+.TEX-SSB {
+  font-family: MJXZERO, MJXTEX-SSB;
+}
+
+.TEX-SSI {
+  font-family: MJXZERO, MJXTEX-SSI;
+}
+
+.TEX-SC {
+  font-family: MJXZERO, MJXTEX-SC;
+}
+
+.TEX-T {
+  font-family: MJXZERO, MJXTEX-T;
+}
+
+.TEX-V {
+  font-family: MJXZERO, MJXTEX-V;
+}
+
+.TEX-VB {
+  font-family: MJXZERO, MJXTEX-VB;
+}
+
+mjx-stretchy-v mjx-c, mjx-stretchy-h mjx-c {
+  font-family: MJXZERO, MJXTEX-S1, MJXTEX-S4, MJXTEX, MJXTEX-A ! important;
+}
+
+@font-face /* 0 */ {
+  font-family: MJXZERO;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Zero.woff") format("woff");
+}
+
+@font-face /* 1 */ {
+  font-family: MJXTEX;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Main-Regular.woff") format("woff");
+}
+
+@font-face /* 2 */ {
+  font-family: MJXTEX-B;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Main-Bold.woff") format("woff");
+}
+
+@font-face /* 3 */ {
+  font-family: MJXTEX-I;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Math-Italic.woff") format("woff");
+}
+
+@font-face /* 4 */ {
+  font-family: MJXTEX-MI;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Main-Italic.woff") format("woff");
+}
+
+@font-face /* 5 */ {
+  font-family: MJXTEX-BI;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Math-BoldItalic.woff") format("woff");
+}
+
+@font-face /* 6 */ {
+  font-family: MJXTEX-S1;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Size1-Regular.woff") format("woff");
+}
+
+@font-face /* 7 */ {
+  font-family: MJXTEX-S2;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Size2-Regular.woff") format("woff");
+}
+
+@font-face /* 8 */ {
+  font-family: MJXTEX-S3;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Size3-Regular.woff") format("woff");
+}
+
+@font-face /* 9 */ {
+  font-family: MJXTEX-S4;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Size4-Regular.woff") format("woff");
+}
+
+@font-face /* 10 */ {
+  font-family: MJXTEX-A;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_AMS-Regular.woff") format("woff");
+}
+
+@font-face /* 11 */ {
+  font-family: MJXTEX-C;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Calligraphic-Regular.woff") format("woff");
+}
+
+@font-face /* 12 */ {
+  font-family: MJXTEX-CB;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Calligraphic-Bold.woff") format("woff");
+}
+
+@font-face /* 13 */ {
+  font-family: MJXTEX-FR;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Fraktur-Regular.woff") format("woff");
+}
+
+@font-face /* 14 */ {
+  font-family: MJXTEX-FRB;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Fraktur-Bold.woff") format("woff");
+}
+
+@font-face /* 15 */ {
+  font-family: MJXTEX-SS;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_SansSerif-Regular.woff") format("woff");
+}
+
+@font-face /* 16 */ {
+  font-family: MJXTEX-SSB;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_SansSerif-Bold.woff") format("woff");
+}
+
+@font-face /* 17 */ {
+  font-family: MJXTEX-SSI;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_SansSerif-Italic.woff") format("woff");
+}
+
+@font-face /* 18 */ {
+  font-family: MJXTEX-SC;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Script-Regular.woff") format("woff");
+}
+
+@font-face /* 19 */ {
+  font-family: MJXTEX-T;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Typewriter-Regular.woff") format("woff");
+}
+
+@font-face /* 20 */ {
+  font-family: MJXTEX-V;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Vector-Regular.woff") format("woff");
+}
+
+@font-face /* 21 */ {
+  font-family: MJXTEX-VB;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Vector-Bold.woff") format("woff");
+}
+</style></head>
+
+<body class="dark-mode" style="font-family: Roboto, &quot;Helvetica Neue&quot;, Arial, sans-serif;">
+    <div class="container">
+        <header>
+            <h1>Explicado paso a paso</h1><div style="text-align: center; padding: 10px 0px 20px;"><button id="themeToggleBtn">☀️ Modo Claro</button></div>
+
+            
+
+            
+        </header>
+
+        <main>
+            
+            <div id="tutorialContainer"><h3>¿Cómo funcionan los dispositivos conectados? (explicado por un experto en IoT)</h3><div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 25px;"><div style="flex: 1 1 0%; min-width: 280px; font-size: 1.1em; line-height: 1.8;"><p>Los dispositivos conectados, el corazón del IoT, son objetos físicos que incorporan sensores, software y otras tecnologías que les permiten recopilar y intercambiar datos a través de Internet u otras redes de comunicación. Piensa en ellos como los "sentidos" y "miembros" de un ecosistema digital, que nos permiten interactuar con el mundo físico de formas nuevas y eficientes.</p>
+</div></div><h4 style="color: var(--accent-color-light); margin-top: 30px; margin-bottom: 15px; font-size: 1.2em;">Explicación paso a paso</h4><div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 20px;"><div style="flex: 1 1 0%; min-width: 280px; font-size: 1.1em; line-height: 1.8;"><p>El funcionamiento de un dispositivo conectado se puede dividir en varias etapas clave:</p>
+<ol>
+<li><strong>Recopilación de Datos (Sensing)</strong>: Todo comienza con un sensor. Estos sensores son la interfaz del dispositivo con el mundo físico. Pueden medir una variedad de parámetros: temperatura, humedad, movimiento, luz, ubicación GPS, calidad del aire, etc. Por ejemplo, un termostato inteligente tiene un sensor de temperatura.</li>
+<li><strong>Procesamiento y Conectividad</strong>: Una vez que el sensor recopila datos, el microcontrolador o procesador dentro del dispositivo los acondiciona. Luego, estos datos deben ser enviados a algún lugar para su análisis. Aquí es donde entra la conectividad. Los dispositivos utilizan diversos protocolos de comunicación:<ul>
+<li><strong>Redes locales</strong>: Wi-Fi, Bluetooth, Zigbee.</li>
+<li><strong>Redes celulares</strong>: 4G, 5G, NB-IoT.</li>
+<li><strong>Redes de largo alcance y baja potencia</strong>: LoRaWAN, Sigfox.</li>
+</ul>
+</li>
+</ol>
+</div></div><div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 20px;"><div style="flex: 1 1 0%; min-width: 280px; font-size: 1.1em; line-height: 1.8;"><p>La elección del protocolo depende de factores como el alcance, el consumo de energía y el volumen de datos.<br>3.  <strong>Transmisión y Almacenamiento (Gateway/Cloud)</strong>: Los datos viajan a través de la red seleccionada. A menudo, pasan por un "gateway" (concentrador) que actúa como puente entre el dispositivo y el Internet. Finalmente, estos datos llegan a una plataforma en la nube o a un servidor local. Aquí es donde se almacenan, procesan y analizan a gran escala.<br>4.  <strong>Análisis y Toma de Decisiones</strong>: La plataforma de análisis aplica algoritmos, reglas o inteligencia artificial (IA) a los datos recopilados. Por ejemplo, un sistema de seguridad podría analizar datos de sensores de movimiento y cámaras para detectar una intrusión.<br>5.  <strong>Acción y Retroalimentación (Actuation/User Interface)</strong>: Basándose en el análisis, se toman decisiones. Estas decisiones pueden dar lugar a:<br>    *   <strong>Acciones automatizadas</strong>: El termostato ajusta la calefacción si la temperatura es demasiado baja.<br>    *   <strong>Notificaciones al usuario</strong>: Recibes una alerta en tu teléfono si se detecta movimiento.<br>    *   <strong>Control del usuario</strong>: A través de una aplicación móvil o una interfaz web, puedes controlar el dispositivo directamente (por ejemplo, apagar las luces de forma remota).</p>
+</div></div><h4 style="color: var(--accent-color-light); margin-top: 30px; margin-bottom: 15px; font-size: 1.2em;">Analogía</h4><div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 25px;"><div style="flex: 1 1 0%; min-width: 280px; font-size: 1.1em; line-height: 1.8;"><p>Imagina que un dispositivo conectado es como un <strong>médico monitoreando a un paciente a distancia</strong>.</p>
+<ul>
+<li><strong>Los Sensores</strong> son como los equipos médicos (termómetros, tensiómetros, oxímetros) que miden constantemente las constantes vitales del paciente.</li>
+<li><strong>La Conectividad</strong> es como el sistema de comunicación (teléfono, Wi-Fi) que envía los datos de estas mediciones.</li>
+<li><strong>La Plataforma en la Nube</strong> es como el consultorio del médico o un centro de monitoreo, donde se reciben y registran todos los datos.</li>
+<li><strong>El Análisis</strong> es lo que hace el médico al revisar los números: diagnostica si algo va mal o si todo está en orden.</li>
+<li><strong>La Acción/Retroalimentación</strong> puede ser una llamada del médico para ajustar la medicación (acción automatizada o remota) o una notificación al paciente diciéndole que sus niveles están bien (interfaz de usuario).</li>
+</ul>
+</div></div><h4 style="color: var(--accent-color-light); margin-top: 30px; margin-bottom: 15px; font-size: 1.2em;">Tres ideas erróneas comunes</h4><div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 25px;"><div style="flex: 1 1 0%; min-width: 280px; font-size: 1.1em; line-height: 1.8;"><ol>
+<li><strong>"Todos los dispositivos conectados son 'inteligentes'":</strong> No necesariamente. Muchos dispositivos simplemente recopilan y transmiten datos sin un procesamiento local significativo. La "inteligencia" a menudo reside en la plataforma en la nube que analiza esos datos. Un simple sensor de temperatura que envía lecturas no es "inteligente" por sí solo, pero forma parte de un sistema inteligente.</li>
+<li><strong>"La seguridad es algo que se añade al final":</strong> ¡Error grave! La seguridad debe ser un pilar fundamental desde el diseño inicial (security by design). Muchos dispositivos tienen vulnerabilidades porque la seguridad se consideró una ocurrencia tardía, lo que los hace fáciles de hackear.</li>
+<li><strong>"Los dispositivos IoT siempre necesitan una conexión a Internet constante":</strong> Si bien muchas aplicaciones de IoT dependen de la conectividad continua, existen dispositivos diseñados para funcionar sin conexión o con conectividad intermitente. Pueden almacenar datos localmente y sincronizarlos cuando la conexión esté disponible, especialmente útiles en áreas remotas o con redes poco fiables.</li>
+</ol>
+<p>Espero que esta explicación detallada te haya sido útil para comprender el fascinante mundo de los dispositivos conectados. ¡Es un campo en constante evolución!</p>
+</div></div></div>
+            <div id="loadingIndicator" style="display: none;">
+                <p>✨ Generando explicación de texto... Esto puede tardar un momento. ✨</p>
+                <div class="spinner"></div>
+            </div>
+            
+
+
+        </main>
+    </div>
+
+    <footer>
+        <p>Diseñado por Juan Guillermo Rivera Berrío con tecnología DeepSeek V4 y asistencia de Open Code</p>
+    </footer>
+
+    
+
+
+<script>
+            (() => {
+                const applyTheme = () => {
+                    const body = document.body;
+                    const btn = document.getElementById('themeToggleBtn');
+                    if (!body || !btn) return;
+                    const isDark = body.classList.contains('dark-mode');
+                    btn.textContent = isDark ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+                    document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+                };
+
+                document.getElementById('themeToggleBtn')?.addEventListener('click', () => {
+                    const body = document.body;
+                    const btn = document.getElementById('themeToggleBtn');
+                    if (!body || !btn) return;
+                    body.classList.toggle('dark-mode');
+                    applyTheme();
+                });
+
+                document.addEventListener('click', (event) => {
+                    const img = event.target.closest('#tutorialContainer img');
+                    if (!img) return;
+                    event.preventDefault();
+                    const existing = document.querySelector('.image-modal-overlay');
+                    if (existing) existing.remove();
+                    const overlay = document.createElement('div');
+                    overlay.className = 'image-modal-overlay';
+                    const clone = document.createElement('img');
+                    clone.src = img.src;
+                    clone.alt = img.alt;
+                    overlay.appendChild(clone);
+                    overlay.addEventListener('click', () => overlay.remove());
+                    document.body.appendChild(overlay);
+                });
+
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') {
+                        document.querySelector('.image-modal-overlay')?.remove();
+                    }
+                });
+
+                applyTheme();
+            })();
+        </script></body></html>
