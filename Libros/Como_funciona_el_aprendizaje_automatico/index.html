@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=yes,minimal-ui">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+	<title>Libro digital interactivo</title>
+
+	<!-- se precarga la imagen utilizada para el cargador del libro, en caso de que se utilice -->
+	<link rel="preload" as="image" href="images/general/icartesilibri_logo.svg">
+
+	<!-- configuración del libro -->
+	<script>
+	window.book_config = {
+		// parámetro que indica si los capítulos, secciones y figura se auto numeran
+		// para que los capítulos se auto numeren deben utilizar la etiqueta <h1>
+		// para que las secciones se auto numeren deben utilizar la etiqueta <h2>
+		auto_numerate_sections_and_figures: true,
+		// parámetro para que los interactivos se muestren a pantalla completa al presionar el botón de la esquina superior derecha
+		open_interactives_fullscreen: true,
+		// parámetro para usar el id de las referencias bibliográficas en lugar de la autonumeración
+		bibitem_ref_id: false,
+	}
+	</script>
+
+  <!-- núcleo del libro interactivo -->
+  <link rel="stylesheet" href="css/style.css" type="text/css">
+  <script type="text/javascript" src="js/book.js" charset="utf-8"></script>
+  
+  <!-- personalización del usuario -->
+  <link rel="stylesheet" href="extra/fonts.css" type="text/css">
+  <link rel="stylesheet" href="extra/style.css" type="text/css">
+  <link rel="stylesheet" href="extra/mis-estilos.css" type="text/css">
+
+  <!-- inclusión de la biblioteca KaTex -->
+  <link rel="stylesheet" type="text/css" href="extra/katex/katex.min.css"/>
+  <script src="extra/katex/katex.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="extra/katex/copy-tex.min.css"/>
+  <script src="extra/katex/copy-tex.min.js"></script>
+  <script src="extra/katex/auto-render.min.js" ></script>
+
+  <!-- Opcional en caso de requerir formulas químicas -->
+  <script src="extra/katex/mhchem.min.js"></script>
+  
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [ {left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}, {left: "\\[", right: "\\]", display: true}, {left: "\\(", right: "\\)", display: false} ]
+    });
+  });
+  </script>
+  
+  <style>
+        .flotad {
+            float: right;
+			margin-top:10px;
+            margin-left: 20px; /* Espacio entre imagen y texto */
+            margin-bottom: 8px;
+            max-width: 50%; /* Tamaño máximo de la imagen */
+        }
+		
+		.flotai {
+            float: left;
+			margin-top:10px;
+			margin-right: 20px; /* Espacio entre imagen y texto */
+            margin-bottom: 8px;
+            max-width: 50%; /* Tamaño máximo de la imagen */
+        }
+        
+    </style>
+</head>
+
+<body>
+	<div id="book_loader_container">
+		<!-- se utiliza un elemento para que funcione como cargador del libro -->
+		<div id="book_loader"></div>
+		<!-- y se indica la imagen a utilizar para personalizar el libro -->
+		<img src="images/general/icartesilibri_logo.svg" width="20%" style="padding-left:1em;">
+	</div>
+	
+	<div id="book_container">
+		<div id="btn_back_page"></div>
+		<div id="btn_next_page"></div>
+		<button id="go_to_table_of_content"></button>
+		
+		<button id="btn_config"></button>
+		<div id="config_options">
+			<div id="dark_light_mode"></div>
+		</div>
+
+		<!-- si este elemento no esta presente, el botón de la tabla de contenido lleva a la primera página con un elemento class="toc_link" -->
+	<div id="table_of_content"></div>
+
+	<div id="pages_container">
+	<!--  -->
+	<div class="page" style="background-color:transparent;"></div>
+
+	<!-- Portada -->
+	<div class="page invertcolor" style="margin:0; padding:0; background-size:contain; background-image:url(images/general/portada.svg);">
+				
+		<div class="invertcolor" style="position: absolute; width: 640px; height: 1025px; left: 0px; top: 0px; background-size:contain; background-image: url('images/portada1.png');"></div>
+					
+		<!-- Nombre del autor del libro -->
+		<div style="position: absolute; bottom: 5px; left:0; width:640px; font-size:29px; color:#01e1fe; text-shadow: 2px 1px black; text-align:center; text-shadow: 2px 1px black">Juan Guillermo Rivera Berrío<br></div>
+		
+		<!-- Logo de la editorial o institución -->
+		<div class="box-glass" style="position: absolute; top: 
+		10px; left:0; width:640px; text-align:center;"> <a  target="_blank" href="https://proyectodescartes.org"> <img src="images/general/gifanimadoRedProyecto.gif" width="120px"/></a> </div>
+	</div>
+
+	<!--  -->
+	<div class="page" style="display:flex; align-items:center; justify-content:center;">
+		<a style="width:50%" target="_blank" href="https://proyectodescartes.org/iCartesiLibri/"><img src="images/general/icartesilibri_logo.svg" width="100%"></a>
+	</div>
+
+	<!--  -->
+	<!-- init-page-num="true" es un parámetro que indica que a partir de esta página comienza la numeración -->
+	<!-- inicialmente los números de las páginas se numeran con numerales romanos -->
+	<!-- num="" es un parámetro que indica que esta página no lleva numeración visible -->
+	<!--  -->
+	<div class="page" style="text-align:center; font-size:120%;" init-page-num="true" num="">
+		<h1>¿Cómo funciona el aprendizaje automático?</h1>
+		<br><br><br><br>
+		<div style="margin-top: 110px; color: var(--h1-color); font-size:30px"><b>Juan Guillermo Rivera Berrío</b>
+		<br><br>
+		</div>
+		<div align="center" style="position: absolute; bottom: 105px; left:0; right:0;"> Fondo Editorial RED Descartes<br><br>
+		<a  target="_blank" href="https://proyectodescartes.org"> <img src="images/general/logo_descartes3.png" width="300px"/></a></div>
+
+		<div align="center" style="position: absolute; bottom: 50px; left:0; right:0;">Córdoba (España)<br/>
+		2026</div>
+	</div>
+
+	<!--  -->
+    <div class="page" num="">
+		<p>¿Cómo funciona el aprendizaje automático?</p>
+		<br>
+		<p>Autor: <br>
+		Juan Guillermo Rivera Berrío
+		</p><br>
+      	  
+		<p>
+        Código JavaScript para el libro: <a href="https://github.com/jlongi/libro_interactivo" target="_blank">Joel Espinosa Longi</a>, <a href="https://www.matem.unam.mx/" target="_blank">IMATE</a>, UNAM. <br>
+        Recursos interactivos: <a href="http://descartes.matem.unam.mx/" target="_blank">DescartesJS</a>, <a href="https://proyectodescartes.org/descartescms/herramientas-ia" target="_blank">Herramientas de IA</a>, ChatGPT y Gemini. <br>
+        Fuentes: <a href="https://fonts.google.com/specimen/Lato" target="_blank">Lato</a> y <a href="https://fonts.google.com/specimen/Ubuntu+Mono" target="_blank">UbuntuMono</a><br>
+		Imagen de portada: ilustración generada por GPT Image 2</p><br><br>
+		<p>Red Educativa Digital Descartes<br>
+        Córdoba (España)<br>
+        <a href="mailto:descartes@proyectodescartes.org?Subject=Fondo editorial"> descartes@proyectodescartes.org</a><br>
+        <a href="https://proyectodescartes.org/descartescms/" target="_blank">https://proyectodescartes.org</a><br>
+        <br>
+        Proyecto iCartesiLibri<br>
+        <a href="https://proyectodescartes.org/iCartesiLibri/index.htm" target="_blank">https://proyectodescartes.org/iCartesiLibri/index.htm</a> <br>
+        <br>
+        ISBN: <br>
+		</p>
+		<p style="font-size:10px; position: absolute; bottom: 30px; left: 50px; right:0;"><a href="http://creativecommons.org/licenses/by-nc-sa/4.0" target="_blank"><img src="images/general/88x31.png" style="height:36px; width:99px" /></a><br>
+        Esta obra está bajo una licencia Creative Commons 4.0 internacional: Reconocimiento-No Comercial-Compartir Igual.</p>
+    
+	</div>
+
+	<!--  -->
+	<div class="page">
+		<h2>Tabla de contenido</h2>
+		<div class="toc_link" href="#prefacio"></div>
+		<div class="toc_link" href="#c11"></div>
+		<div class="toc_link" href="#c12"></div>
+		<div class="toc_link" href="#c13"></div>
+		<div class="toc_link" href="#c14"></div>
+		<div class="toc_link" href="#c15"></div>
+		<div class="toc_link" href="#c16"></div>
+		<div class="toc_link" href="#c17"></div>
+		<div class="toc_link" href="#c18"></div>
+		<div class="toc_link" href="#c19"></div>
+		<div class="toc_link" href="#c110"></div>
+						
+	</div>
+
+	
+
+	<!--  -->
+	<!-- num-type-arabic="true" es un parámetro que indica que a partir de esta página la numeración utilizara numerales arábigos -->
+	<!--  -->
+	<div class="page" num-type-arabic="true">
+		<h1 id="prefacio">Prefacio</h1>
+		<p>Vivimos en una época en la que la inteligencia artificial ha dejado de ser una tecnología reservada para laboratorios de investigación y grandes empresas para convertirse en una herramienta presente en la educación, la medicina, la industria, las finanzas, el entretenimiento y prácticamente todos los ámbitos de la vida cotidiana. Sin embargo, detrás de conceptos como aprendizaje automático, redes neuronales o modelos de inteligencia artificial existen principios científicos y matemáticos que con frecuencia parecen complejos o inaccesibles para quienes se acercan por primera vez a este fascinante campo.</p>
+		<p>Este libro nace precisamente con el propósito de acercar ese conocimiento a cualquier lector curioso.</p>
+		<p><b>¿Cómo funciona el aprendizaje automático?</b> forma parte de la colección "<b>¿Cómo funciona?</b>", una serie de libros concebida para explicar, de manera clara, rigurosa y visual, el funcionamiento de tecnologías, fenómenos científicos, disciplinas y procesos que transforman nuestro mundo. Cada volumen de la colección parte de una pregunta sencilla —"<b>¿Cómo funciona...?</b>"— y la responde mediante explicaciones progresivas, ejemplos cotidianos, ilustraciones, recursos interactivos y un lenguaje accesible, sin renunciar al rigor científico.</p>
+		<p>La filosofía de esta colección consiste en ir más allá de la simple descripción de los conceptos. Nuestro objetivo es revelar los mecanismos internos que hacen posible cada tecnología, comprender por qué funciona y descubrir cómo sus diferentes componentes interactúan entre sí. Creemos que entender el funcionamiento de las cosas es el primer paso para utilizarlas de forma crítica, creativa y responsable.</p>
+		<p style="text-align-last: justify">En este libro, el lector recorrerá el camino que sigue una máquina para aprender a partir de los datos. Descubrirá cómo los algoritmos</p>			
+						
+	</div>
+	
+	<div class="page">
+		<p> identifican patrones, cómo se entrenan los modelos, cuáles son las diferencias entre el aprendizaje supervisado, no supervisado y por refuerzo, cómo funcionan las redes neuronales, de qué manera se evalúa el rendimiento de un modelo y cuáles son las aplicaciones que hoy están transformando múltiples sectores de la sociedad. Finalmente, explorará las tendencias que marcarán el futuro del aprendizaje automático y los desafíos científicos, tecnológicos y éticos que acompañarán su evolución.</p>
+		<p>Como todos los libros de la colección "<b>¿Cómo funciona?</b>", esta obra incorpora abundantes recursos visuales e interactivos que enriquecen la experiencia de aprendizaje. Las ilustraciones, diagramas, simulaciones y actividades permiten experimentar con los conceptos, facilitando una comprensión más profunda y favoreciendo un aprendizaje activo. El objetivo no es únicamente leer sobre el aprendizaje automático, sino también observarlo, explorarlo e interactuar con él.</p>
+		<p>Esperamos que este libro despierte nuevas preguntas, estimule la curiosidad científica y motive a seguir aprendiendo. Porque comprender <b>cómo funciona</b> una tecnología es también comprender mejor el mundo que estamos construyendo y prepararnos para participar activamente en su transformación.</p>
+		<p>Bienvenido a la colección "<b>¿Cómo funciona?</b>".</p>
+		<p>Esperamos que este sea solo el primero de muchos viajes para descubrir, comprender y disfrutar el extraordinario funcionamiento de la ciencia y la tecnología.</p>
+				
+				
+		<p>Juan Guillermo Rivera Berrío</p>
+		<p>2026</p>	
+	
+	</div>
+
+	<!--  -->
+	<!-- Una página en blanco y sin numeración visible -->
+	<!--  -->
+	<div class="page" num="">
+		<div class="image_expand" style="position: absolute; width: 640px; height: 825px; left: 0px; top: 0px; background-image: url('images/intro/intro.png'); background-size:640px 825px; background-repeat: no-repeat" onclick="openImage(this)"></div>
+	</div>
+
+	<!-- pag 7 -->
+	<div class="page">
+		<h2 id="c11">Introducción</h2>
+		
+		<p>El <strong>aprendizaje automático</strong> (o <em>Machine Learning</em>) es una rama de la inteligencia artificial que transforma la manera en que las computadoras resuelven problemas complejos. A diferencia de la programación tradicional, donde un desarrollador escribe reglas lógicas explícitas paso a paso, el aprendizaje automático permite que los sistemas identifiquen patrones de manera autónoma a partir de datos históricos. En esencia, el <strong>principio de funcionamiento</strong> busca encontrar una función matemática desconocida $f$ que mapee un conjunto de variables de entrada $X$ hacia una salida deseada $Y$:</p>
+		$$Y = f(X)$$
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/intro/intro2.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>El futuro aprende de los datos.</figcaption></figure>
+		<p>Mediante esta formulación, el algoritmo adapta sus propios parámetros para aproximar la función $f$ sin ser programado específicamente para cada escenario.</p>
+			
+	</div>
+
+	<!-- pag 8 -->
+	<div class="page">
+		<p>Para lograr esta adaptación, los <strong>procesos internos</strong> del aprendizaje automático se estructuran en torno a tres <strong>componentes principales</strong>: los datos de entrenamiento, un modelo predictivo y una función de costo o pérdida. Durante la fase de entrenamiento, el modelo toma las entradas y genera una estimación $\hat{y}$. A continuación, el sistema evalúa qué tan distante está su predicción del valor real $y$ mediante la función de pérdida, como el error cuadrático medio:</p>
+		$$L(\theta) = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$$
+		<p>A través de un algoritmo de optimización (como el descenso de gradiente), el modelo ajusta recursivamente sus parámetros internos $\theta$ para minimizar el valor de $L(\theta)$, mejorando gradualmente su precisión a medida que procesa más información.</p>
+		<p>Este flujo de trabajo ha dado lugar a múltiples <strong>aplicaciones prácticas</strong> y <strong>casos reales</strong> que utilizamos a diario. Entre los ejemplos más destacados se encuentran:</p>
+		<p><strong>Sistemas de recomendación:</strong> Plataformas como Netflix o Spotify analizan patrones de consumo masivos para predecir qué contenido ofrecer a cada usuario.</p>
+		<p><strong>Diagnóstico médico:</strong> Algoritmos de visión por computadora procesan imágenes médicas (como resonancias o radiografías) para detectar patologías en etapas tempranas.</p>
+		<p><strong>Procesamiento de lenguaje natural:</strong> Asistentes virtuales y traductores automáticos interpretan el contexto gramatical para generar respuestas coherentes.</p>
+						
+	</div>
+	
+	<!-- pag 9 -->
+	<div class="page">
+		<p>Entre sus principales <strong>beneficios y ventajas</strong>, destaca la capacidad de automatizar la toma de decisiones en entornos altamente dinámicos y procesar grandes volúmenes de datos en múltiples dimensiones, algo imposible de realizar manualmente. Además, los modelos son capaces de adaptarse a nuevos datos de forma continua, mejorando su desempeño con el tiempo sin necesidad de reescribir la arquitectura base del software.</p>
+		<p>No obstante, esta tecnología presenta <strong>desafíos y limitaciones</strong> significativos. Los modelos son altamente dependientes de la calidad de los datos recibidos; si los datos de entrenamiento contienen sesgos o errores, el algoritmo replicará y amplificará esas deficiencias. Asimismo, existe el riesgo del <strong>sobreajuste</strong> (<i>overfitting</i>), un fenómeno donde el modelo memoriza perfectamente los datos de entrenamiento pero pierde la capacidad de generalizar ante datos nuevos, sumado a la falta de interpretabilidad en modelos complejos, comúnmente conocidos como "cajas negras".</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/intro/intro3.png" style="border-radius:15px;cursor:pointer;width:85%;" onclick="openImage(this)">
+        <figcaption>Aplicaciones prácticas del aprendizaje automático.</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 10 -->
+	<div class="page">
+		<h2 id="c12">¿Cómo funciona el aprendizaje de las máquinas a partir de datos?</h2>
+		<p>El aprendizaje de las máquinas a partir de datos se basa en el principio de que los sistemas informáticos pueden identificar patrones, extraer conocimiento y tomar decisiones de forma autónoma sin ser programados explícitamente para cada regla. En lugar de seguir instrucciones fijas del tipo "si ocurre A, haz B", el modelo analiza un conjunto de datos de entrada $X$ para aproximar una función matemática desconocida $f$ que conecta dichos datos con un resultado deseado $y$. Esta relación fundamental se representa conceptualmente como: $y = f(X) + \epsilon$, donde $\epsilon$ representa el error impredecible o ruido inherente a los datos reales.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c11.png" style="border-radius:15px;cursor:pointer;width:90%;" onclick="openImage(this)">
+        <figcaption>Así funciona el aprendizaje de las máquinas a partir de datos.</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 11 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c12.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Las máquinas aprenden identificando patrones en los datos.</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 12 -->
+	<div class="page">
+		<p> A medida que el algoritmo procesa más ejemplos, ajusta paulatinamente sus parámetros internos para reducir este margen de error y capturar la verdadera estructura subyacente de la información. Para llevar a cabo esta transformación, el proceso interno de aprendizaje depende de tres componentes principales: los datos de entrenamiento (características $X$ y etiquetas $y$), la <strong>función de pérdida</strong> ($\mathcal{L}$) y el <strong>algoritmo de optimización</strong>. La función de pérdida mide la discrepancia entre la predicción del modelo, denotada como $\hat{y}$, y el valor real $y$. Para corregir las desviaciones, se utiliza un método iterativo como el descenso del gradiente, el cual actualiza paulatinamente los parámetros del modelo ($\theta$) mediante la siguiente expresión:</p>
+		$$\theta_{t+1} = \theta_t - \alpha \nabla \mathcal{L}(\theta_t)$$
+		<p>Donde $\alpha$ es la tasa de aprendizaje y $\nabla \mathcal{L}(\theta_t)$ es el gradiente de la pérdida. Mediante este ciclo continuo de predicción, evaluación de error y ajuste matemático, el sistema "aprende" progresivamente a minimizar el fallo global.</p>
+		<p>Este enfoque impulsado por datos ofrece valiosas <strong>ventajas</strong>, como la adaptabilidad a entornos cambiantes y la capacidad de descubrir patrones complejos no evidentes para el ojo humano. Entre sus <strong>aplicaciones prácticas y casos reales</strong> más destacados se encuentran:</p>
+		<p><strong>Diagnóstico médico por imagen:</strong> Análisis de miles de tomografías para detectar anomalías o tumores con alta precisión.</p>
+		<p> <strong>Filtros de correo no deseado:</strong> Clasificación automática de mensajes analizando la frecuencia de palabras y la estructura del texto.</p>
+		<p><strong>Predicción del valor inmobiliario:</strong> Estimación del precio de una vivienda en función de características como la ubicación, la superficie en metros cuadrados y el número de habitaciones.</p>	
+	
+	</div>	
+	
+	<!-- pag 13 -->
+	<div class="page">
+		<p>A pesar de su enorme potencial, la extracción de conocimiento a partir de datos presenta <strong>desafíos y limitaciones</strong> críticos. El problema más recurrente es el <em>sobreajuste</em> (<em>overfitting</em>), que ocurre cuando el modelo memoriza en exceso el ruido del conjunto de entrenamiento y pierde la capacidad de generalizar ante datos nuevos. Asimismo, se cumple el principio fundamental de <em>"garbage in, garbage out"</em>: si los datos de origen están sesgados, incompletos o mal etiquetados, el sistema aprenderá y perpetuará dichos errores de forma sistemática. Por ello, la calidad y el preprocesamiento de los datos resultan tan determinantes como la sofisticación del propio algoritmo.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c13.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Las máquinas aprenden a partir de datos.</figcaption></figure>
+		
+	</div>
+	
+	<!-- pag 14 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c14.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 15 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c14.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 16 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p16.png" width="540" height="720" src="interactivos/i11.html"></div>
+	
+	</div>	
+	
+	<!-- pag 17 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p17.png" width="540" height="720" src="interactivos/i12.html"></div>
+	
+	</div>	
+
+	<!-- pag 18 -->
+	<div class="page">
+		<h2 id="c13">¿Cómo funciona el aprendizaje supervisado?</h2>
+		<p>El <strong>aprendizaje supervisado</strong> es uno de los paradigmas fundamentales del aprendizaje automático, cuyo <strong>concepto fundamental</strong> se asemeja al proceso de enseñanza humana guiada por un tutor. En este enfoque, el algoritmo aprende a partir de un conjunto de datos previamente etiquetados, donde cada vector de entrada $X$ está explícitamente vinculado a una respuesta o etiqueta objetivo $y$. El <strong>principio de funcionamiento</strong> radica en descubrir una función matemática implícita capaz de mapear estas entradas con sus correspondientes salidas, permitiendo realizar predicciones acertadas sobre datos futuros nunca antes vistos.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c21.png" style="border-radius:15px;cursor:pointer;width:97%;" onclick="openImage(this)">
+        <figcaption>¿Cómo funciona el aprendizaje supervisado?</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 19 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c22.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>El aprendizaje supervisado es un paradigma del aprendizaje automático.</figcaption></figure>
+	
+	</div>
+
+	<!-- pag 20 -->
+	<div class="page">
+		<p>Esta relación entre la variable dependiente y las independientes se expresa formalmente como:</p>
+		$$y = f(X) + \epsilon$$
+		<p>Donde $f(X)$ representa la función objetivo que el modelo intenta aproximar, $X$ son las características de entrada, $y$ es la salida real y $\epsilon$ simboliza el término de error no reducible o ruido aleatorio de la muestra.</p>
+		<p>Dentro de sus <strong>componentes principales</strong> se encuentran las variables de entrada o características (<strong>features</strong>), las etiquetas objetivo (<strong>targets</strong>), los parámetros optimizables (como los pesos $w$ y el sesgo $b$) y la función de costo. Durante los <strong>procesos internos</strong> de aprendizaje, el algoritmo evalúa constantemente la discrepancia entre las predicciones realizadas ($\hat{y}$) y los valores verdaderos ($y$). En problemas de regresión numérica, un método habitual para medir este margen de error es el <strong>Error Cuadrático Medio</strong> ($MSE$):</p>
+		$$MSE = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2$$
+		<p>A través de métodos numéricos de optimización, como el <strong>gradiente descendente</strong>, el sistema ajusta iterativamente sus parámetros internos en la dirección opuesta al gradiente del error, logrando reducciones progresivas hasta converger en un punto de mínima pérdida.</p>
+		<p>Para garantizar la precisión de este proceso, el flujo de trabajo estándar en el aprendizaje supervisado se divide en las siguientes etapas clave:</p>
+				
+	</div>
+	
+	<!-- pag 21 -->
+	<div class="page">
+		<p><strong>Preparación y etiquetado:</strong> Recolección, limpieza y asignación rigurosa de las etiquetas (<i>ground truth</i>) a los datos de entrenamiento.</p>
+		<p><strong>División del conjunto de datos:</strong> Separación de la muestra en conjuntos de entrenamiento, validación y prueba (frecuentemente en proporciones 80/20 o 70/30).</p>
+		<p><strong>Fase de entrenamiento e inferencia:</strong> Optimización de los parámetros del modelo utilizando el conjunto de entrenamiento y posterior evaluación en el conjunto de prueba para medir la generalización.</p>
+		
+		<p>En cuanto a sus <strong>aplicaciones prácticas y casos reales</strong>, el aprendizaje supervisado está detrás de tecnologías cotidianas como los filtros de <em>spam</em> en el correo electrónico, el diagnóstico de patologías mediante visón por computadora en radiografías, la estimación del precio de bienes raíces y los sistemas de reconocimiento de voz. Sus principales <strong>beneficios y ventajas</strong> incluyen un alto nivel de precisión en tareas bien delimitadas, la capacidad de cuantificar con certeza el margen de error del modelo y un comportamiento altamente predecible cuando se le alimenta con datos de alta calidad.</p>
+		<p>No obstante, este paradigma enfrenta <strong>desafíos o limitaciones</strong> considerables. El obstáculo más apremiante es la alta dependencia de grandes volúmenes de datos etiquetados, proceso que suele ser costoso, lento y sujeto a sesgos humanos. Asimismo, existe el riesgo constante del <strong>sobreajuste</strong> (<i>overfitting</i>), en el cual el modelo memoriza el ruido de los datos de entrenamiento perdiendo capacidad de abstracción, o del <strong>subajuste</strong> (<i>underfitting</i>), que ocurre cuando el algoritmo es demasiado simple para capturar la complejidad subyacente de la información.</p>
+		
+	</div>
+	
+	<!-- pag 22 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c24.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 23 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c24.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 24 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p24.png" width="540" height="720" src="interactivos/i21.html"></div>
+	
+	</div>	
+	
+	<!-- pag 25 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p25.png" width="540" height="720" src="interactivos/i22.html"></div>
+	
+	</div>	
+
+	<!-- pag 26 -->
+	<div class="page">
+		<h2 id="c14">¿Cómo funciona el aprendizaje no supervisado?</h2>
+		<p>El <strong>aprendizaje no supervisado</strong> es una rama fundamental del aprendizaje automático donde el algoritmo se entrena utilizando conjuntos de datos que carecen de etiquetas o respuestas predefinidas. A diferencia del modelo supervisado, aquí el sistema no intenta predecir un resultado específico $y$, sino que explora la estructura intrínseca del conjunto de datos $X = \{x_1, x_2, \dots, x_n\}$ para descubrir patrones ocultos, agrupaciones o relaciones subyacentes. Su <strong>principio de funcionamiento</strong> se apoya en la autoorganización de la información: el algoritmo evalúa continuamente métricas de similitud y distancia matemática entre los datos para construir representaciones estructuradas sin la intervención de un tutor humano.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c31.png" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>¿Cómo funciona el aprendizaje no supervisado?</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 27 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c32.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>El aprendizaje no supervisado es una rama del aprendizaje automático.</figcaption></figure>
+	
+	</div>
+
+	<!-- pag 28 -->
+	<div class="page">
+		<p>Entre sus <strong>componentes principales</strong> y <strong>procesos internos</strong>, el agrupamiento o <em>clustering</em> destaca como una técnica primordial, siendo el algoritmo $K$-Means uno de los más extendidos. Durante su ejecución, el modelo distribuye iterativamente cada observación $x_i$ hacia el centroide $\mu_j$ más próximo, buscando minimizar la varianza total dentro de cada grupo. La función de costo o inercia que el sistema optimiza internamente se expresa mediante la suma de distancias euclidianas al cuadrado:</p>
+		$$J = \sum_{j=1}^{k} \sum_{x_i \in S_j} \| x_i - \mu_j \|^2$$
+		<p>Donde $k$ es el número total de clusters, $S_j$ representa el conjunto de datos asignados al cluster $j$, y $\| x_i - \mu_j \|$ cuantifica la distancia entre el dato $x_i$ y su centroide $\mu_j$.</p>
+		<p>Otro proceso esencial es la <strong>reducción de dimensionalidad</strong>, técnica diseñada para simplificar tablas de datos complejas eliminando la redundancia y conservando la máxima información posible. El Análisis de Componentes Principales (PCA) es el método matemático por excelencia para este fin; proyecta los datos originales a un nuevo sistema de coordenadas donde los ejes principales maximizan la varianza. La transformación lineal que mapea los datos a un espacio reducido se define como:</p>
+		$$Z = X W$$
+		<p>Donde $X$ representa la matriz original de datos de dimensión $n \times p$, $W$ es la matriz de proyección formada por los autovectores de la matriz de covarianza, y $Z$ es la nueva representación simplificada en un espacio de menor dimensión.</p>
+				
+	</div>
+
+	<!-- pag 29 -->
+	<div class="page">
+		<p>Las <strong>aplicaciones prácticas</strong> y <strong>casos reales</strong> de esta metodología son indispensables en la industria moderna:</p>
+		<p><strong>Segmentación de clientes:</strong> Identificación de perfiles de consumidores con hábitos de compra similares para optimizar campañas de marketing.</p>
+		<p><strong>Detección de anomalías:</strong> Monitoreo de transacciones financieras para señalar comportamientos atípicos que sugieran fraude bancario.</p>
+		<p><strong>Sistemas de recomendación:</strong> Descubrimiento de afinidades entre productos o contenidos audiovisuales en plataformas de <i>streaming</i>.</p>
+		<figure class="flotad">
+        <img loading="lazy" src="images/contenido/c33.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>La máquina encuentra patrones sin instrucciones previas.</figcaption></figure>
+		<p>Esta aproximación ofrece destacados <strong>beneficios y ventajas</strong>, como la eliminación de la laboriosa tarea de etiquetar manualmente volúmenes masivos de datos y la capacidad para detectar conexiones imprevistas que el ojo humano pasaría por alto. No obstante, plantea significativos <strong>desafíos y limitaciones</strong>: la evaluación del desempeño suele ser subjetiva al no existir una "respuesta correcta" comprobable, y la interpretación de los grupos o dimensiones resultantes requiere un profundo conocimiento del dominio por parte del especialista.</p>
+		
+	</div>
+	
+	<!-- pag 30 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c34.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 31 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c34.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 32 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p32.png" width="540" height="720" src="interactivos/i31.html"></div>
+	
+	</div>	
+	
+	<!-- pag 33 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p33.png" width="540" height="720" src="interactivos/i32.html"></div>
+	
+	</div>	
+	
+	<!-- pag 34 -->
+	<div class="page">
+		<h2 id="c15">¿Cómo funciona el aprendizaje por refuerzo?</h2>
+		<p>El <strong>aprendizaje por refuerzo</strong> es una rama del aprendizaje automático inspirada en la psicología conductista, cuyo <strong>concepto fundamental</strong> se basa en el aprendizaje interactivo a través del ensayo y error. A diferencia del aprendizaje supervisado, donde un modelo se entrena con un conjunto de datos previamente etiquetados por humanos, en este paradigma una entidad autónoma denominada <strong>agente</strong> aprende a tomar decisiones secuenciales interactuando directamente con un <strong>entorno</strong>. El <strong>principio de funcionamiento</strong> radica en que el agente no es instruido sobre qué acciones tomar, sino que debe descubrirlas evaluando cuáles producen la mayor <strong>recompensa</strong> a largo plazo.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c41.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>¿Cómo funciona el aprendizaje por refuerzo?</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 35 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c42.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Aprendizaje interactivo a través de ensayo y error.</figcaption></figure>
+	
+	</div>
+
+	<!-- pag 36 -->
+	<div class="page">
+		<p>Para estructurar este <strong>proceso interno</strong> de toma de decisiones de manera rigurosa, el problema se formaliza habitualmente mediante los Procesos de Decisión de Markov (MDP). Los <strong>componentes principales</strong> del sistema interactúan en un ciclo continuo: en cada paso temporal $t$, el agente evalúa el <strong>estado</strong> actual $s_t$, ejecuta una <strong>acción</strong> $a_t$ y el entorno responde devolviendo una <strong>recompensa</strong> numérica $r_{t+1}$ junto con un nuevo estado $s_{t+1}$. Para calcular el valor futuro acumulado de tomar una decisión concreta, el agente utiliza la ecuación de Bellman, expresada formalmente como:</p>
+		$$Q(s, a) = r + \gamma \max_{a'} Q(s', a')$$
+		<p>En esta formulación, $Q(s, a)$ representa el valor estimado de ejecutar la acción $a$ estando en el estado $s$; $r$ es la recompensa inmediata; $s'$ es el nuevo estado al que se transiciona; $a'$ representa la mejor acción posible en ese nuevo estado, y $\gamma \in [0, 1)$ es el <strong>factor de descuento</strong>, un parámetro crucial que pondera la importancia de las recompensas futuras con respecto a las inmediatas.</p>
+		<p>Entre las <strong>ventajas y beneficios</strong> más destacados de este método se encuentra su capacidad para operar en entornos inciertos y altamente dinámicos sin necesidad de conocimiento previo sobre las reglas internas del sistema, superando frecuentemente los límites de la intuición humana. Sin embargo, la técnica enfrenta importantes <strong>desafíos y limitaciones</strong>. Uno de los más complejos es el dilema entre exploración (probar nuevas acciones no evaluadas) y explotación (repetir acciones conocidas que ya ofrecen recompensas altas). Asimismo, el problema de la asignación de crédito complica el entrenamiento, pues una recompensa positiva o negativa puede ser el resultado diferido de una cadena de cientos de decisiones previas, requiriendo un alto costo computacional para converger a una solución óptima.</p>
+		
+	</div>
+
+	<!-- pag 37 -->
+	<div class="page">
+		<p>A pesar de estas complejidades, las <strong>aplicaciones prácticas</strong> e <strong>historias de éxito reales</strong> han demostrado un impacto transformador en diversas industrias avanzadas:</p>
+		<p><strong>Sistemas de control en robótica:</strong> Permite a brazos mecánicos aprender a manipular objetos frágiles o a robots bípedos mantener el equilibrio al desplazarse por terrenos irregulares.</p>
+		<p><strong>Dominio de juegos complejos:</strong> Ejemplares como <i>AlphaGo</i> de DeepMind o <i>OpenAI Five</i>, que derrotaron a campeones mundiales en el juego de Go y en videojuegos de estrategia en tiempo real, aprendiendo mediante simulaciones masivas contra sí mismos.</p>
+		<p><strong>Navegación autónoma:</strong> Optimización en tiempo real de trayectorias, aceleración y maniobras de adelantamiento en vehículos autónomos.</p>
+		<p><strong>Eficiencia en centros de datos:</strong> Ajuste dinámico de los sistemas de refrigeración industrial, logrando reducir drásticamente el consumo energético.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c43.png" style="border-radius:15px;cursor:pointer;width:68%;" onclick="openImage(this)">
+        <figcaption>Descubre, explora y aprende por refuerzo.</figcaption></figure>
+		
+	</div>
+	
+	<!-- pag 38 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c44.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 39 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c44.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 40 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p40.png" width="540" height="720" src="interactivos/i41.html"></div>
+	
+	</div>	
+	
+	<!-- pag 41 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p41.png" width="540" height="720" src="interactivos/i42.html"></div>
+	
+	</div>	
+
+	<!-- pag 42 -->
+	<div class="page">
+		<h2 id="c16">¿Cómo funcionan las redes neuronales?</h2>
+		<p>Las <strong>redes neuronales artificiales</strong> son modelos matemáticos inspirados en la estructura y el comportamiento del cerebro humano, diseñados para reconocer patrones complejos en grandes volúmenes de datos. Su <strong>concepto fundamental</strong> se basa en interconectar unidades de procesamiento llamadas <strong>neuronas artificiales</strong> o nodos, organizadas en tres tipos de capas: la <b>capa de entrada</b>, que recibe los datos iniciales; las <b>capas ocultas</b>, que procesan la información en distintos niveles de abstracción; y la <b>capa de salida</b>, que entrega la predicción final.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c51.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>¿Cómo funcionan las redes neuronales?</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 43 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c52.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Modelos matemáticos inspirados en el cerebro humano.</figcaption></figure>
+	
+	</div>		
+	
+	<!-- pag 44 -->
+	<div class="page">
+		 <p>Cada conexión entre neuronas posee un valor numérico denominado <strong>peso</strong> ($w_i$), el cual regula la importancia de esa señal, junto con un término de ajuste llamado <strong>sesgo</strong> ($b$). Matemáticamente, el valor de entrada combinado para una neurona se calcula como:</p>
+		 $$z = \sum_{i=1}^{n} w_i x_i + b$$
+		 <p>Donde $x_i$ representa cada una de las entradas que recibe la neurona.</p>
+		 <p>El <strong>principio de funcionamiento</strong> de esta estructura ocurre mediante un proceso conocido como <strong>propagación hacia adelante</strong> (<i>forward propagation</i>). Cuando el valor combinado $z$ pasa por la neurona, no se transmite tal cual; en su lugar, se procesa a través de una <strong>función de activación</strong> ($\sigma$). Esta función introduce no-linealidad en la red, lo que le permite aprender relaciones sumamente complejas que van más allá de simples líneas rectas. Una de las funciones clásicas más utilizadas es la función sigmoide:</p>
+		 $$a = \sigma(z) = \frac{1}{1 + e^{-z}}$$
+		 <p>Donde $a$ es la activación resultante que la neurona transmitirá como entrada hacia las neuronas de la siguiente capa, repitiendo el proceso hasta alcanzar la salida.</p>
+		 <p>El verdadero aprendizaje ocurre en los <strong>procesos internos</strong> de corrección de errores mediante la <strong>propagación hacia atrás</strong> (<i>backpropagation</i>) y el <strong>descenso del gradiente</strong>. Cuando la red genera una predicción ($\hat{y}$), esta se compara con la respuesta real ($y$) utilizando una función de pérdida que mide qué tan alejada estuvo la red de la realidad. Por ejemplo, mediante el error cuadrático medio:</p>
+			
+	</div>
+
+	<!-- pag 45 -->
+	<div class="page">
+		 $$L = \frac{1}{2}(\hat{y} - y)^2$$	
+		<p>A partir de este error $L$, el algoritmo calcula la derivada parcial para saber cuánto contribuyó cada peso al fallo y actualiza los parámetros en dirección opuesta al error para mejorarlos gradualmente, ajustando cada peso según la regla:</p>
+		$$w_{\text{nuevo}} = w_{\text{viejo}} - \alpha \frac{\partial L}{\partial w}$$
+		<p>Donde $\alpha$ representa la <strong>tasa de aprendizaje</strong>, un hiperparámetro que controla qué tan grandes son los pasos en la corrección de los pesos.</p>
+		<p>En cuanto a sus <strong>aplicaciones prácticas y casos reales</strong>, las redes neuronales son la columna vertebral de tecnologías modernas revolucionarias. Destacan en campos como:</p>
+		<p><strong>Visión por computadora:</strong> Diagnóstico médico mediante análisis de radiografías y detección de obstáculos en vehículos autónomos.</p>
+		<p><strong>Procesamiento del lenguaje natural:</strong> Traducción automática instantánea, asistentes de voz e interactividad con modelos de lenguaje generativos.</p>
+		<p><strong>Procesamiento de audio:</strong> Cancelación de ruido inteligente y reconocimiento de voz.</p>
+		<p>Los principales <strong>beneficios y ventajas</strong> de esta arquitectura residen en su extraordinaria capacidad para realizar <em>extracción automática de características</em>, lo que evita la necesidad de procesar o etiquetar manualmente cada detalle de datos no estructurados como imágenes, texto o audio.</p>
+		
+	</div>
+
+	<!-- pag 46 -->
+	<div class="page">
+		<p>A pesar de su enorme potencial, existen importantes <strong>desafíos o limitaciones</strong> que deben considerarse. El entrenamiento de redes neuronales profundas requiere un consumo masivo de recursos computacionales (GPUs/TPUs) y enormes cantidades de datos etiquetados para evitar el <strong>sobreajuste</strong> (<i>overfitting</i>), fenómeno en el que la red memoriza los datos de entrenamiento pero falla al generalizar ante datos nuevos. Asimismo, sufren del problema de la "caja negra": debido a los millones de parámetros matemáticos interactuando al mismo tiempo, interpretar exactamente <b>por qué</b> la red tomó una decisión específica sigue siendo un reto fundamental en el aprendizaje automático moderno.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c53.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Redes neuronales.</figcaption></figure>
+		
+	</div>
+	
+	<!-- pag 47 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p47.png" width="540" height="690" src="interactivos/i1.html"></div>
+		<p style="font-size: 17px">Simulación diseñada con Claude Sonnet 5 (ver en pantalla ampliada).</p>
+	
+	</div>	
+	
+	<!-- pag 48 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c54.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 49 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c54.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 50 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p50.png" width="540" height="720" src="interactivos/i51.html"></div>
+	
+	</div>	
+	
+	<!-- pag 51 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p51.png" width="540" height="720" src="interactivos/i52.html"></div>
+	
+	</div>
+	
+	<!-- pag 52 -->
+	<div class="page">
+		<h2 id="c17">¿Cómo funciona el entrenamiento de un modelo de IA?</h2>
+		<p>El entrenamiento de un modelo de inteligencia artificial es un proceso iterativo mediante el cual un algoritmo aprende a realizar tareas específicas ajustando sus parámetros internos a través de la exposición continua a datos. En términos sencillos, es análogo al aprendizaje humano: el modelo realiza una suposición, mide su nivel de error y ajusta su conocimiento previo para no repetir las equivocaciones. Los <strong>componentes principales</strong> de este ecosistema incluyen el conjunto de datos de entrenamiento (<i>dataset</i>), los <strong>parámetros optimizables</strong> (pesos $w$ y sesgos $b$), una <strong>función de pérdida</strong> (o <i>loss function</i>) que cuantifica el margen de error, y un <strong>algoritmo de optimización</strong> encargado de aplicar las correcciones necesarias.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c61.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>¿Cómo funciona el entrenamiento de un modelo de IA?</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 53 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c62.png" style="border-radius:15px;cursor:pointer;width:95%;" onclick="openImage(this)">
+        <figcaption>El entrenamiento de un modelo de IA.</figcaption></figure>
+	
+	</div>
+
+	<!-- pag 54 -->
+	<div class="page">
+		<p>El <strong>principio de funcionamiento</strong> se basa en un ciclo iterativo. Durante la fase de propagación hacia adelante (<i>forward pass</i>), los datos de entrada $x$ se combinan con los pesos $w$ y el sesgo $b$ para generar una predicción $\hat{y}$. Inmediatamente después, el modelo evalúa su precisión comparando la predicción con el valor real. En un problema de regresión, por ejemplo, una de las métricas de error más utilizadas es el <strong>Error Cuadrático Medio</strong> (MSE), expresado formalmente como:</p>
+		$$L(w, b) = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2$$
+		<p>Donde $N$ representa el número total de muestras observadas, $y_i$ indica el valor real esperado y $\hat{y}_i$ denota la estimación producida por el modelo. Una vez calculado el error, se inician los <strong>procesos internos</strong> más críticos del entrenamiento: la retropropagación (<i>backpropagation</i>) y la optimización. Mediante la regla de la cadena del cálculo diferencial, la retropropagación calcula la derivada parcial de la función de pérdida con respecto a cada peso, determinando cuánto contribuyó cada parámetro al error total. Con esta información, el algoritmo de <strong>Descenso del Gradiente</strong> actualiza los pesos en la dirección opuesta al gradiente para reducir la pérdida en la siguiente iteración, siguiendo la regla de actualización:</p>
+		$$w_{nuevo} = w_{actual} - \eta \cdot \frac{\partial L}{\partial w}$$
+		<p>En esta ecuación, $\eta$ representa la <strong>tasa de aprendizaje</strong> (<i>learning rate</i>), un hiperparámetro clave que controla la magnitud del paso que da el modelo en cada iteración para alcanzar el mínimo de la función.</p>
+		<p style="text-align-last: justify">Este flujo de trabajo ofrece <strong>beneficios y ventajas</strong> extraordinarios, pues permite resolver problemas altamente complejos —como la</p>
+		
+	</div>
+
+	<!-- pag 55 -->
+	<div class="page">
+		<p>visión por computadora o el procesamiento del lenguaje natural— sin necesidad de programar reglas explícitas. En <strong>casos reales</strong> como el diagnóstico médico asistido por imagen, un modelo puede analizar miles de tomografías etiquetadas hasta reducir el valor de $L$ a niveles óptimos, logrando identificar patologías con una precisión sobrehumana. Sin embargo, el entrenamiento también conlleva importantes <strong>desafíos y limitaciones</strong>:</p>
+		<p><strong>Sobreajuste (<i>overfitting</i>):</strong> El modelo memoriza el ruido de los datos de entrenamiento y pierde la capacidad de generalizar ante datos nuevos e imprevistos.</p>
+		<p><strong>Subajuste (<i>underfitting</i>):</strong> La arquitectura es demasiado simple o el entrenamiento insuficiente, impidiendo que el algoritmo capture la estructura subyacente de los datos.</p>
+		<p><strong>Costo computacional elevado:</strong> Los modelos modernos requieren días o semanas de procesamiento en hardware especializado (GPU o TPU), implicando un consumo energético considerable.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c63.jpeg" style="border-radius:15px;cursor:pointer;width:50%;" onclick="openImage(this)">
+        <figcaption>El entrenamiento de un modelo de IA.</figcaption></figure>
+			
+	</div>
+	
+	<!-- pag 56 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c64.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 57 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c64.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 58 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p58.png" width="540" height="720" src="interactivos/i61.html"></div>
+	
+	</div>	
+	
+	<!-- pag 59 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p59.png" width="540" height="720" src="interactivos/i62.html"></div>
+	
+	</div>
+
+	<!-- pag 60 -->
+	<div class="page">
+		<h2 id="c18">¿Cómo funciona la evaluación de un modelo?</h2>
+		<p>Evaluar un modelo de aprendizaje automático consiste en medir qué tan bien generaliza sus predicciones ante datos completamente nuevos que no utilizó durante la fase de entrenamiento. El <strong>concepto fundamental</strong> radica en simular el comportamiento que tendrá el algoritmo en el mundo real. Para lograrlo, el <strong>principio de funcionamiento</strong> se basa en la división del conjunto de datos original en subconjuntos independientes, típicamente en una proporción de 80% para entrenamiento (<i>training set</i>) y 20% para evaluación (<i>test set</i>). El algoritmo ajusta sus parámetros internos únicamente con los datos de entrenamiento; posteriormente, se le presentan las entradas del conjunto de prueba para observar sus predicciones sin permitirle ver las respuestas correctas de antemano.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c71.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>¿Cómo funciona la evaluación de un modelo?</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 61 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c72.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>La evaluación consiste en medir qué tan bien hace sus predicciones.</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 62 -->
+	<div class="page">
+		<p>El <strong>proceso interno</strong> de evaluación compara de forma sistemática los valores reales con las predicciones generadas. Los <strong>componentes principales</strong> de esta fase varían según la naturaleza del problema planteado:</p>
+		<p><strong>Métricas de Regresión:</strong> Evalúan la desviación numérica continua entre el valor real y la predicción.</p>
+		<p><strong>Métricas de Clasificación:</strong> Miden la tasa de aciertos y errores al asignar categorías discretas (mediante herramientas como la matriz de confusión).</p>
+		<p>Por ejemplo, en un problema de estimación numérica, la métrica estándar por excelencia es el <strong>Error Cuadrático Medio</strong> (MSE), expresado matemáticamente como:</p>
+		$$\text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$$
+		<p>Donde $n$ es el número total de muestras de prueba, $y_i$ representa el valor real observado y $\hat{y}_i$ es la predicción calculada por el modelo. Al elevar las diferencias al cuadrado, esta función penaliza con mayor severidad los errores grandes.</p>
+		<p style="text-align-last: justify">Para maximizar los <strong>beneficios y ventajas</strong> del proceso, se utiliza la técnica de <b>validación cruzada</b> ($k$-fold cross-validation), la cual divide los datos en $k$ particiones y rota iterativamente el conjunto de prueba. Esto evita la fuga de información (<i>data leakage</i>) y garantiza que las métricas obtenidas sean estadísticamente sólidas. En <strong>casos reales</strong>, como en los sistemas de diagnóstico médico asistido por inteligencia artificial para la detección de tumores, una simple métrica de exactitud global resulta insuficiente. En este escenario, la evaluación se centra en optimizar la <b>sensibilidad</b> (minimizar los falsos negativos),</p>
+	
+	</div>
+
+	<!-- pag 63 -->
+	<div class="page">
+		<p> ya que clasificar a un paciente enfermo como sano tiene consecuencias drásticamente más graves que la situación inversa.</p>
+		<p>No obstante, el proceso de evaluación enfrenta severos <strong>desafíos y limitaciones</strong>, siendo el principal el equilibrio entre el sesgo y la varianza (<i>bias-variance tradeoff</i>). Un modelo excesivamente complejo puede memorizar el ruido de los datos de entrenamiento (sobreajuste u <i>overfitting</i>), mostrando un rendimiento perfecto en el entrenamiento pero colapsando durante la evaluación. La descomposición del error esperado en el modelo se formula de la siguiente manera:</p>
+		$$\text{Error Total} = \text{Sesgo}^2 + \text{Varianza} + \sigma^2$$
+		<p>Donde $\sigma^2$ representa el error irreducible o ruido inherente a los datos. En las <strong>aplicaciones prácticas</strong>, como los motores de recomendación en plataformas de <i>streaming</i> o la detección de fraudes bancarios en tiempo real, comprender estas métricas permite a los desarrolladores ajustar los hiperparámetros con precisión antes de desplegar los modelos a producción.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c73.jpeg" style="border-radius:15px;cursor:pointer;width:65%;" onclick="openImage(this)">
+        <figcaption>¿Que tan inteligente es realmente tu modelo?</figcaption></figure>
+		
+	</div>
+	
+	<!-- pag 64 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c74.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 65 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c74.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 66 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p66.png" width="540" height="720" src="interactivos/i71.html"></div>
+	
+	</div>	
+	
+	<!-- pag 67 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p67.png" width="540" height="720" src="interactivos/i72.html"></div>
+	
+	</div>
+
+	<!-- pag 68 -->
+	<div class="page">
+		<h2 id="c19">¿Cómo funcionan las aplicaciones <br>del aprendizaje automático?</h2>
+		<p>Las aplicaciones del aprendizaje automático (<strong>Machine Learning</strong>) no siguen instrucciones rígidas programadas línea por línea, sino que operan mediante el reconocimiento de patrones ocultos en grandes volúmenes de datos. Su <strong>principio de funcionamiento</strong> radica en encontrar una función matemática capaz de transformar una serie de datos de entrada en una salida o predicción deseada. De manera simplificada, la aplicación busca modelar una relación del tipo:</p>
+		$$y = f(\mathbf{x}; \boldsymbol{\theta})$$
+		<p>Donde $\mathbf{x}$ representa el vector de características de entrada (por ejemplo, los píxeles de una imagen o el historial de compras de un usuario), $y$ es la respuesta o predicción esperada, y $\boldsymbol{\theta}$ representa el conjunto de parámetros ajustables que el modelo optimiza automáticamente durante su fase de aprendizaje.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c83.jpeg" style="border-radius:15px;cursor:pointer;width:68%;" onclick="openImage(this)">
+        <figcaption>Del dato a la decisión</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 69 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c82.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>Las aplicaciones operan mediante el reconocimiento de patrones ocultos.</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 70 -->
+	<div class="page">
+		<p>Para lograr esto, la arquitectura de una aplicación de aprendizaje automático integra varios <strong>componentes y procesos internos</strong> clave: la recolección y preprocesamiento de datos, la ingeniería de características, el entrenamiento del modelo y su posterior despliegue. Durante el entrenamiento, la aplicación mide qué tan lejos está su predicción del valor real mediante una <b>función de pérdida</b> $\mathcal{L}$. A través de algoritmos de optimización como el <strong>descenso del gradiente</strong>, los parámetros se actualizan iterativamente siguiendo la regla:</p>
+		$${\theta}^{(t+1)} = {\theta}^{(t)} - \eta \nabla_{\theta} \mathcal{L}({\theta}^{(t)})$$
+		<p>Donde $\eta$ es la tasa de aprendizaje y $\nabla_{\theta} \mathcal{L}$ representa el gradiente de la función de pérdida. Este proceso iterativo permite que la aplicación "aprenda" de sus propios errores y minimice las desviaciones en predicciones futuras.</p>
+		<p>En la práctica, este mecanismo impulsa diversas <strong>aplicaciones prácticas y casos reales</strong> que impactan nuestra vida cotidiana:</p>
+		<p><strong>Visión por computadora:</strong> Detección de anomalías en radiografías médicas y reconocimiento de obstáculos en vehículos autónomos.</p>
+		<p><strong>Procesamiento del Lenguaje Natural (PLN):</strong> Sistemas de traducción en tiempo real, asistentes de voz y detectores de spam en el correo electrónico.</p>
+		<p><strong>Sistemas de recomendación:</strong> Algoritmos en plataformas como Netflix, Spotify o Amazon que predicen los gustos del usuario analizando patrones de comportamiento globales.</p>
+		<p style="text-align-last: justify">Entre los principales <strong>beneficios y ventajas</strong> de estas aplicaciones destacan su capacidad de <strong>escalabilidad</strong> y su <strong>adaptabilidad</strong>. A diferencia del software convencional, estas herramientas pueden procesar</p>		
+	
+	</div>
+
+	<!-- pag 71 -->
+	<div class="page">
+		<p> millones de variables simultáneamente y mejorar progresivamente su precisión a medida que interactúan con nuevos datos, sin necesidad de ser rediseñadas desde cero por un programador.</p>
+		<p>Sin embargo, el desarrollo de estas tecnologías implica serios <strong>desafíos y limitaciones</strong>. El rendimiento depende estrictamente de la calidad de los datos recopilados; datos sesgados o incompletos generan modelos deficientes (<em>Garbage in, Garbage out</em>). Además, existe el problema del <strong>sobreajuste</strong> (<em>overfitting</em>), donde el modelo memoriza los datos de entrenamiento pero falla al generalizar ante información nueva, así como la falta de explicabilidad en modelos complejos (fenómeno de la "caja negra"), lo que dificulta entender cómo la aplicación llegó a una decisión específica.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c81.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>¿Cómo funcionan las aplicaciones <br>del aprendizaje automático?</figcaption></figure>
+		
+	</div>
+
+	<!-- pag 72 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c84.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 73 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c84.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 74 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p74.png" width="540" height="720" src="interactivos/i81.html"></div>
+	
+	</div>	
+	
+	<!-- pag 75 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p75.png" width="540" height="720" src="interactivos/i82.html"></div>
+	
+	</div>
+	
+	<!-- pag 76 -->
+	<div class="page">
+		<h2 id="c110">¿Cómo será el futuro del aprendizaje<br> automático?</h2>
+		<p>El futuro del aprendizaje automático se encamina hacia una era de <strong>automatización total, sostenibilidad y computación cuántica</strong>, transformando el <strong>concepto fundamental</strong> de cómo los sistemas procesan la información. En lugar de depender de una supervisión humana intensiva para ajustar hiperparámetros o estructurar conjuntos de datos, los modelos del mañana utilizarán el <strong>aprendizaje automático automatizado (AutoML)</strong> y algoritmos autosuficientes capaces de optimizarse en tiempo real.</p>
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c91.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>¿Cómo será el futuro del aprendizaje<br> automático?</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 77 -->
+	<div class="page">
+		<figure style="text-align: center">
+        <img loading="lazy" src="images/contenido/c92.png" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>El futuro de la IA es más consciente, eficiente y conectado con el mundo.</figcaption></figure>
+	
+	</div>
+	
+	<!-- pag 78 -->
+	<div class="page">
+		<p> En esta nueva etapa, el objetivo matemático evolucionará desde la simple minimización del error empírico hacia una optimización multiobjetivo consciente de los recursos, la cual se puede expresar mediante la función:</p>
+		$$\theta^* = \arg\min_{\theta} \left( \mathcal{L}_{\text{tarea}}(\theta) + \lambda \cdot \mathcal{C}_{\text{eficiencia}}(\theta) \right)$$
+		<p>Donde $\theta$ representa los parámetros ajustables del modelo, $\mathcal{L}_{\text{tarea}}$ mide la imprecisión en la tarea asignada, y $\mathcal{C}_{\text{eficiencia}}$ es una función de costo que penaliza el consumo energético y la huella de carbono, regulada por el hiperparámetro $\lambda$.</p>
+		<p>Entre los <strong>componentes principales</strong> se destacan los procesadores neuromórficos —diseñados para imitar la estructura física de las neuronas biológicas—, las computadoras cuánticas basadas en cúbits ($|\psi\rangle$) y los algoritmos de <strong>aprendizaje autosupervisado</strong>. El <strong>principio de funcionamiento</strong> y los <strong>procesos internos</strong> se basarán en la búsqueda de arquitecturas neuronales dinámicas (NAS, por sus siglas en inglés). En este proceso, el algoritmo no solo aprende los pesos de una red fija, sino que modifica activamente su propia topología, añadiendo o eliminando conexiones según la complejidad del problema sin requerir la intervención de un diseñador humano.</p>
+		<p>Las <strong>aplicaciones prácticas</strong> y <strong>casos reales</strong> proyectados transformarán industrias críticas a una velocidad sin precedentes:</p>
+		<p><strong>Medicina de precisión:</strong> Diseño de fármacos personalizados en cuestión de horas mediante la simulación cuántica del plegamiento de proteínas.</p>
+		<p><strong>Modelado climático global:</strong> Predicción exacta de fenómenos meteorológicos extremos con meses de anticipación al resolver ecuaciones complejas de la dinámica de fluidos.</p>
+	
+	</div>
+
+	<!-- pag 79 -->
+	<div class="page">
+		<p><strong>Sistemas autónomos avanzados:</strong> Vehículos y robots capaces de navegar e interactuar en entornos totalmente desconocidos sin entrenamiento previo en esos escenarios específicos.</p>
+		<figure class="flotad">
+        <img loading="lazy" src="images/contenido/c93.jpeg" style="border-radius:15px;cursor:pointer;width:100%;" onclick="openImage(this)">
+        <figcaption>El futuro del aprendizaje automático.</figcaption></figure>
+		<p>Esta evolución ofrecerá <strong>beneficios y ventajas</strong> sustanciales, como una verdadera democratización del desarrollo de software a través de plataformas <i>no-code</i> impulsadas por inteligencia artificial, así como la capacidad de lograr un "aprendizaje de pocos disparos" (<i>few-shot learning</i>). Esto último permitirá a los algoritmos generalizar conceptos abstractos a partir de una única muestra de entrenamiento, emulando la eficiencia cognitiva del cerebro humano y reduciendo drásticamente la necesidad de recopilar petabytes de datos etiquetados.</p>
+		<p>Sin embargo, el avance del aprendizaje automático también conlleva serios <strong>desafíos y limitaciones</strong>. La creciente complejidad de los modelos acentúa el problema de la "caja negra", lo que exige el desarrollo de una <strong>IA explicable (XAI)</strong> capaz de transparentar el razonamiento matemático detrás de cada diagnóstico médico o decisión financiera. Asimismo, garantizar la seguridad frente a ataques adversarios, erradicar los sesgos discriminatorios en los datos de origen y regular el uso ético de modelos superinteligentes constituyen los obstáculos más complejos que la comunidad científica deberá resolver en los próximos años.</p>
+		
+	</div>
+
+	<!-- pag 80 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c94.png);margin-left:0; background-repeat: no-repeat" onclick="openImage(this)">		
+	
+	</div>
+	
+	<!-- pag 81 -->	
+	<div class="page image_expand" num="" style="margin:0; padding:0; background-size:1280px 825px; background-image:url(images/contenido/c94.png);margin-left:0; background-position:-640px 0px;" onclick="openImage(this)">
+		
+	</div>
+	
+	<!-- pag 82 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p82.png" width="540" height="720" src="interactivos/i91.html"></div>
+	
+	</div>	
+	
+	<!-- pag 83 -->	
+	<div class="page">
+		<div class="interactive" poster="posters/p83.png" width="540" height="720" src="interactivos/i92.html"></div>
+	
+	</div>
+	
+	
+
+	<!--  -->
+	<div class="page invertcolor" num="" style="background-image: radial-gradient(white, #ecf0f1, #e3e5e7); display:flex; align-items:center; justify-content:center;">
+			<a style="width:50%" target="_blank" href="https://descartes.matem.unam.mx/"><img loading="lazy" src="images/general/logo_descartes.svg" width="100%"></a>
+	</div>
+	
+	<!-- [cierra] pages_container -->
+	</div>
+
+	<!-- [cierra] book_container -->
+	</div>
+
+</body>
+</html>
