@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio de Aprendizaje Supervisado — Generación de Imágenes</title>
+<style>
+  :root{
+    --bg: #12131c;
+    --bg-soft: #191b28;
+    --panel: #1c1e2e;
+    --line: #2c2f45;
+    --text: #eceef5;
+    --text-dim: #9a9fb8;
+    --pred: #5EEAD4;   /* predicción: teal */
+    --label: #F2A65A;  /* etiqueta/objetivo: ámbar */
+    --danger: #f2726a;
+    --radius: 7px;
+    --mono: ui-monospace, "SFMono-Regular", "Courier New", monospace;
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+    --sans: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  *{ box-sizing: border-box; }
+  html,body{
+    margin:0; padding:0; background: var(--bg); color: var(--text);
+    font-family: var(--sans); min-height:100vh;
+  }
+  a{ color: var(--pred); }
+
+  header.top{
+    padding: 28px clamp(16px,4vw,48px) 18px;
+    border-bottom: 1px solid var(--line);
+    background:
+      radial-gradient(1200px 300px at 15% -40%, rgba(94,234,212,.10), transparent 60%),
+      radial-gradient(900px 260px at 90% -60%, rgba(242,166,90,.10), transparent 60%);
+  }
+  .eyebrow{
+    font-family: var(--mono); font-size: 11px; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--text-dim); margin: 0 0 10px;
+    display:flex; gap:10px; align-items:center;
+  }
+  .eyebrow .dot{ width:6px; height:6px; border-radius:50%; background: var(--pred); box-shadow:0 0 8px var(--pred); }
+  h1{
+    font-family: var(--serif); font-weight: 400; font-size: clamp(24px, 3.4vw, 36px);
+    margin: 0 0 8px; letter-spacing: .01em;
+  }
+  h1 em{ font-style: normal; color: var(--label); }
+  .sub{ color: var(--text-dim); max-width: 72ch; line-height:1.55; font-size: 14.5px; margin:0; }
+
+  main.lab{
+    display: grid;
+    grid-template-columns: minmax(300px, 380px) 1fr;
+    gap: 20px;
+    padding: 22px clamp(16px,4vw,48px) 40px;
+    align-items: start;
+  }
+  @media (max-width: 900px){
+    main.lab{ grid-template-columns: 1fr; }
+  }
+
+  .panel{
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px 18px 20px;
+  }
+  .panel + .panel{ margin-top: 18px; }
+
+  .panel h2{
+    font-family: var(--mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: .12em;
+    color: var(--text-dim); margin: 0 0 14px; padding-bottom: 10px; border-bottom: 1px dashed var(--line);
+  }
+
+  .field{ margin-bottom: 14px; }
+  .field:last-child{ margin-bottom: 0; }
+  .field label{
+    display:flex; justify-content: space-between; gap: 10px; font-size: 13px; margin-bottom: 6px; color: var(--text);
+  }
+  .field label .val{ font-family: var(--mono); color: var(--pred); font-size: 12px; }
+  input[type="range"]{
+    -webkit-appearance:none; appearance:none; width:100%; height: 4px; border-radius: 2px;
+    background: var(--line); outline-offset: 4px;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:15px; height:15px; border-radius:50%;
+    background: var(--pred); border: 2px solid #0c0d14; cursor:pointer;
+    box-shadow: 0 0 0 2px rgba(94,234,212,.25);
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:15px; height:15px; border-radius:50%; background: var(--pred); border: 2px solid #0c0d14; cursor:pointer;
+  }
+  input[type="range"]:focus-visible, select:focus-visible, button:focus-visible{
+    outline: 2px solid var(--pred);
+  }
+
+  select{
+    width:100%; background: var(--bg-soft); color: var(--text); border: 1px solid var(--line);
+    border-radius: 5px; padding: 9px 10px; font-size: 13.5px; font-family: var(--sans);
+  }
+
+  .btn-row{ display:flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  button{
+    font-family: var(--mono); font-size: 12px; letter-spacing: .03em;
+    background: var(--bg-soft); color: var(--text); border: 1px solid var(--line);
+    border-radius: 5px; padding: 9px 12px; cursor: pointer; transition: border-color .15s, color .15s;
+  }
+  button:hover{ border-color: var(--pred); color: var(--pred); }
+  button.primary{ background: rgba(94,234,212,.12); border-color: rgba(94,234,212,.4); color: var(--pred); }
+  button.primary:hover{ background: rgba(94,234,212,.2); }
+  button.stop{ border-color: rgba(242,114,106,.5); color: var(--danger); }
+  button:disabled{ opacity:.4; cursor: not-allowed; }
+
+  .stat-row{ display:flex; gap: 14px; margin-top: 12px; font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+  .stat-row b{ color: var(--text); font-weight: 500; }
+
+  .canvas-panel{ display:flex; flex-direction: column; gap: 18px; }
+  .stage{
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px;
+  }
+  .stage-head{ display:flex; justify-content: space-between; align-items:baseline; margin-bottom: 12px; }
+  .stage-head h2{ margin:0; border:none; padding:0; }
+  .stage-head .tag{ font-family: var(--mono); font-size: 11px; color: var(--text-dim); }
+  #mainCanvas{
+    width: 100%; aspect-ratio: 16/9; border-radius: 5px; display:block;
+    border: 1px solid var(--line);
+  }
+
+  /* signature element: the error bridge */
+  .bridge{
+    display:grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items:center;
+  }
+  @media (max-width: 640px){ .bridge{ grid-template-columns: 1fr; } }
+  .bridge figure{ margin:0; text-align:center; }
+  .bridge canvas{
+    width:100%; aspect-ratio: 4/3; border-radius: 5px; display:block; border: 1px solid var(--line);
+  }
+  .bridge figcaption{
+    font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing:.1em;
+    color: var(--text-dim); margin-top: 8px;
+  }
+  #predCanvas{ box-shadow: 0 0 0 1px rgba(94,234,212,.25) inset; }
+  #targetCanvas{ box-shadow: 0 0 0 1px rgba(242,166,90,.25) inset; }
+  .bridge-mid{ display:flex; flex-direction:column; align-items:center; gap:8px; min-width: 110px; }
+  .loss-line{
+    width: 70px; height: 2px; background: repeating-linear-gradient(90deg, var(--danger) 0 6px, transparent 6px 10px);
+    transition: background .4s;
+  }
+  .loss-badge{
+    font-family: var(--mono); font-size: 11px; text-align:center; padding: 6px 10px;
+    border-radius: 20px; border: 1px solid var(--line); color: var(--text-dim); white-space:nowrap;
+    transition: color .3s, border-color .3s;
+  }
+  @media (prefers-reduced-motion: reduce){ .loss-line, .loss-badge{ transition: none; } }
+
+  #lossCanvas{ width:100%; height: 140px; display:block; border-radius: 5px; border: 1px solid var(--line); }
+
+  .weights-grid{
+    display:grid; grid-template-columns: repeat(6, 1fr); gap: 3px;
+  }
+  .wcell{ aspect-ratio: 1; border-radius: 2px; }
+
+  footer.note{
+    padding: 20px clamp(16px,4vw,48px) 36px; color: var(--text-dim); font-size: 12.5px; line-height:1.6;
+    border-top: 1px solid var(--line); max-width: 80ch;
+  }
+  footer.note code{ font-family: var(--mono); background: var(--bg-soft); padding:1px 5px; border-radius:3px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <p class="eyebrow"><span class="dot"></span>Simulación pedagógica — sin conexión, sin API externas</p>
+  <h1>Aprendizaje supervisado aplicado a la <em>generación de imágenes</em></h1>
+  <p class="sub">Una red neuronal pequeña aprende a transformar un vector de características (entrada) en los parámetros visuales de una imagen (salida), comparando su predicción contra ejemplos etiquetados y ajustando sus pesos por descenso de gradiente. Mueve los controles para explorar; entrena la red para observar cómo se reduce el error.</p>
+</header>
+
+<main class="lab">
+  <section>
+    <div class="panel">
+      <h2>1 · Vector de entrada (X)</h2>
+      <div class="field">
+        <label>Calidez <span class="val" id="v-warmth">0.50</span></label>
+        <input type="range" id="s-warmth" min="0" max="100" value="50">
+      </div>
+      <div class="field">
+        <label>Complejidad <span class="val" id="v-complexity">0.50</span></label>
+        <input type="range" id="s-complexity" min="0" max="100" value="50">
+      </div>
+      <div class="field">
+        <label>Simetría <span class="val" id="v-symmetry">0.50</span></label>
+        <input type="range" id="s-symmetry" min="0" max="100" value="50">
+      </div>
+      <div class="field">
+        <label>Energía <span class="val" id="v-energy">0.50</span></label>
+        <input type="range" id="s-energy" min="0" max="100" value="50">
+      </div>
+      <div class="field">
+        <label>Textura <span class="val" id="v-texture">0.50</span></label>
+        <input type="range" id="s-texture" min="0" max="100" value="50">
+      </div>
+      <p style="font-family:var(--mono); font-size:11px; color:var(--text-dim); margin:12px 0 0;">
+        Estos valores alimentan la red → panel derecho, "Exploración libre".
+      </p>
+    </div>
+
+    <div class="panel">
+      <h2>2 · Ejemplo de entrenamiento</h2>
+      <div class="field">
+        <label>Estilo etiquetado</label>
+        <select id="exampleSelect"></select>
+      </div>
+      <div class="btn-row">
+        <button id="btnLoadExample">Cargar en entrada manual</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>3 · Entrenamiento (descenso de gradiente)</h2>
+      <div class="field">
+        <label>Tasa de aprendizaje <span class="val" id="v-lr">0.60</span></label>
+        <input type="range" id="s-lr" min="5" max="200" value="60">
+      </div>
+      <div class="btn-row">
+        <button id="btnStep" class="primary">Entrenar 1 época</button>
+        <button id="btnAuto" class="primary">Entrenar automático</button>
+        <button id="btnStop" class="stop" disabled>Detener</button>
+        <button id="btnReset">Reiniciar pesos</button>
+      </div>
+      <div class="stat-row">
+        <span>Época: <b id="epochCount">0</b></span>
+        <span>Error medio (MSE): <b id="lossValue">—</b></span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>4 · Pesos internos (capa oculta → salida)</h2>
+      <div class="weights-grid" id="weightsGrid"></div>
+      <p style="font-family:var(--mono); font-size:10.5px; color:var(--text-dim); margin:10px 0 0;">
+        Cada celda es un peso aprendido. El color se reordena en cada época de entrenamiento.
+      </p>
+    </div>
+  </section>
+
+  <section class="canvas-panel">
+    <div class="stage">
+      <div class="stage-head">
+        <h2>Exploración libre — salida de la red para tu entrada actual</h2>
+        <span class="tag">seed fija · sin etiqueta objetivo</span>
+      </div>
+      <canvas id="mainCanvas" width="1000" height="560"></canvas>
+    </div>
+
+    <div class="stage">
+      <div class="stage-head">
+        <h2>Progreso sobre el ejemplo seleccionado</h2>
+        <span class="tag" id="exampleTag">—</span>
+      </div>
+      <div class="bridge">
+        <figure>
+          <canvas id="predCanvas" width="400" height="300"></canvas>
+          <figcaption style="color:var(--pred)">Predicción de la red</figcaption>
+        </figure>
+        <div class="bridge-mid">
+          <div class="loss-line" id="bridgeLine"></div>
+          <div class="loss-badge" id="bridgeBadge">MSE —</div>
+          <div class="loss-line" id="bridgeLine2"></div>
+        </div>
+        <figure>
+          <canvas id="targetCanvas" width="400" height="300"></canvas>
+          <figcaption style="color:var(--label)">Objetivo (etiqueta humana)</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-head">
+        <h2>Curva de aprendizaje</h2>
+        <span class="tag">error promedio del conjunto, por época</span>
+      </div>
+      <canvas id="lossCanvas" width="1000" height="200"></canvas>
+    </div>
+  </section>
+</main>
+
+<footer class="note">
+  Cómo leerlo: la red recibe 5 números (<code>X</code>), los pasa por una capa oculta de 6 neuronas (<code>tanh</code>) y produce 4 números de salida (<code>Y</code>: tono, densidad, tamaño, ruido) mediante <code>sigmoide</code>. Esos 4 números controlan el generador de imágenes. Al entrenar, la red compara su <code>Y</code> predicha contra la <code>Y</code> etiquetada de cada ejemplo y corrige sus pesos en la dirección que reduce el error — el mismo principio detrás de modelos generativos reales, aquí reducido a una escala observable a simple vista.
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- utilidades ----------
+  function mulberry32(seed){
+    return function(){
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const clamp01 = v => Math.max(0, Math.min(1, v));
+  function randIn(rng, a, b){ return a + rng()*(b-a); }
+
+  // ---------- conjunto de entrenamiento ----------
+  const dataset = [
+    { name:"Atardecer cálido",  x:[0.90,0.30,0.50,0.40,0.30], y:[0.05,0.30,0.60,0.20] },
+    { name:"Bosque nocturno",   x:[0.10,0.70,0.20,0.30,0.80], y:[0.33,0.70,0.30,0.50] },
+    { name:"Cristal frío",      x:[0.05,0.20,0.90,0.20,0.10], y:[0.55,0.15,0.80,0.05] },
+    { name:"Fuego intenso",     x:[0.95,0.80,0.30,0.95,0.60], y:[0.02,0.85,0.50,0.60] },
+    { name:"Calma pastel",      x:[0.50,0.15,0.70,0.10,0.20], y:[0.80,0.20,0.40,0.10] },
+    { name:"Caos urbano",       x:[0.40,0.95,0.05,0.80,0.90], y:[0.60,0.95,0.90,0.80] },
+  ];
+
+  // ---------- red neuronal (5 -> 6 tanh -> 4 sigmoide) ----------
+  const IN=5, HID=6, OUT=4;
+  let W1, b1, W2, b2;
+
+  function randomWeights(){
+    const rng = Math.random;
+    W1 = Array.from({length:HID}, () => Array.from({length:IN}, () => randIn(rng,-1,1)));
+    b1 = Array.from({length:HID}, () => randIn(rng,-0.5,0.5));
+    W2 = Array.from({length:OUT}, () => Array.from({length:HID}, () => randIn(rng,-1,1)));
+    b2 = Array.from({length:OUT}, () => randIn(rng,-0.5,0.5));
+  }
+
+  function sigmoid(z){ return 1/(1+Math.exp(-z)); }
+
+  function forward(x){
+    const preH = new Array(HID), h = new Array(HID);
+    for(let k=0;k<HID;k++){
+      let s = b1[k];
+      for(let i=0;i<IN;i++) s += W1[k][i]*x[i];
+      preH[k] = s; h[k] = Math.tanh(s);
+    }
+    const preO = new Array(OUT), y = new Array(OUT);
+    for(let j=0;j<OUT;j++){
+      let s = b2[j];
+      for(let k=0;k<HID;k++) s += W2[j][k]*h[k];
+      preO[j] = s; y[j] = sigmoid(s);
+    }
+    return { h, y };
+  }
+
+  function mse(y, target){
+    let s=0; for(let j=0;j<OUT;j++){ const d=y[j]-target[j]; s+=d*d; }
+    return s/OUT;
+  }
+
+  function trainEpoch(lr){
+    const dW1 = Array.from({length:HID}, () => new Array(IN).fill(0));
+    const db1 = new Array(HID).fill(0);
+    const dW2 = Array.from({length:OUT}, () => new Array(HID).fill(0));
+    const db2 = new Array(OUT).fill(0);
+    let totalLoss = 0;
+
+    for(const ex of dataset){
+      const { h, y } = forward(ex.x);
+      totalLoss += mse(y, ex.y);
+
+      const deltaOut = new Array(OUT);
+      for(let j=0;j<OUT;j++){
+        const dLdy = 2*(y[j]-ex.y[j])/OUT;
+        deltaOut[j] = dLdy * y[j]*(1-y[j]);
+      }
+      for(let j=0;j<OUT;j++){
+        db2[j] += deltaOut[j];
+        for(let k=0;k<HID;k++) dW2[j][k] += deltaOut[j]*h[k];
+      }
+      const deltaHidden = new Array(HID);
+      for(let k=0;k<HID;k++){
+        let s=0; for(let j=0;j<OUT;j++) s += deltaOut[j]*W2[j][k];
+        deltaHidden[k] = s * (1 - h[k]*h[k]);
+      }
+      for(let k=0;k<HID;k++){
+        db1[k] += deltaHidden[k];
+        for(let i=0;i<IN;i++) dW1[k][i] += deltaHidden[k]*ex.x[i];
+      }
+    }
+
+    const n = dataset.length;
+    for(let k=0;k<HID;k++){
+      b1[k] -= lr*(db1[k]/n);
+      for(let i=0;i<IN;i++) W1[k][i] -= lr*(dW1[k][i]/n);
+    }
+    for(let j=0;j<OUT;j++){
+      b2[j] -= lr*(db2[j]/n);
+      for(let k=0;k<HID;k++) W2[j][k] -= lr*(dW2[j][k]/n);
+    }
+    return totalLoss/n;
+  }
+
+  // ---------- generador de imágenes procedurales ----------
+  function renderImage(ctx, y, seed){
+    const w = ctx.canvas.width, h = ctx.canvas.height;
+    const rng = mulberry32(seed);
+    const hue = y[0]*360;
+    const density = Math.round(6 + y[1]*70);
+    const sizeVar = y[2];
+    const noise = y[3];
+
+    const grad = ctx.createLinearGradient(0,0,w,h);
+    grad.addColorStop(0, `hsl(${hue.toFixed(0)},65%,${(14+noise*6).toFixed(0)}%)`);
+    grad.addColorStop(1, `hsl(${((hue+45)%360).toFixed(0)},55%,${(8+noise*4).toFixed(0)}%)`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0,0,w,h);
+
+    for(let i=0;i<density;i++){
+      const rx = rng()*w, ry = rng()*h;
+      const radius = (8 + rng()*(18 + sizeVar*Math.min(w,h)*0.22));
+      const hueJ = hue + (rng()-0.5)*70*noise;
+      const alpha = 0.12 + rng()*0.5;
+      const rg = ctx.createRadialGradient(rx,ry,0,rx,ry,radius);
+      rg.addColorStop(0, `hsla(${hueJ.toFixed(0)},75%,65%,${alpha.toFixed(2)})`);
+      rg.addColorStop(1, `hsla(${hueJ.toFixed(0)},75%,55%,0)`);
+      ctx.fillStyle = rg;
+      ctx.beginPath();
+      ctx.arc(rx,ry,radius,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  function drawWeightHeatmap(){
+    const grid = document.getElementById('weightsGrid');
+    grid.innerHTML = '';
+    let maxAbs = 0.001;
+    for(const row of W2) for(const v of row) maxAbs = Math.max(maxAbs, Math.abs(v));
+    for(let j=0;j<OUT;j++){
+      for(let k=0;k<HID;k++){
+        const v = W2[j][k];
+        const t = clamp01((v/maxAbs+1)/2);
+        const cell = document.createElement('div');
+        cell.className = 'wcell';
+        const hue = t > 0.5 ? 172 : 8;
+        const light = 20 + Math.abs(t-0.5)*60;
+        cell.style.background = `hsl(${hue}, 70%, ${light}%)`;
+        grid.appendChild(cell);
+      }
+    }
+  }
+
+  function drawLossChart(history){
+    const canvas = document.getElementById('lossCanvas');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = '#191b28';
+    ctx.fillRect(0,0,w,h);
+
+    if(history.length < 2){
+      ctx.fillStyle = '#6b7090';
+      ctx.font = '12px ui-monospace, monospace';
+      ctx.fillText('Entrena al menos una época para ver la curva', 16, h/2);
+      return;
+    }
+    const maxLoss = Math.max(...history, 0.001);
+    const pad = 20;
+    ctx.strokeStyle = '#2c2f45';
+    ctx.beginPath();
+    ctx.moveTo(pad, h-pad); ctx.lineTo(w-8, h-pad);
+    ctx.moveTo(pad, 8); ctx.lineTo(pad, h-pad);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.strokeStyle = '#5EEAD4';
+    ctx.lineWidth = 2;
+    history.forEach((v, i) => {
+      const px = pad + (i/(history.length-1))*(w-pad-14);
+      const py = (h-pad) - (v/maxLoss)*(h-pad-14);
+      if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    });
+    ctx.stroke();
+
+    ctx.fillStyle = '#9a9fb8';
+    ctx.font = '11px ui-monospace, monospace';
+    ctx.fillText(`máx: ${maxLoss.toFixed(4)}`, pad, 16);
+    ctx.fillText(`actual: ${history[history.length-1].toFixed(4)}`, w-150, 16);
+  }
+
+  // ---------- estado y cableado de la interfaz ----------
+  const sliderIds = ['warmth','complexity','symmetry','energy','texture'];
+  const sliders = {}, valEls = {};
+  sliderIds.forEach(id => {
+    sliders[id] = document.getElementById('s-'+id);
+    valEls[id] = document.getElementById('v-'+id);
+  });
+  const lrSlider = document.getElementById('s-lr');
+  const lrVal = document.getElementById('v-lr');
+
+  const mainCtx = document.getElementById('mainCanvas').getContext('2d');
+  const predCtx = document.getElementById('predCanvas').getContext('2d');
+  const targetCtx = document.getElementById('targetCanvas').getContext('2d');
+
+  const exampleSelect = document.getElementById('exampleSelect');
+  dataset.forEach((ex, i) => {
+    const opt = document.createElement('option');
+    opt.value = i; opt.textContent = ex.name;
+    exampleSelect.appendChild(opt);
+  });
+
+  let epoch = 0;
+  let lossHistory = [];
+  let autoHandle = null;
+
+  function currentX(){
+    return sliderIds.map(id => sliders[id].value/100);
+  }
+
+  function refreshSliderReadouts(){
+    sliderIds.forEach(id => { valEls[id].textContent = (sliders[id].value/100).toFixed(2); });
+  }
+
+  function updateBridgeStyle(loss){
+    const badge = document.getElementById('bridgeBadge');
+    const line1 = document.getElementById('bridgeLine');
+    const line2 = document.getElementById('bridgeLine2');
+    badge.textContent = 'MSE ' + loss.toFixed(4);
+    const t = clamp01(1 - loss/0.25);
+    const color = `hsl(${(t*160).toFixed(0)},70%,60%)`;
+    badge.style.color = color;
+    badge.style.borderColor = color;
+    const dash = `repeating-linear-gradient(90deg, ${color} 0 6px, transparent 6px 10px)`;
+    line1.style.background = dash;
+    line2.style.background = dash;
+  }
+
+  function renderAll(){
+    // exploración libre
+    const x = currentX();
+    const { y: yPred } = forward(x);
+    renderImage(mainCtx, yPred, 999);
+
+    // ejemplo seleccionado
+    const idx = Number(exampleSelect.value);
+    const ex = dataset[idx];
+    document.getElementById('exampleTag').textContent = ex.name;
+    const { y: yExPred } = forward(ex.x);
+    renderImage(predCtx, yExPred, idx + 1);
+    renderImage(targetCtx, ex.y, idx + 1);
+    updateBridgeStyle(mse(yExPred, ex.y));
+
+    drawWeightHeatmap();
+    document.getElementById('epochCount').textContent = epoch;
+    document.getElementById('lossValue').textContent = lossHistory.length
+      ? lossHistory[lossHistory.length-1].toFixed(4) : '—';
+    drawLossChart(lossHistory);
+  }
+
+  sliderIds.forEach(id => {
+    sliders[id].addEventListener('input', () => { refreshSliderReadouts(); renderAll(); });
+  });
+  lrSlider.addEventListener('input', () => {
+    lrVal.textContent = (lrSlider.value/100).toFixed(2);
+  });
+  exampleSelect.addEventListener('change', renderAll);
+
+  document.getElementById('btnLoadExample').addEventListener('click', () => {
+    const ex = dataset[Number(exampleSelect.value)];
+    sliderIds.forEach((id, i) => { sliders[id].value = Math.round(ex.x[i]*100); });
+    refreshSliderReadouts();
+    renderAll();
+  });
+
+  document.getElementById('btnStep').addEventListener('click', () => {
+    const lr = lrSlider.value/100;
+    const loss = trainEpoch(lr);
+    epoch += 1;
+    lossHistory.push(loss);
+    if(lossHistory.length > 400) lossHistory.shift();
+    renderAll();
+  });
+
+  const btnAuto = document.getElementById('btnAuto');
+  const btnStop = document.getElementById('btnStop');
+  const btnStep = document.getElementById('btnStep');
+  const btnReset = document.getElementById('btnReset');
+
+  btnAuto.addEventListener('click', () => {
+    if(autoHandle) return;
+    btnAuto.disabled = true; btnStep.disabled = true; btnReset.disabled = true;
+    btnStop.disabled = false;
+    autoHandle = setInterval(() => {
+      const lr = lrSlider.value/100;
+      const loss = trainEpoch(lr);
+      epoch += 1;
+      lossHistory.push(loss);
+      if(lossHistory.length > 400) lossHistory.shift();
+      renderAll();
+    }, 90);
+  });
+
+  btnStop.addEventListener('click', () => {
+    clearInterval(autoHandle); autoHandle = null;
+    btnAuto.disabled = false; btnStep.disabled = false; btnReset.disabled = false;
+    btnStop.disabled = true;
+  });
+
+  btnReset.addEventListener('click', () => {
+    randomWeights();
+    epoch = 0; lossHistory = [];
+    renderAll();
+  });
+
+  // ---------- inicio ----------
+  randomWeights();
+  refreshSliderReadouts();
+  lrVal.textContent = (lrSlider.value/100).toFixed(2);
+  renderAll();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio de Aprendizaje por Refuerzo — Agente en cuadrícula</title>
+<style>
+  :root{
+    --bg: #0d1613;
+    --bg-soft: #142019;
+    --panel: #16211b;
+    --line: #2c4239;
+    --text: #eaf2ec;
+    --text-dim: #8fa89b;
+    --purple: #9b6bd6;   /* exploración */
+    --teal: #2ec4b6;     /* explotación */
+    --yellow: #f7e05e;   /* recompensa / meta */
+    --danger: #f2545b;   /* trampa / detener */
+    --mono: ui-monospace, "SFMono-Regular", "Courier New", monospace;
+    --sans: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; padding:0; background: var(--bg); color: var(--text); min-height:100vh;
+    font-family: -apple-system,"Segoe UI",Roboto,sans-serif;
+    background-image: radial-gradient(circle, rgba(46,196,182,.10) 1px, transparent 1.4px);
+    background-size: 26px 26px;
+  }
+
+  header.top{
+    padding: 30px clamp(16px,4vw,48px) 20px;
+    border-bottom: 2px solid var(--line);
+    background: var(--bg-soft);
+  }
+  .eyebrow{
+    font-family: var(--mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--text-dim); margin: 0 0 12px; display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow .chip{
+    width:9px; height:9px; background: var(--purple); box-shadow: 4px 0 0 var(--teal), 8px 0 0 var(--yellow);
+  }
+  h1{
+    font-family: var(--sans); font-weight: 800; font-stretch: condensed;
+    text-transform: uppercase; letter-spacing: .01em;
+    font-size: clamp(24px, 3.6vw, 38px); margin: 0 0 10px; color: var(--text);
+  }
+  h1 span{ color: var(--yellow); }
+  .sub{ color: var(--text-dim); max-width: 74ch; line-height:1.55; font-size: 14.5px; margin:0; }
+
+  main.lab{
+    display:grid; grid-template-columns: minmax(300px,360px) 1fr; gap: 2px;
+    padding: 2px clamp(16px,4vw,48px) 40px;
+    align-items: start;
+  }
+  @media (max-width: 920px){ main.lab{ grid-template-columns: 1fr; } }
+
+  .panel{
+    background: var(--panel); border: 1px solid var(--line); padding: 18px 18px 20px; margin-top: 18px;
+  }
+  .panel:first-child{ margin-top: 18px; }
+  .panel h2{
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .14em;
+    color: var(--text-dim); margin: 0 0 14px; padding-bottom: 10px; border-bottom: 1px solid var(--line);
+  }
+
+  .field{ margin-bottom: 14px; }
+  .field:last-child{ margin-bottom:0; }
+  .field label{ display:flex; justify-content: space-between; gap:10px; font-size: 13px; margin-bottom: 6px; }
+  .field label .val{ font-family: var(--mono); color: var(--teal); font-size: 12px; }
+  input[type="range"]{
+    -webkit-appearance:none; appearance:none; width:100%; height: 3px; background: var(--line); outline-offset:4px;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:14px; height:14px; border-radius:0; transform: rotate(45deg);
+    background: var(--teal); border: 2px solid #0a0f0d; cursor:pointer;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:14px; height:14px; border-radius:0; transform: rotate(45deg);
+    background: var(--teal); border: 2px solid #0a0f0d; cursor:pointer;
+  }
+  input[type="range"]:focus-visible, button:focus-visible{ outline: 2px solid var(--teal); }
+
+  .btn-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top: 4px; }
+  button{
+    font-family: var(--mono); font-size: 11.5px; letter-spacing:.03em;
+    background: var(--bg-soft); color: var(--text); border: 1px solid var(--line);
+    padding: 9px 12px; cursor:pointer; transition: border-color .15s, color .15s;
+  }
+  button:hover{ border-color: var(--teal); color: var(--teal); }
+  button.primary{ background: rgba(46,196,182,.12); border-color: rgba(46,196,182,.5); color: var(--teal); }
+  button.primary:hover{ background: rgba(46,196,182,.22); }
+  button.stop{ border-color: rgba(242,84,91,.55); color: var(--danger); }
+  button:disabled{ opacity:.4; cursor:not-allowed; }
+
+  .stat-grid{
+    display:grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin-top: 12px;
+    font-family: var(--mono); font-size: 12px; color: var(--text-dim);
+  }
+  .stat-grid b{ color: var(--text); font-weight: 600; display:block; font-size: 14px; margin-top: 2px; }
+
+  .badge{
+    display:inline-block; font-family: var(--mono); font-size: 11px; padding: 4px 9px;
+    border: 1px solid var(--line); margin-top: 8px;
+  }
+  .badge.explore{ color: var(--purple); border-color: var(--purple); }
+  .badge.exploit{ color: var(--teal); border-color: var(--teal); }
+
+  .stage-col{ display:flex; flex-direction:column; gap: 18px; }
+  .stage{ background: var(--panel); border: 1px solid var(--line); padding: 18px; margin-top: 18px; }
+  .stage-head{ display:flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+  .stage-head h2{ margin:0; border:none; padding:0; }
+  .stage-head .tag{ font-family: var(--mono); font-size: 11px; color: var(--text-dim); }
+
+  #gridCanvas{ width:100%; aspect-ratio: 720/480; display:block; border: 1px solid var(--line); background: var(--bg-soft); }
+  #rewardCanvas{ width:100%; height:160px; display:block; border: 1px solid var(--line); }
+
+  .legend{ display:flex; align-items:center; gap: 10px; margin-top: 12px; font-family: var(--mono); font-size: 10.5px; color: var(--text-dim); }
+  .legend .bar{ flex:1; height: 8px; background: linear-gradient(90deg, #440154, #3b528b, #21918c, #5ec962, #fde725); }
+
+  footer.note{
+    padding: 20px clamp(16px,4vw,48px) 36px; color: var(--text-dim); font-size: 12.5px; line-height:1.6;
+    border-top: 1px solid var(--line); max-width: 82ch;
+  }
+  footer.note code{ font-family: var(--mono); background: var(--bg-soft); padding: 1px 5px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <p class="eyebrow"><span class="chip"></span>Simulación pedagógica — sin conexión, sin API externas</p>
+  <h1>Aprendizaje por <span>refuerzo</span>: un agente que aprende explorando</h1>
+  <p class="sub">Un agente se mueve por una cuadrícula sin que nadie le diga cuál es el camino correcto. Cada paso le da una recompensa (o un castigo), y con el tiempo actualiza una tabla de valores Q para preferir las acciones que más recompensa acumulan. Cambia los parámetros para ver cómo cambia lo que el agente aprende.</p>
+</header>
+
+<main class="lab">
+  <section>
+    <div class="panel">
+      <h2>1 · Entorno (cuadrícula)</h2>
+      <div class="field">
+        <label>Número de trampas <span class="val" id="v-traps">4</span></label>
+        <input type="range" id="s-traps" min="0" max="10" value="4" step="1">
+      </div>
+      <div class="field">
+        <label>Penalización de trampa <span class="val" id="v-trapPen">-10</span></label>
+        <input type="range" id="s-trapPen" min="1" max="20" value="10" step="1">
+      </div>
+      <div class="field">
+        <label>Recompensa de meta <span class="val" id="v-goalR">10</span></label>
+        <input type="range" id="s-goalR" min="1" max="20" value="10" step="1">
+      </div>
+      <div class="field">
+        <label>Costo por paso <span class="val" id="v-stepCost">-0.05</span></label>
+        <input type="range" id="s-stepCost" min="0" max="200" value="5" step="1">
+      </div>
+      <div class="btn-row">
+        <button id="btnNewGrid">Generar nueva cuadrícula</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>2 · Parámetros de aprendizaje</h2>
+      <div class="field">
+        <label>Tasa de aprendizaje (α) <span class="val" id="v-alpha">0.40</span></label>
+        <input type="range" id="s-alpha" min="1" max="100" value="40" step="1">
+      </div>
+      <div class="field">
+        <label>Factor de descuento (γ) <span class="val" id="v-gamma">0.90</span></label>
+        <input type="range" id="s-gamma" min="1" max="99" value="90" step="1">
+      </div>
+      <div class="field">
+        <label>Exploración (ε) <span class="val" id="v-epsilon">0.25</span></label>
+        <input type="range" id="s-epsilon" min="0" max="100" value="25" step="1">
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>3 · Control de episodios</h2>
+      <div class="btn-row">
+        <button id="btnStep" class="primary">Ejecutar 1 episodio</button>
+        <button id="btnAuto" class="primary">Entrenar automático</button>
+        <button id="btnStop" class="stop" disabled>Detener</button>
+        <button id="btnReset">Reiniciar tabla Q</button>
+      </div>
+      <div class="stat-grid">
+        <div>Episodio <b id="statEpisode">0</b></div>
+        <div>Pasos <b id="statSteps">0</b></div>
+        <div>Recompensa del episodio <b id="statReward">0.00</b></div>
+        <div>Promedio (últimos 20) <b id="statAvg">—</b></div>
+      </div>
+      <span class="badge" id="actionBadge">sin acciones aún</span>
+    </div>
+  </section>
+
+  <section class="stage-col">
+    <div class="stage">
+      <div class="stage-head">
+        <h2>Mundo cuadrícula — valores Q y política aprendida</h2>
+        <span class="tag">color = valor máximo por celda · flecha = mejor acción</span>
+      </div>
+      <canvas id="gridCanvas" width="720" height="480"></canvas>
+      <div class="legend">
+        <span>bajo</span><div class="bar"></div><span>alto</span>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-head">
+        <h2>Curva de recompensa por episodio</h2>
+        <span class="tag">tendencia ascendente = política mejorando</span>
+      </div>
+      <canvas id="rewardCanvas" width="1000" height="200"></canvas>
+    </div>
+  </section>
+</main>
+
+<footer class="note">
+  Cómo leerlo: el agente parte de la esquina superior izquierda (S) y busca llegar a la meta (esquina inferior derecha). En cada paso elige una acción: con probabilidad <code>ε</code> explora al azar (morado), y el resto del tiempo explota lo que ya sabe, tomando la acción de mayor valor Q (verde azulado). Tras cada paso actualiza <code>Q(s,a) += α · (r + γ · max Q(s') − Q(s,a))</code>. Con suficientes episodios, el mapa de calor y las flechas convergen hacia el camino más corto que evita las trampas — el mismo principio detrás de agentes de refuerzo reales, aquí reducido a una cuadrícula observable a simple vista.
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  const ROWS = 6, COLS = 9;
+  const START = { r:0, c:0 };
+  const GOAL  = { r: ROWS-1, c: COLS-1 };
+  const MAX_STEPS = 150;
+  const ACTIONS = 4; // 0 up, 1 down, 2 left, 3 right
+
+  function stateIdx(r,c){ return r*COLS + c; }
+  function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+
+  // ---------- entorno ----------
+  let traps = [];
+  function generateGrid(n){
+    traps = [];
+    const forbidden = new Set([stateIdx(START.r,START.c), stateIdx(GOAL.r,GOAL.c)]);
+    let guard = 0;
+    while(traps.length < n && guard < 500){
+      guard++;
+      const r = Math.floor(Math.random()*ROWS), c = Math.floor(Math.random()*COLS);
+      const idx = stateIdx(r,c);
+      if(forbidden.has(idx)) continue;
+      if(traps.some(t => stateIdx(t.r,t.c)===idx)) continue;
+      traps.push({r,c});
+    }
+  }
+  function isTrap(r,c){ return traps.some(t => t.r===r && t.c===c); }
+
+  // ---------- tabla Q ----------
+  let Q;
+  function resetQ(){ Q = Array.from({length: ROWS*COLS}, () => [0,0,0,0]); }
+
+  function envStep(r,c,a, stepCost, trapPen, goalR){
+    let nr=r, nc=c;
+    if(a===0) nr=r-1; else if(a===1) nr=r+1; else if(a===2) nc=c-1; else if(a===3) nc=c+1;
+    if(nr<0||nr>=ROWS||nc<0||nc>=COLS){ nr=r; nc=c; }
+    let reward = -stepCost, done = false;
+    if(nr===GOAL.r && nc===GOAL.c){ reward = goalR; done = true; }
+    else if(isTrap(nr,nc)){ reward = -trapPen; done = true; }
+    return { nr, nc, reward, done };
+  }
+
+  function chooseAction(state, epsilon){
+    if(Math.random() < epsilon) return { action: Math.floor(Math.random()*ACTIONS), explored:true };
+    const qs = Q[state];
+    let best = 0;
+    for(let a=1;a<ACTIONS;a++) if(qs[a] > qs[best]) best = a;
+    const maxV = qs[best];
+    const cands = [0,1,2,3].filter(a => qs[a]===maxV);
+    return { action: cands[Math.floor(Math.random()*cands.length)], explored:false };
+  }
+
+  function updateQ(state, action, reward, nextState, alpha, gamma, done){
+    const maxNext = done ? 0 : Math.max(...Q[nextState]);
+    Q[state][action] += alpha*(reward + gamma*maxNext - Q[state][action]);
+  }
+
+  // ---------- paleta viridis (interpolación) ----------
+  const VIRIDIS = [
+    [0.00, [68,1,84]], [0.25,[59,82,139]], [0.5,[33,145,140]],
+    [0.75,[94,201,98]], [1.0,[253,231,37]]
+  ];
+  function viridis(t){
+    t = clamp01(t);
+    for(let i=0;i<VIRIDIS.length-1;i++){
+      const [p0,c0] = VIRIDIS[i], [p1,c1] = VIRIDIS[i+1];
+      if(t>=p0 && t<=p1){
+        const f = (t-p0)/(p1-p0);
+        const r = Math.round(c0[0]+(c1[0]-c0[0])*f);
+        const g = Math.round(c0[1]+(c1[1]-c0[1])*f);
+        const b = Math.round(c0[2]+(c1[2]-c0[2])*f);
+        return `rgb(${r},${g},${b})`;
+      }
+    }
+    return `rgb(${VIRIDIS[VIRIDIS.length-1][1].join(',')})`;
+  }
+
+  // ---------- render ----------
+  const gridCanvas = document.getElementById('gridCanvas');
+  const gctx = gridCanvas.getContext('2d');
+  const cell = gridCanvas.width / COLS;
+
+  let agentPos = { r: START.r, c: START.c };
+  let trail = [];
+
+  function drawArrow(cx, cy, action, size, color){
+    gctx.save();
+    gctx.translate(cx, cy);
+    const rot = { 0:-Math.PI/2, 1:Math.PI/2, 2:Math.PI, 3:0 }[action];
+    gctx.rotate(rot);
+    gctx.fillStyle = color;
+    gctx.beginPath();
+    gctx.moveTo(size,0); gctx.lineTo(-size*0.6, size*0.6); gctx.lineTo(-size*0.6,-size*0.6);
+    gctx.closePath(); gctx.fill();
+    gctx.restore();
+  }
+
+  function drawGrid(){
+    gctx.clearRect(0,0,gridCanvas.width, gridCanvas.height);
+
+    let minQ = Infinity, maxQ = -Infinity;
+    for(let s=0;s<Q.length;s++){
+      const m = Math.max(...Q[s]);
+      if(m<minQ) minQ=m; if(m>maxQ) maxQ=m;
+    }
+    if(!isFinite(minQ)){ minQ=0; maxQ=0; }
+    const span = (maxQ-minQ) || 1;
+
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;c++){
+        const x = c*cell, y = r*cell;
+        const s = stateIdx(r,c);
+        const maxV = Math.max(...Q[s]);
+        const t = (maxV-minQ)/span;
+        gctx.fillStyle = viridis(t);
+        gctx.fillRect(x,y,cell,cell);
+        gctx.strokeStyle = 'rgba(13,22,19,0.5)';
+        gctx.strokeRect(x,y,cell,cell);
+
+        if(isTrap(r,c)){
+          gctx.save();
+          gctx.strokeStyle = 'rgba(242,84,91,0.9)'; gctx.lineWidth = 3;
+          gctx.beginPath();
+          for(let i=-cell;i<cell*2;i+=10){
+            gctx.moveTo(x+i,y); gctx.lineTo(x+i+cell,y+cell);
+          }
+          gctx.save(); gctx.beginPath(); gctx.rect(x,y,cell,cell); gctx.clip(); gctx.stroke(); gctx.restore();
+          gctx.restore();
+        } else if(r===GOAL.r && c===GOAL.c){
+          gctx.fillStyle = '#0d1613'; gctx.font = `${cell*0.5}px sans-serif`;
+          gctx.textAlign='center'; gctx.textBaseline='middle';
+          gctx.fillText('★', x+cell/2, y+cell/2+2);
+        } else if(r===START.r && c===START.c){
+          gctx.fillStyle='rgba(13,22,19,0.85)'; gctx.font = `bold ${cell*0.32}px ui-monospace, monospace`;
+          gctx.textAlign='center'; gctx.textBaseline='middle';
+          gctx.fillText('S', x+cell/2, y+cell/2);
+        } else {
+          let best=0; for(let a=1;a<4;a++) if(Q[s][a]>Q[s][best]) best=a;
+          if(Math.max(...Q[s]) !== 0){
+            drawArrow(x+cell/2, y+cell/2, best, cell*0.16, 'rgba(234,242,236,0.85)');
+          }
+        }
+      }
+    }
+
+    // trail
+    trail.forEach((p, i) => {
+      const alpha = (i+1)/trail.length * 0.5;
+      gctx.fillStyle = `rgba(155,107,214,${alpha.toFixed(2)})`;
+      gctx.beginPath();
+      gctx.arc(p.c*cell+cell/2, p.r*cell+cell/2, cell*0.10, 0, Math.PI*2);
+      gctx.fill();
+    });
+
+    // agente
+    gctx.beginPath();
+    gctx.fillStyle = '#f7e05e';
+    gctx.arc(agentPos.c*cell+cell/2, agentPos.r*cell+cell/2, cell*0.22, 0, Math.PI*2);
+    gctx.fill();
+    gctx.strokeStyle = '#0d1613'; gctx.lineWidth = 2; gctx.stroke();
+  }
+
+  function drawRewardChart(history){
+    const canvas = document.getElementById('rewardCanvas');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = '#142019'; ctx.fillRect(0,0,w,h);
+
+    if(history.length < 2){
+      ctx.fillStyle = '#8fa89b'; ctx.font = '12px ui-monospace, monospace';
+      ctx.fillText('Ejecuta al menos un episodio para ver la curva', 16, h/2);
+      return;
+    }
+    const maxR = Math.max(...history), minR = Math.min(...history, 0);
+    const span = (maxR-minR) || 1;
+    const pad = 20;
+    ctx.strokeStyle = '#2c4239';
+    ctx.beginPath();
+    ctx.moveTo(pad, h-pad); ctx.lineTo(w-8, h-pad);
+    ctx.moveTo(pad, 8); ctx.lineTo(pad, h-pad);
+    ctx.stroke();
+
+    // linea cero
+    const zeroY = (h-pad) - ((0-minR)/span)*(h-pad-14);
+    ctx.strokeStyle = 'rgba(143,168,155,0.4)';
+    ctx.beginPath(); ctx.moveTo(pad, zeroY); ctx.lineTo(w-8, zeroY); ctx.stroke();
+
+    ctx.beginPath();
+    ctx.strokeStyle = '#2ec4b6'; ctx.lineWidth = 2;
+    history.forEach((v,i) => {
+      const px = pad + (i/(history.length-1))*(w-pad-14);
+      const py = (h-pad) - ((v-minR)/span)*(h-pad-14);
+      if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    });
+    ctx.stroke();
+
+    ctx.fillStyle = '#8fa89b'; ctx.font = '11px ui-monospace, monospace';
+    ctx.fillText(`máx: ${maxR.toFixed(2)}`, pad, 16);
+    ctx.fillText(`última: ${history[history.length-1].toFixed(2)}`, w-160, 16);
+  }
+
+  // ---------- estado UI ----------
+  const sliders = {
+    traps: document.getElementById('s-traps'),
+    trapPen: document.getElementById('s-trapPen'),
+    goalR: document.getElementById('s-goalR'),
+    stepCost: document.getElementById('s-stepCost'),
+    alpha: document.getElementById('s-alpha'),
+    gamma: document.getElementById('s-gamma'),
+    epsilon: document.getElementById('s-epsilon'),
+  };
+  const vals = {
+    traps: document.getElementById('v-traps'),
+    trapPen: document.getElementById('v-trapPen'),
+    goalR: document.getElementById('v-goalR'),
+    stepCost: document.getElementById('v-stepCost'),
+    alpha: document.getElementById('v-alpha'),
+    gamma: document.getElementById('v-gamma'),
+    epsilon: document.getElementById('v-epsilon'),
+  };
+
+  function params(){
+    return {
+      alpha: sliders.alpha.value/100,
+      gamma: sliders.gamma.value/100,
+      epsilon: sliders.epsilon.value/100,
+      stepCost: sliders.stepCost.value/100,
+      trapPen: Number(sliders.trapPen.value),
+      goalR: Number(sliders.goalR.value),
+    };
+  }
+
+  function refreshReadouts(){
+    vals.traps.textContent = sliders.traps.value;
+    vals.trapPen.textContent = '-' + sliders.trapPen.value;
+    vals.goalR.textContent = sliders.goalR.value;
+    vals.stepCost.textContent = '-' + (sliders.stepCost.value/100).toFixed(2);
+    vals.alpha.textContent = (sliders.alpha.value/100).toFixed(2);
+    vals.gamma.textContent = (sliders.gamma.value/100).toFixed(2);
+    vals.epsilon.textContent = (sliders.epsilon.value/100).toFixed(2);
+  }
+  Object.values(sliders).forEach(s => s.addEventListener('input', () => { refreshReadouts(); if(s!==sliders.traps) return; }));
+
+  let episode = 0;
+  let rewardHistory = [];
+  let stepHandle = null;
+  let autoHandle = null;
+
+  const els = {
+    episode: document.getElementById('statEpisode'),
+    steps: document.getElementById('statSteps'),
+    reward: document.getElementById('statReward'),
+    avg: document.getElementById('statAvg'),
+    badge: document.getElementById('actionBadge'),
+  };
+
+  function setBadge(explored){
+    els.badge.textContent = explored ? 'explorando (acción al azar)' : 'explotando (mejor acción conocida)';
+    els.badge.className = 'badge ' + (explored ? 'explore' : 'exploit');
+  }
+
+  function updateStats(steps, reward){
+    els.episode.textContent = episode;
+    els.steps.textContent = steps;
+    els.reward.textContent = reward.toFixed(2);
+    if(rewardHistory.length){
+      const last20 = rewardHistory.slice(-20);
+      const avg = last20.reduce((a,b)=>a+b,0)/last20.length;
+      els.avg.textContent = avg.toFixed(2);
+    }
+  }
+
+  const btnStep = document.getElementById('btnStep');
+  const btnAuto = document.getElementById('btnAuto');
+  const btnStop = document.getElementById('btnStop');
+  const btnReset = document.getElementById('btnReset');
+  const btnNewGrid = document.getElementById('btnNewGrid');
+
+  function lockControls(locked){
+    btnStep.disabled = locked; btnAuto.disabled = locked; btnReset.disabled = locked; btnNewGrid.disabled = locked;
+    btnStop.disabled = !locked;
+  }
+
+  // ---------- episodio animado paso a paso ----------
+  btnStep.addEventListener('click', () => {
+    lockControls(true);
+    const p = params();
+    agentPos = { r: START.r, c: START.c };
+    trail = [];
+    let steps = 0, totalReward = 0, done = false;
+
+    stepHandle = setInterval(() => {
+      if(done || steps >= MAX_STEPS){
+        clearInterval(stepHandle); stepHandle = null;
+        episode += 1; rewardHistory.push(totalReward);
+        if(rewardHistory.length > 500) rewardHistory.shift();
+        drawRewardChart(rewardHistory);
+        lockControls(false);
+        return;
+      }
+      const s = stateIdx(agentPos.r, agentPos.c);
+      const { action, explored } = chooseAction(s, p.epsilon);
+      const res = envStep(agentPos.r, agentPos.c, action, p.stepCost, p.trapPen, p.goalR);
+      const s2 = stateIdx(res.nr, res.nc);
+      updateQ(s, action, res.reward, s2, p.alpha, p.gamma, res.done);
+      trail.push({ r: agentPos.r, c: agentPos.c });
+      if(trail.length > 40) trail.shift();
+      agentPos = { r: res.nr, c: res.nc };
+      totalReward += res.reward; steps += 1; done = res.done;
+      setBadge(explored);
+      drawGrid();
+      updateStats(steps, totalReward);
+    }, 90);
+  });
+
+  // ---------- entrenamiento automático (episodios rápidos) ----------
+  btnAuto.addEventListener('click', () => {
+    lockControls(true); btnAuto.disabled = true; btnStep.disabled = true;
+    autoHandle = setInterval(() => {
+      const p = params();
+      let r = START.r, c = START.c, steps = 0, totalReward = 0, done = false;
+      let lastExplored = false;
+      trail = [];
+      while(!done && steps < MAX_STEPS){
+        const s = stateIdx(r,c);
+        const { action, explored } = chooseAction(s, p.epsilon);
+        lastExplored = explored;
+        const res = envStep(r,c, action, p.stepCost, p.trapPen, p.goalR);
+        const s2 = stateIdx(res.nr, res.nc);
+        updateQ(s, action, res.reward, s2, p.alpha, p.gamma, res.done);
+        trail.push({r,c});
+        r = res.nr; c = res.nc; totalReward += res.reward; steps += 1; done = res.done;
+      }
+      if(trail.length > 40) trail = trail.slice(-40);
+      agentPos = { r, c };
+      episode += 1; rewardHistory.push(totalReward);
+      if(rewardHistory.length > 500) rewardHistory.shift();
+      setBadge(lastExplored);
+      drawGrid();
+      updateStats(steps, totalReward);
+      drawRewardChart(rewardHistory);
+    }, 45);
+  });
+
+  btnStop.addEventListener('click', () => {
+    if(stepHandle){ clearInterval(stepHandle); stepHandle = null; }
+    if(autoHandle){ clearInterval(autoHandle); autoHandle = null; }
+    lockControls(false);
+  });
+
+  btnReset.addEventListener('click', () => {
+    resetQ();
+    episode = 0; rewardHistory = [];
+    agentPos = { r: START.r, c: START.c }; trail = [];
+    els.badge.textContent = 'sin acciones aún'; els.badge.className = 'badge';
+    drawGrid(); drawRewardChart(rewardHistory); updateStats(0, 0);
+    els.avg.textContent = '—';
+  });
+
+  btnNewGrid.addEventListener('click', () => {
+    generateGrid(Number(sliders.traps.value));
+    resetQ();
+    episode = 0; rewardHistory = [];
+    agentPos = { r: START.r, c: START.c }; trail = [];
+    els.badge.textContent = 'sin acciones aún'; els.badge.className = 'badge';
+    drawGrid(); drawRewardChart(rewardHistory); updateStats(0, 0);
+    els.avg.textContent = '—';
+  });
+
+  // ---------- inicio ----------
+  refreshReadouts();
+  generateGrid(Number(sliders.traps.value));
+  resetQ();
+  drawGrid();
+  drawRewardChart(rewardHistory);
+  updateStats(0, 0);
+})();
+</script>
+</body>
+</html>
